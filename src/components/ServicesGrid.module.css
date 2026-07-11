@@ -1,0 +1,131 @@
+.servicesSection {
+  width: 100%;
+  padding: 80px 0;
+  background-color: #ffffff; /* Fundo totalmente branco */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* --- ÁREA DO CABEÇALHO --- */
+.headerArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b9cd6; /* Azul claro para a tag de categoria */
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #004066; /* Azul escuro institucional */
+  margin: 0;
+}
+
+.viewAllLink {
+  color: #006097;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.viewAllLink:hover {
+  color: #004066;
+}
+
+/* --- GRID DE CARDS --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais no Desktop */
+  gap: 24px;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #eef2f5;
+  border-radius: 12px;
+  padding: 30px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+/* Efeito de Hover igual ao padrão moderno */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 64, 102, 0.06);
+  border-color: #dbe6ee;
+}
+
+.iconBox {
+  background-color: #e6f2f8; /* Fundo azul bem claro para o ícone */
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.icon {
+  color: #006097; /* Cor do ícone interna */
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #004066;
+  margin: 0 0 8px 0;
+}
+
+.cardDescription {
+  font-size: 14px;
+  color: #667085;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas em tablets */
+    }
+}
+
+@media (max-width: 650px) {
+    .headerArea {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr; /* 1 coluna em celulares */
+        gap: 16px;
+    }
+    
+    .title {
+        font-size: 26px;
+    }
+}
