@@ -1,0 +1,92 @@
+.carouselSection {
+  width: 100%;
+  padding: 60px 0;
+  background-color: #f4f7f9; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.headerArea {
+  margin-bottom: 25px;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b9cd6;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #004066;
+  margin: 0;
+}
+
+/* Moldura do carrossel */
+.carouselWrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 16px; 
+  overflow: hidden; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.slide {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- ESTILO DE REDIMENSIONAMENTO DA IMAGEM NEXT.JS --- */
+.bannerImg {
+  width: 100% !important;
+  height: auto !important; /* Mantém a proporção perfeita de 1920x555 sem deformar */
+  display: block;
+}
+
+/* Setas redondas nas laterais */
+.arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #004066;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.arrow:hover {
+  background-color: #004066;
+  color: #ffffff;
+  opacity: 1;
+}
+
+.arrowLeft { left: 24px; }
+.arrowRight { right: 24px; }
+
+@media (max-width: 768px) {
+  .arrow { width: 32px; height: 32px; font-size: 14px; }
+  .arrowLeft { left: 12px; }
+  .arrowRight { right: 12px; }
+}
