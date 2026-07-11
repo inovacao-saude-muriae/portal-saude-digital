@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import styles from './News.module.css';
+import styles from './NewsSection.module.css';
 
-export default function News() {
+export default function NewsSection() {
   // Dados baseados na imagem das suas últimas atualizações
   const newsData = [
     {

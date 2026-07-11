@@ -1,7 +1,8 @@
-import Carousel from "@/components/Carousel";
 import Hero from "@/components/Hero";
-import News from "@/components/SectionNews";
-import ServicesGrid from "@/components/ServicesSection";
+import ServiceSection from "@/components/ServiceSection";
+import Carousel from "@/components/Carousel";
+import NewsSection from "@/components/NewsSection";
+import EventSection from "@/components/EventSection";
 
 export default function Home() {
     return (
@@ -10,15 +11,16 @@ export default function Home() {
         <Hero />
         
         {/* SERVIÇOS */}
-        <ServicesGrid />
+        <ServiceSection />
 
         {/* CAROUSEL */}
         <Carousel />
 
         {/* NEWS */}
-        <News />
+        <NewsSection />
 
         {/* eventos */}
+        <EventSection />
 
         </>
     );

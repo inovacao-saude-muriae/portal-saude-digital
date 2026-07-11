@@ -2,11 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import styles from './ServicesGrid.module.css';
+import styles from './ServiceSection.module.css';
 // Importação dos ícones correspondentes da biblioteca Lucide
 import { Stethoscope, Syringe, Baby, HeartPulse, Pill, Ambulance } from 'lucide-react';
 
-export default function ServicesGrid() {
+export default function ServiceSection() {
     // Array com os dados dos serviços para deixar o código limpo e escalável
     const servicos = [
         {
