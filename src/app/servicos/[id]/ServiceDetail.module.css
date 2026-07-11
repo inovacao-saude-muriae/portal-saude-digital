@@ -1,0 +1,498 @@
+/* ==========================================================================
+   --- ESTRUTURA GLOBAL E COMPONENTES BASE --- 
+   ========================================================================== */
+
+.pageWrapper {
+  width: 100%;
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%; 
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --- HERO BANNER (100% da largura da tela com imagem padrão) --- */
+.heroBanner {
+  width: 100%;
+  background-image: linear-gradient(135deg, rgba(0, 59, 92, 0.95) 0%, rgba(0, 92, 138, 0.85) 100%), url('/img/banner-paginas.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 64px 0; /* Aumenta a altura para dar o porte imponente do print */
+  box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* --- OVERLAY INTERNO --- */
+.overlay {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.heroSubtitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #bae6fd;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff; /* Fica visível perfeitamente sobre o gradiente azul */
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* --- BARRA DE NAVEGAÇÃO SUPERIOR --- */
+.navigationBar {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 14px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #005c8a; 
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+  transform: translateX(-4px);
+}
+
+/* --- ÁREA DE CONTEÚDO --- */
+.mainContent {
+  padding: 40px 0 80px 0;
+}
+
+/* Bloco Informativo PNI */
+.infoBlock {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+}
+
+.infoBlock h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #003b5c;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.blockIcon {
+  font-size: 22px;
+}
+
+.infoBlock p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #475569;
+  margin: 0;
+}
+
+/* --- NAVEGAÇÃO POR ABAS COESAS --- */
+.tabHeader {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  background: #e2e8f0;
+  padding: 6px;
+  border-radius: 12px;
+  max-width: fit-content;
+}
+
+.tabButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+}
+
+.tabButton:hover {
+  color: #003b5c;
+}
+
+.tabButtonActive {
+  color: #003b5c;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   --- ABA 1: GRID DOS CARDS DE CAMPANHAS E VACINAS --- 
+   ========================================================================== */
+
+.vacinacaoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 24px;
+}
+
+.vacinaCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vacinaCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.04);
+}
+
+.vacinaCardTitle {
+  font-size: 22px;
+  color: #003b5c;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.vacinaCardDesc {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.vacinaSection {
+  margin-bottom: 16px;
+  border-bottom: 1px dashed #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.vacinaSection:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* CORREÇÃO VISUAL: Títulos fortes e escuros para contraste total */
+.vacinaSection strong {
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #005c8a;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.vacinaSection p {
+  font-size: 15px;
+  color: #334155;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.vacinaAlerta {
+  margin-top: 20px;
+  background-color: #fff1f2;
+  border-left: 4px solid #f43f5e;
+  padding: 14px 18px;
+  border-radius: 8px;
+}
+
+.vacinaAlerta p {
+  font-size: 14px;
+  color: #9f1239;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   --- ABA 2: DESIGN PREMIUM DA LINHA DO TEMPO (CALENDÁRIO) --- 
+   ========================================================================== */
+
+.calendarContainer {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+/* FAIXA DOS GRUPOS: Alinhada, moderna e espaçada */
+.grupoGrid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  background: #f1f5f9; 
+  padding: 16px;
+  border-radius: 100px;
+  margin-bottom: 32px;
+  border: 1px solid #e2e8f0;
+}
+
+/* BOTÕES REDONDOS REESTILIZADOS */
+.grupoCircleBtn {
+  display: flex;
+  flex-direction: row; /* Layout horizontal fica mais elegante e limpo */
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 10px 24px;
+  height: auto;
+  width: auto;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.grupoCircleBtn:hover {
+  background: #f8fafc;
+  border-color: #005c8a;
+  transform: translateY(-1px);
+}
+
+/* Estado Ativo: Destaque com o Azul do Portal */
+.grupoCircleActive {
+  background: #003b5c !important;
+  border-color: #003b5c !important;
+  box-shadow: 0 8px 16px -4px rgba(0, 59, 92, 0.3);
+}
+
+.grupoEmoji {
+  font-size: 20px;
+}
+
+.grupoLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.2s;
+}
+
+.grupoCircleActive .grupoLabel {
+  color: #ffffff !important;
+}
+
+.calendarSubtext {
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* SANFONAS (ACCORDIONS) MODERNIZADAS */
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.timelineItem {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.timelineItem:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.accordionHeader:hover {
+  background: #f8fafc;
+}
+
+.timelineTime {
+  font-size: 14px;
+  font-weight: 700;
+  color: #005c8a;
+  background-color: #e0f2fe;
+  padding: 6px 14px;
+  border-radius: 30px;
+  display: inline-block;
+  margin-right: 16px;
+}
+
+.timelineName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  flex-grow: 1;
+}
+
+.accordionContent {
+  padding: 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.accordionContent strong {
+  color: #003b5c;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.evitaText {
+  margin: 0;
+  color: #475569;
+}
+
+/* ==========================================================================
+   --- LAYOUT PADRÃO (OUTROS SERVIÇOS DO PORTAL) --- 
+   ========================================================================== */
+
+.infoLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.docList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.docList li {
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.stickyWidget {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+  position: sticky;
+  top: 24px;
+}
+
+.widgetItem {
+  margin-bottom: 24px;
+}
+
+.widgetItem:last-child {
+  margin-bottom: 0;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.widgetIcon {
+  font-size: 18px;
+}
+
+.widgetHeader h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.widgetItem p {
+  font-size: 15px;
+  color: #1e293b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ==========================================================================
+   --- RESPONSIVIDADE COMPLETA --- 
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .infoLayout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .vacinacaoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroTitle { 
+    font-size: 28px; 
+  }
+  .infoBlock, .calendarContainer { 
+    padding: 24px; 
+  }
+  .grupoGrid { 
+    flex-wrap: wrap; 
+    border-radius: 24px; 
+    gap: 12px; 
+    padding: 16px;
+  }
+  .grupoCircleBtn {
+    padding: 8px 16px;
+    width: 100%; /* Em telas pequenas viram blocos empilhados confortáveis */
+    justify-content: center;
+  }
+  .accordionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .timelineTime {
+    margin-right: 0;
+  }
+}

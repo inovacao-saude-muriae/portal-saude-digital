@@ -8,39 +8,39 @@ import styles from './ServicesPage.module.css';
 export default function ServicesPage() {
   const servicos = [
     {
-      id: "atencao-basica",
+      id: "atendimento-domiciliar",
       icon: <Stethoscope size={22} />,
-      title: "Atenção Básica",
+      title: "Atendimento Domiciliar",
       desc: "Consultas médicas, exames de rotina, curativos, pré-natal e acompanhamento de saúde da família nas UBS."
     },
     {
-      id: "vacinacao",
+      id: "camara-tecnica",
       icon: <Syringe size={22} />,
-      title: "Vacinação",
+      title: "Câmara Técnica",
       desc: "Aplicação de vacinas do calendário nacional, campanhas sazonais e imunização de grupos prioritários."
     },
     {
-      id: "saude-da-crianca",
+      id: "farmacia-municipal",
       icon: <Baby size={22} />,
-      title: "Saúde da Criança",
+      title: "Farmácia Municipal",
       desc: "Puericultura, triagem neonatal (teste do pezinho, orelhinha, olhinho) e acompanhamento do desenvolvimento infantil."
     },
     {
-      id: "doencas-cronicas",
+      id: "laboratorio-municipal",
       icon: <HeartPulse size={22} />,
-      title: "Doenças Crônicas",
+      title: "Labortório Municipal",
       desc: "Acompanhamento de hipertensão, diabetes, saúde cardiovascular e programas de prevenção."
     },
     {
-      id: "farmacia-popular",
+      id: "doacao-de-sangue",
       icon: <Pill size={22} />,
-      title: "Farmácia Popular",
+      title: "Doação de Sangue",
       desc: "Dispensação gratuita de medicamentos essenciais e do componente especializado."
     },
     {
-      id: "urgencia-emergencia",
+      id: "vacina",
       icon: <Truck size={22} />,
-      title: "Urgência e Emergência",
+      title: "Vacina",
       desc: "SAMU 192, UPA 24 horas e atendimento pré-hospitalar em toda a cidade."
     }
   ];

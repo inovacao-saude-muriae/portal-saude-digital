@@ -1,0 +1,351 @@
+/* ==========================================================================
+   --- CONFIGURAÇÕES GERAIS DA PÁGINA (ESTILO BEGE PREMIUM) --- 
+   ========================================================================== */
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f7f4eb; /* Cor bege claro de fundo idêntica ao print */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.topContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px 30px 24px;
+  text-align: center;
+}
+
+.badgeTop {
+  display: inline-flex;
+  align-items: center;
+  background-color: #d1eae5;
+  color: #0f6251;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.mainTitle {
+  font-size: 44px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+  letter-spacing: -1px;
+}
+
+.mainSubtitle {
+  font-size: 15px;
+  color: #475569;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   --- SELEÇÃO DOS GRUPOS (AS QUATRO COLUNAS DO TOPO) --- 
+   ========================================================================== */
+.timelineTrackContainer {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+
+/* Linha horizontal cinza que passa por trás dos botões */
+/* ==========================================================================
+   --- SELEÇÃO DOS GRUPOS (QUATRO COLUNAS DO TOPO CORRIGIDAS) --- 
+   ========================================================================== */
+.timelineTrackContainer {
+  position: relative;
+  max-width: 1100px;
+  margin: 40px auto 20px auto; /* Aumenta o espaço para não sufocar o topo */
+}
+
+/* Linha horizontal cinza calibrada para passar exatamente no centro dos círculos */
+.timelineLine {
+  position: absolute;
+  top: 59px; /* Ajuste milimétrico para centralizar horizontalmente com o círculo de 110px */
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background-color: #cbd5e1;
+  z-index: 1;
+}
+
+.grupoFlex {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  z-index: 2;
+}
+
+.grupoCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Botões Circulares Principais Ajustados */
+.circleBtn {
+  width: 114px; /* Ajustado ligeiramente para casar com a proporção do print */
+  height: 114px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+
+.circleBtn:hover {
+  transform: scale(1.03);
+}
+
+/* Estado ativo do círculo (Borda verde-água perfeita) */
+.circleActive {
+  border-color: #008a83 !important;
+  box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.15);
+}
+
+/* Imagens dentro dos botões superiores preenchendo sem distorcer ou vazar */
+.circleImageSrc {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain; /* Mudado para contain caso suas imagens tenham margem interna branca nativa */
+  border-radius: 50%;
+}
+
+/* Pequenas tags cinza (Grávidas, Crianças...) */
+.grupoTag {
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 50px; /* Formato pílula idêntico ao print */
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.grupoTitle {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.grupoDesc {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0 0 14px 0;
+  max-width: 220px;
+  min-height: 40px; /* Mantém a altura fixa prevenindo quebras desalinhadas */
+}
+
+/* Links Dinâmicos de Ação */
+.actionLink {
+  background: none;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700; /* Negrito mais visível como no print */
+  color: #008a83;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+  padding: 4px 8px;
+}
+
+.actionLink:hover {
+  color: #0f6251;
+}
+
+.actionLinkActive {
+  color: #0f6251;
+}/* ==========================================================================
+   --- O QUADRADO/CARD GIGANTE BRANCO DO CONTEÚDO --- 
+   ========================================================================== */
+.containerLayoutBase {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 80px 24px;
+}
+
+.quadradoPainelPrincipal {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px; /* Bordas arredondadas idênticas às do quadrado principal */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+/* Cabeçalho Superior com Linha Divisória de Ponta a Ponta */
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 40px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0; /* Linha cinza divisória interna do quadrado */
+}
+
+/* Área de Conteúdo abaixo da Linha Divisória */
+.quadradoConteudoInterno {
+  padding: 32px 40px 40px 40px;
+}
+
+/* Avatar em miniatura circular com borda verde-água fina */
+.groupAvatarCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid #008a83;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  flex-shrink: 0;
+}
+
+.avatarEmoji {
+  font-size: 32px;
+}
+
+.groupHeaderTitle {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.groupHeaderSubtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 15px;
+  color: #008a83;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   --- GRID INTERNO DOS CARDS DE VACINA --- 
+   ========================================================================== */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Distribuição exata em 3 colunas iguais */
+  gap: 20px;
+}
+
+.vacinaCard {
+  background-color: #fcfbfa; /* Leve tom marfim interno dos cards */
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 120px;
+}
+
+.cardHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Badges em formato de Pílula Arredondada */
+.idadeBadge {
+  background-color: #d1eae5;
+  color: #0f6251;
+  padding: 4px 14px;
+  border-radius: 50px; /* Transforma em pílula perfeita */
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rotuloTexto {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.vacinaList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vacinaList li {
+  font-size: 14.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.bulletPoint {
+  color: #008a83;
+  font-weight: 700;
+}
+
+.vacinaTexto {
+  color: #1e293b;
+}
+
+/* ==========================================================================
+   --- RESPONSIVIDADE ADAPTATIVA --- 
+   ========================================================================== */
+@media (max-width: 992px) {
+  .grupoFlex { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 32px 16px; 
+  }
+  .timelineLine { 
+    display: none; 
+  }
+  .cardsGrid { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .quadradoConteudoInterno, .groupHeader { 
+    padding: 24px; 
+  }
+}
+
+@media (max-width: 640px) {
+  .grupoFlex { 
+    grid-template-columns: 1fr; 
+    gap: 24px;
+  }
+  .cardsGrid { 
+    grid-template-columns: 1fr; 
+  }
+  .mainTitle {
+    font-size: 32px;
+  }
+}
