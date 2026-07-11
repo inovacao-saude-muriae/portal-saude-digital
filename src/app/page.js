@@ -1,5 +1,6 @@
 import Carousel from "@/components/Carousel";
 import Hero from "@/components/Hero";
+import News from "@/components/News";
 import ServicesGrid from "@/components/ServicesGrid";
 
 export default function Home() {
@@ -13,6 +14,12 @@ export default function Home() {
 
         {/* CAROUSEL */}
         <Carousel />
+
+        {/* NEWS */}
+        <News />
+
+        {/* eventos */}
+
         </>
     );
 }
