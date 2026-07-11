@@ -1,0 +1,190 @@
+.footer {
+  width: 100%;
+  background-color: #003656; /* Azul escuro idêntico ao do print */
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1.2fr 1fr; /* Distribuição proporcional das colunas */
+  gap: 40px;
+}
+
+.footerTop {
+  padding: 60px 0;
+}
+
+/* --- COLUNA 1: MARCA --- */
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logoIcon {
+  background-color: #006097;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.logoArea h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.brandDesc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e2e8f0;
+  margin: 0 0 24px 0;
+  max-width: 260px;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 12px;
+}
+
+.socialIcons a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.socialIcons a:hover {
+  background-color: #3b9cd6;
+}
+
+/* --- COLUNA 2: LINKS --- */
+.column h4 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+  color: #ffffff;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linkList a {
+  color: #e2e8f0;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.linkList a:hover {
+  color: #3b9cd6;
+}
+
+/* --- COLUNA 3: CONTATOS --- */
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.infoRow p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.infoIcon {
+  color: #3b9cd6;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.subText {
+  color: #94a3b8;
+}
+
+/* --- COLUNA 4: HORÁRIOS --- */
+.timeList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+.emergency {
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+/* --- BARRA INFERIOR --- */
+.footerBottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.containerBottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.containerBottom p {
+  margin: 0;
+}
+
+.prefeituraText {
+  font-weight: 500;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) {
+  .container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  
+  .containerBottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
