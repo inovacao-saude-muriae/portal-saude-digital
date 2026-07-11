@@ -44,29 +44,18 @@
 }
 
 /* ==========================================================================
-   --- SELEÇÃO DOS GRUPOS (AS QUATRO COLUNAS DO TOPO) --- 
+   --- SELEÇÃO DOS GRUPOS (QUATRO COLUNAS DO TOPO) --- 
    ========================================================================== */
 .timelineTrackContainer {
   position: relative;
   max-width: 1100px;
-  margin: 0 auto;
-  padding-bottom: 20px;
-}
-
-/* Linha horizontal cinza que passa por trás dos botões */
-/* ==========================================================================
-   --- SELEÇÃO DOS GRUPOS (QUATRO COLUNAS DO TOPO CORRIGIDAS) --- 
-   ========================================================================== */
-.timelineTrackContainer {
-  position: relative;
-  max-width: 1100px;
-  margin: 40px auto 20px auto; /* Aumenta o espaço para não sufocar o topo */
+  margin: 40px auto 20px auto; /* Espaço ideal para o topo */
 }
 
 /* Linha horizontal cinza calibrada para passar exatamente no centro dos círculos */
 .timelineLine {
   position: absolute;
-  top: 59px; /* Ajuste milimétrico para centralizar horizontalmente com o círculo de 110px */
+  top: 59px; /* Centralização perfeita na metade dos botões de 114px */
   left: 12%;
   right: 12%;
   height: 2px;
@@ -91,7 +80,7 @@
 
 /* Botões Circulares Principais Ajustados */
 .circleBtn {
-  width: 114px; /* Ajustado ligeiramente para casar com a proporção do print */
+  width: 114px; 
   height: 114px;
   border-radius: 50%;
   border: 4px solid #ffffff;
@@ -122,22 +111,56 @@
 .circleImageSrc {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain; /* Mudado para contain caso suas imagens tenham margem interna branca nativa */
+  object-fit: contain; 
   border-radius: 50%;
 }
 
-/* Pequenas tags cinza (Grávidas, Crianças...) */
-.grupoTag {
-  background-color: #e2e8f0;
-  color: #475569;
-  font-size: 12px;
+/* --- ESTILO BASE DINÂMICO DAS TAGS/PÍLULAS --- */
+.grupoBaseTag {
+  font-size: 13px;
   font-weight: 600;
-  padding: 4px 14px;
-  border-radius: 50px; /* Formato pílula idêntico ao print */
+  padding: 4px 16px;
+  border-radius: 50px;
   margin-bottom: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  line-height: 1;
+  transition: all 0.25s ease; /* Transição de cor suave ao alternar cliques */
+}
+
+/* Alinhamento fino para centralizar o mini ícone vetorial SVG */
+.tagIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- ESTADO INATIVO DEFAULT (Fundo cinza-creme sutil) --- */
+.tagInativa {
+  background-color: #edeae4;
+  color: #64748b;
+}
+
+/* --- ESTADOS ATIVOS COLORIDOS INTERATIVOS (Apenas quando clicados) --- */
+.tagGravidasAtiva {
+  background-color: #fce4e4; /* Vermelho/Rosa suave */
+  color: #c24141;
+}
+
+.tagCriancasAtiva {
+  background-color: #d1eae5; /* Azul esmaecido do print */
+  color: #0f6251;
+}
+
+.tagAdolescentesAtiva {
+  background-color: #e7f2eb; /* Verde menta */
+  color: #1e5a3e;
+}
+
+.tagIdososAtiva {
+  background-color: #fef3c7; /* Amarelo/Dourado suave */
+  color: #b45309;
 }
 
 .grupoTitle {
@@ -153,7 +176,7 @@
   line-height: 1.4;
   margin: 0 0 14px 0;
   max-width: 220px;
-  min-height: 40px; /* Mantém a altura fixa prevenindo quebras desalinhadas */
+  min-height: 40px; /* Previne desalinhamentos na quebra de linha de texto */
 }
 
 /* Links Dinâmicos de Ação */
@@ -161,7 +184,7 @@
   background: none;
   border: none;
   font-size: 13.5px;
-  font-weight: 700; /* Negrito mais visível como no print */
+  font-weight: 700; /* Negrito visível como no print */
   color: #008a83;
   cursor: pointer;
   display: inline-flex;
@@ -177,7 +200,9 @@
 
 .actionLinkActive {
   color: #0f6251;
-}/* ==========================================================================
+}
+
+/* ==========================================================================
    --- O QUADRADO/CARD GIGANTE BRANCO DO CONTEÚDO --- 
    ========================================================================== */
 .containerLayoutBase {
@@ -191,7 +216,7 @@
   width: 100%;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 24px; /* Bordas arredondadas idênticas às do quadrado principal */
+  border-radius: 24px; /* Bordas idênticas às do painel do print */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   overflow: hidden;
 }
@@ -203,7 +228,7 @@
   gap: 20px;
   padding: 32px 40px;
   background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0; /* Linha cinza divisória interna do quadrado */
+  border-bottom: 1px solid #e2e8f0; /* Linha cinza divisória interna */
 }
 
 /* Área de Conteúdo abaixo da Linha Divisória */
@@ -223,10 +248,14 @@
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-.avatarEmoji {
-  font-size: 32px;
+.avatarImageSrc {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .groupHeaderTitle {
@@ -257,12 +286,12 @@
    ========================================================================== */
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Distribuição exata em 3 colunas iguais */
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas exatas do print */
   gap: 20px;
 }
 
 .vacinaCard {
-  background-color: #fcfbfa; /* Leve tom marfim interno dos cards */
+  background-color: #fcfbfa; /* Tom marfim interno */
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 24px;
@@ -281,7 +310,7 @@
   background-color: #d1eae5;
   color: #0f6251;
   padding: 4px 14px;
-  border-radius: 50px; /* Transforma em pílula perfeita */
+  border-radius: 50px; /* Pílula perfeita */
   font-size: 13px;
   font-weight: 600;
 }
