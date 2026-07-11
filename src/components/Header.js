@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
-import styles from './Header.modules.css';
-import Image from 'next/image';
+"use client";
 
-const logoSecretaria = '/img/logo-secretaria.png';
+import React, { useState } from 'react';
+import styles from './Header.module.css'; 
+import Image from 'next/image';
+import Link from 'next/link'; // <-- 1. IMPORTA O LINK DO NEXT.JS PARA NAVEGAÇÃO INTERNA
+import { usePathname } from 'next/navigation';
+
+const logoSecretaria = '/img/logo-Prefeitura.png'; 
 
 export default function Header() {
     const [menuAberto, setMenuAberto] = useState(false);
+    const pathname = usePathname(); // Captura a página real atual
     const toggleMenu = () => {
         setMenuAberto(!menuAberto);
+    };
+
+    // Função que verifica se a rota do botão é a mesma da URL do navegador
+    const isActive = (path) => {
+        return pathname === path ? styles.activeLink : "";
     };
 
     return (
@@ -16,13 +26,13 @@ export default function Header() {
             <div className={styles.topBar}>
                 <div className={`${styles.container} ${styles.topBarContainer}`}>
                     <div className={styles.topBarLeft}>
-                        <span>(32)3696-3305</span>
-                        <span>Av. Maestro Sansão</span>
+                        <span>📞 (32) 3696-3305</span>
+                        <span>📍 Av. Maestro Sansão</span>
                     </div>
                     <div className={styles.topBarRight}>
-                        <a href="#ouvidoria">Ouvidoria</a>
-                        <span className={styles.divider}>|</span>
-                        <a href="#transparecia">Transparência</a>
+                        <Link href="/ouvidoria" className={isActive('/ouvidoria')}>Ouvidoria</Link>
+                        <span className={styles.divisor}>|</span> 
+                        <Link href="/transparencia" className={isActive('/transparencia')}>Transparência</Link>
                     </div>
                 </div>
             </div>
@@ -34,7 +44,7 @@ export default function Header() {
                     <div className={styles.brand}>
                         <div className={styles.logoBox}>
                             <Image 
-                                src={logoSecretariaPath} 
+                                src={logoSecretaria} 
                                 alt="Logo Secretaria de Saúde do Município" 
                                 width={45}  
                                 height={45} 
@@ -43,7 +53,7 @@ export default function Header() {
                             />
                         </div>
                         <div className={styles.brandText}>
-                            <span className={styles.subTitle}>Prefeitura Municipal</span>
+                            <span className={styles.subTitle}>Prefeitura Municipal de Muriaé</span>
                             <h1 className={styles.mainTitle}>Secretaria de Saúde</h1>
                         </div>
                     </div>
@@ -55,17 +65,17 @@ export default function Header() {
                         <span className={`${styles.bar} ${menuAberto ? styles.transform : ""}`}></span>
                     </button>
 
-                    {/*LINKS DE NAVEGAÇÃO*/}
+                    {/* LINKS DE NAVEGAÇÃO CORRIGIDOS */}
                     <nav className={`${styles.navMenu} ${menuAberto ? styles.active : ""}`}>
-                        <a href="#inicio" className={styles.navItem}>Início</a>
-                        <a href="#secretaria" className={styles.navItem}>A Secretaria</a>
-                        <a href="#servicos" className={styles.navItem}>Serviços</a>
-                        <a href="#noticias" className={`${styles.navItem} ${styles.activeLink}`}>Notícias</a>
-                        <a href="#eventos" className={styles.navItem}>Eventos</a>
-                        <a href="#contato" className={styles.navItem}>Contato</a>
+                        <Link href="/" className={`${styles.navItem} ${isActive('/')}`}>Início</Link>
+                        <Link href="/secretaria" className={`${styles.navItem} ${isActive('/secretaria')}`}>A Secretaria</Link>
+                        <Link href="/servicos" className={`${styles.navItem} ${isActive('/servicos')}`}>Serviços</Link>
+                        <Link href="/noticias" className={`${styles.navItem} ${isActive('/noticias')}`}>Notícias</Link>
+                        <Link href="/eventos" className={`${styles.navItem} ${isActive('/eventos')}`}>Eventos</Link>
+                        <Link href="/contato" className={`${styles.navItem} ${isActive('/contato')}`}>Contato</Link>
                     </nav>
                 </div>
             </div>
         </header>    
-    )
+    );
 }
