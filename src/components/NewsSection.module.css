@@ -72,16 +72,18 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* --- MOLDURA CRÍTICA DA IMAGEM --- */
 .imageWrapper {
-  position: relative; /* OBRIGATÓRIO para o fill do Next.js */
+  position: relative; 
   width: 100%;
-  aspect-ratio: 16 / 10; /* Define a proporção perfeita do topo do cartão */
-  background-color: #e2e8f0; /* Fundo cinza enquanto a imagem carrega */
+  aspect-ratio: 31 / 12; 
+  background-color: #e2e8f0; 
+  overflow: hidden; 
 }
 
 .cardImage {
-  object-fit: cover !important; /* Preenche o espaço todo sem distorcer a imagem */
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover; 
 }
 
 /* Conteúdo de texto do cartão */

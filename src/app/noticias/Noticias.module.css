@@ -1,0 +1,190 @@
+/* ==========================================================================
+   --- CONFIGURAÇÕES GERAIS DA PÁGINA --- 
+   ========================================================================== */
+.pageWrapper {
+  width: 100%;
+  background-color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==========================================================================
+   --- HERO BANNER (IGUAL SERVIÇOS) --- 
+   ========================================================================== */
+.heroBanner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 355; 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 40px 0; 
+  background: linear-gradient(to right, rgba(0, 59, 92, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.heroSubtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.heroTitle {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.heroDesc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 650px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   --- CONTEÚDO CENTRAL E GRELHA --- 
+   ========================================================================== */
+.contentSection {
+  padding: 60px 0 80px 0;
+}
+
+.gridNoticias {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ==========================================================================
+   --- CARDS ESTILIZADOS SEGUINDO O PADRÃO DA IMAGEM --- 
+   ========================================================================== */
+.cardNoticia {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 59, 92, 0.01);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cardNoticia:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 59, 92, 0.06);
+}
+
+.capsulaImagem {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  background-color: #e2e8f0;
+}
+
+.imagemNoticiaSrc {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.infoCard {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.badgeCategoria {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 50px;
+}
+
+/* Categorias customizadas */
+.catVacinacao {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.catInfra {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+.catPrevencao {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.dataText {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.tituloCard {
+  font-size: 18px;
+  font-weight: 700;
+  color: #003b5c; /* Mantém a paleta institucional do município */
+  line-height: 1.4;
+  margin: 0 0 10px 0;
+}
+
+.resumoCard {
+  font-size: 14px;
+  color: #627d98;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+}
+
+.leiaMaisBtn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #005c8a;
+  margin-top: auto;
+  display: inline-flex;
+}
+
+/* ==========================================================================
+   --- RESPONSIVIDADE --- 
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .gridNoticias { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .heroBanner { aspect-ratio: auto; min-height: 240px; }
+  .heroTitle { font-size: 32px; }
+  .gridNoticias { grid-template-columns: 1fr; }
+}

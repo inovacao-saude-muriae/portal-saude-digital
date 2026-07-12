@@ -3,60 +3,66 @@
 import React from 'react';
 import Link from 'next/link';
 import styles from './ServiceSection.module.css';
-// Importação dos ícones correspondentes da biblioteca Lucide
-import { Stethoscope, Syringe, Baby, HeartPulse, Pill, Ambulance } from 'lucide-react';
+import { 
+  Home,           // Para Atendimento Domiciliar
+  ClipboardList,  // Para Câmara Técnica
+  Pill,           // Para Farmácia Municipal
+  Ambulance,      // Para Fluxos Assistenciais / Urgência
+  Syringe,        // Para Vacinação (Universal)
+  ChartNoAxesCombined     // Para Transparência / Conformidade (ou BarChart / Eye)
+} from 'lucide-react';
 
 export default function ServiceSection() {
-    // Array com os dados dos serviços para deixar o código limpo e escalável
+    
     const servicos = [
         {
             id: 1,
             title: "Atendimento Domiciliar",
-            description: "Consultas, exames e acompanhamento nas UBS.",
-            icon: <Stethoscope size={22} className={styles.icon} />,
-            link: "/servicos/atencao-basica"
+            description: "Consultas, exames e acompanhamento no conforto do lar.",
+            icon: <Home size={22} className={styles.icon} />,
+            link: "/servicos/atendimento-domiciliar"
         },
         {
             id: 2,
-            title: "Camara técnica",
-            description: "Calendário nacional e campanhas sazonais.",
-            icon: <Syringe size={22} className={styles.icon} />,
-            link: "/servicos/vacinacao"
+            title: "Câmara Técnica",
+            description: "Análises, protocolos médicos e diretrizes de saúde.",
+            icon: <ClipboardList size={22} className={styles.icon} />,
+            link: "/servicos/camara-tecnica"
         },
         {
             id: 3,
-            title: "Vacinação",
-            description: "Puericultura, triagem neonatal e vacinas.",
-            icon: <Baby size={22} className={styles.icon} />,
-            link: "/servicos/saude-da-crianca"
-        },
-        {
-            id: 4,
             title: "Farmácia Municipal",
             description: "Dispensação gratuita de medicamentos.",
             icon: <Pill size={22} className={styles.icon} />,
-            link: "/servicos/farmacia-popular"
+            link: "/servicos/farmacia-municipal"
+        },
+        {
+            id: 4,
+            title: "Fluxos Assistenciais",
+            description: "Atendimento móvel de urgência 24h e encaminhamentos.",
+            icon: <Ambulance size={22} className={styles.icon} />,
+            link: "/servicos/fluxos-assistenciais"
         },
         {
             id: 5,
-            title: "Transparência",
-            description: "Hipertensão, diabetes e saúde mental.",
-            icon: <HeartPulse size={22} className={styles.icon} />,
-            link: "/servicos/programas-cronicos"
+            title: "Vacinação",
+            description: "Calendário nacional, triagem e campanhas sazonais.",
+            icon: <Syringe size={22} className={styles.icon} />,
+            link: "/servicos/vacina"
         },
         {
             id: 6,
-            title: "Fluxos assistênciais",
-            description: "Atendimento móvel de urgência 24h.",
-            icon: <Ambulance size={22} className={styles.icon} />,
-            link: "/servicos/samu"
+            title: "Transparência",
+            description: "Prestação de contas, relatórios e dados da saúde.",
+            icon: <ChartNoAxesCombined size={22} className={styles.icon} />,
+            link: "/servicos/transparencia"
         }
     ];
 
     return (
         <section className={styles.servicesSection}>
             <div className={styles.container}>
-                
+
                 {/* CABEÇALHO DA SEÇÃO */}
                 <div className={styles.headerArea}>
                     <div className={styles.titleWrapper}>
@@ -80,7 +86,6 @@ export default function ServiceSection() {
                         </Link>
                     ))}
                 </div>
-
             </div>
         </section>
     );

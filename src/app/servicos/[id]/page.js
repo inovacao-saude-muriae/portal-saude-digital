@@ -109,20 +109,8 @@ const dbServicos = {
     ],
     comunicacao: "Informações de Coleta em Muriaé: Toda quarta-feira, das 7h30 às 15h, no Posto Avançado de Coleta Externa (PACE). Localizado na Rua Dr. Ivan Américo / R. Menotti Porcaro, s/n – Centro (Prédio do antigo Viva a Vida)."
   },
-  "vacinacao": {
-    title: "Proteção e Imunização para toda a População",
-    desc: "A vacinação é uma das estratégias mais eficazes para proteger a saúde da população e promover uma sociedade mais segura e saudável. Além de prevenir doenças graves, contribui para a redução da circulação de vírus e bactérias, protegendo especialmente as pessoas mais vulneráveis.\n\nNo Brasil, a política de vacinação é coordenada pelo Programa Nacional de Imunizações (PNI) do SUS, garantindo acesso integral e gratuito a uma ampla oferta de imunobiológicos. Atualmente, são disponibilizados 47 itens, incluindo vacinas, soros e imunoglobulinas. As vacinas contemplam tanto o Calendário Nacional de Vacinação quanto às imunizações especiais destinadas a pessoas com condições clínicas crônicas ou imunossuprimidas, oferecidas nos Centros de Referência para Imunobiológicos Especiais (CRIE).",
-    requisitos: "Apresentar documento de identificação e, preferencialmente, o cartão de vacina.",
-    documentos: [
-      "Documento de identidade oficial com foto (RG, CNH) ou Certidão de Nascimento (para crianças).",
-      "Cartão Nacional de Saúde (CNS) ou CPF.",
-      "Caderneta/Cartão de Vacinação atual (se possuir)."
-    ],
-    onde: "Salas de vacina das Unidades Básicas de Saúde (UBS) e pontos estratégicos durante campanhas.",
-    horario: "Segunda a sexta-feira, das 08h às 16h30 (pode variar conforme a unidade)."
-  },
   "vacina": {
-    title: "Proteção e Imunização para toda a População",
+    title: "Vacina",
     desc: "A vacinação é uma das estratégias mais eficazes para proteger a saúde da população e promover uma sociedade mais segura e saudável. Além de prevenir doenças graves, contribui para a redução da circulação de vírus e bactérias, protegendo especialmente as pessoas mais vulneráveis.\n\nNo Brasil, a política de vacinação é coordenada pelo Programa Nacional de Imunizações (PNI) do SUS, garantindo acesso integral e gratuito a uma ampla oferta de imunobiológicos. Atualmente, são disponibilizados 47 itens, incluindo vacinas, soros e imunoglobulinas. As vacinas contemplam tanto o Calendário Nacional de Vacinação quanto às imunizações especiais destinadas a pessoas com condições clínicas crônicas ou imunossuprimidas, oferecidas nos Centros de Referência para Imunobiológicos Especiais (CRIE).",
     requisitos: "Apresentar documento de identificação e, preferencialmente, o cartão de vacina.",
     documentos: [
