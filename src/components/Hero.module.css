@@ -1,15 +1,33 @@
 .heroSection {
     width: 100%;
     min-height: 550px;
-    position: relative;
-    background-image: linear-gradient(to right, rgba(0, 64, 102, 0.9) 30%, rgba(0, 64, 102, 0.5) 100%), url('/img/fundo-hospital.jpg');
+    position: relative; /* Mantido para ancorar o overlay e os textos */
+    
+    /* CORRIGIDO: Deixamos apenas a imagem pura aqui para o Next.js mapear a partir da pasta public */
+    background-image: url('/img/banner-home.png');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    
     display: flex;
     align-items: center;
     padding: 60px 0;
     color: #ffffff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+
+/* CAMADA DE GRADIENTE AZUL PROFISSIONAL (IGUAL AO SEU PRINT) */
+.heroSection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradiente idêntico ao que você criou, cobrindo perfeitamente a foto */
+    background: linear-gradient(to right, rgba(0, 64, 102, 0.95) 30%, rgba(0, 64, 102, 0.5) 100%);
+    z-index: 1; /* Fica acima da foto, mas abaixo do texto */
 }
 
 .container {
@@ -21,6 +39,8 @@
     justify-content: space-between;
     align-items: center;
     gap: 40px;
+    position: relative; 
+    z-index: 2; /* CORRIGIDO: Joga todo o conteúdo (textos e vidros) para a FRENTE do azul */
 }
 
 /* --- LADO ESQUERDO --- */
