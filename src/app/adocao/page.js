@@ -5,7 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from './Adocao.module.css';
 
-// BANCO DE DADOS ATUALIZADO COM OS 38 ANIMAIS DO CCZ
+// URL DO SEU SCRIPT DO GOOGLE SHEETS
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUUUek2JT-XM_zDaK44_4kYQq6gLNo4x8w4fe1kr46ubM4Kmn98suVymRL_XF14IYg/exec";
+
+// BANCO DE DADOS DE ANIMAIS DO CCZ
 const animaisDisponiveis = [
   {
     "id": 1,
@@ -13,7 +16,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho é dócil, carinhoso e amoroso — daqueles que conquista com o olhar e retribui com afeto sincero. Já está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia, prontinho para ser adotado com segurança e responsabilidade. Está no CCZ desde 2023, sonhando com uma família que lhe ofereça o carinho e o lar que ele tanto merece. Se você acredita no poder da adoção e quer transformar uma vida (e a sua também), venha conhecê-lo. Ele pode ser o companheiro que faltava na sua história.",
+    "descricao": "Esse peludinho é dócil, carinhoso e amoroso — daqueles que conquista com o olhar e retribui com afeto sincero. Já está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia, prontinho para ser adotado com segurança e responsabilidade. Está no CCZ desde 2023, sonhando com uma família que lhe ofereça o carinho e o lar que ele tanto merece.",
     "foto": "/img/animais/Amigao.jpeg"
   },
   {
@@ -22,7 +25,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa SRD de porte médio tem cerca de 2 anos e é uma parceira incrível: dócil, amorosa e extremamente companheira. Já está castrada, vacinada contra a raiva, vermifugada e com a saúde em dia — pronta para começar uma nova vida ao seu lado. Está no CCZ desde 2023, aguardando por alguém que enxergue seu coração gigante e ofereça o lar que ela tanto merece. Se você procura uma amiga leal, cheia de afeto e pronta para caminhar ao seu lado, venha conhecê-la. Ela pode ser o início de uma linda história.",
+    "descricao": "Essa SRD de porte médio tem cerca de 2 anos e é uma parceira incrível: dócil, amorosa e extremamente companheira. Já está castrada, vacinada contra a raiva, vermifugada e com a saúde em dia — pronta para começar uma nova vida ao seu lado. Está no CCZ desde 2023.",
     "foto": "/img/animais/Amora.jpeg"
   },
   {
@@ -31,7 +34,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Bela é SRD, aproximadamente 1 ano de idade, castrada, vermifugada, controle de ectoparasitas em dia, vacinada para raiva, está no CCZ aproxidamente 3 mseses. Dócil, carinhosa, carente e brincalhona.",
+    "descricao": "Bela é SRD, aproximadamente 1 ano de idade, castrada, vermifugada, controle de ectoparasitas em dia, vacinada para raiva, está no CCZ aproximadamente 3 meses. Dócil, carinhosa, carente e brincalhona.",
     "foto": "/img/animais/Bela.jpeg"
   },
   {
@@ -40,7 +43,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho já está castrado, vacinado contra a raiva, com o controle de ectoparasitas em dia e vermifugado — prontinho para fazer parte da sua família! Ele é dócil, brincalhão e tem um jeitinho especial: adora dar abraços! Está no CCZ desde 2021, esperando ansiosamente por uma chance de ser amado e viver momentos felizes ao seu lado. Se você procura um companheiro fiel e carinhoso, venha conhecê-lo. Quem sabe ele não é o amor que faltava na sua vida?",
+    "descricao": "Esse peludinho já está castrado, vacinado contra a raiva, com o controle de ectoparasitas em dia e vermifugado — prontinho para fazer parte da sua família! Ele é dócil, brincalhão e tem um jeitinho especial: adora dar abraços!",
     "foto": "/img/animais/Belisario.jpeg"
   },
   {
@@ -49,7 +52,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho é dócil, carinhoso, amoroso e carente — daqueles que só querem atenção, afeto e um cantinho seguro para chamar de seu. Já está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia, prontinho para ser acolhido com responsabilidade e muito amor. Está no CCZ desde 2025, esperando por uma família que enxergue seu jeitinho doce e ofereça o lar que ele tanto merece. Se você tem espaço no coração para um amigo fiel e carente de afeto, venha conhecê-lo. Ele pode ser o elo que faltava na sua vida.",
+    "descricao": "Esse peludinho é dócil, carinhoso, amoroso e carente — daqueles que só querem atenção, afeto e um cantinho seguro para chamar de seu. Vacinado contra a raiva e vermifugado.",
     "foto": "/img/animais/Bento.jpeg"
   },
   {
@@ -58,7 +61,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinha é castrada, vacinada contra a raiva, com controle de ectoparasitas em dia e vermifugada — prontinha para conquistar seu coração! Ela é dócil, brincalhona, carinhosa e uma verdadeira sobrevivente da cinomose, mostrando que força e ternura podem andar lado a lado. Cada abraço dela é um lembrete de que o amor supera qualquer desafio. Se você busca uma companheira leal, cheia de energia e afeto, venha conhecê-la. Ela está esperando por um lar onde possa viver cercada de carinho e segurança.",
+    "descricao": "Essa peludinha é castrada, vacinada contra a raiva, com controle de ectoparasitas em dia e vermifugada. Dócil, brincalhona e sobrevivente da cinomose.",
     "foto": "/img/animais/Beyonce.jpeg"
   },
   {
@@ -66,8 +69,8 @@ const animaisDisponiveis = [
     "nome": "Bibi",
     "especie": "Cachorro",
     "sexo": "femea",
-    "filhote": "false",
-    "descricao": "Bibi é SRD mestiça com basset, aproximadamente 4 mses de idade, vacinada para raiva, controle de ectoparasitas, vermifgada, está no CCZ a mais ou menos 2 semanas. Dócil e carinhosa.",
+    "filhote": "true",
+    "descricao": "Bibi é SRD mestiça com basset, aproximadamente 4 meses de idade, vacinada para raiva, controle de ectoparasitas e vermifugada. Dócil e carinhosa.",
     "foto": "/img/animais/Bibi.jpeg"
   },
   {
@@ -76,7 +79,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Bode é um SRD de porte médio, com 4 anos, que está no CCZ desde 2025. Já está castrado, vacinado e vermifugado, pronto para ser acolhido com responsabilidade. É um cão ativo, instável e muito companheiro — precisa de um ambiente com espaço, rotina e alguém que compreenda seu perfil. Com paciência e dedicação, ele tem tudo para se tornar um parceiro fiel e cheio de personalidade. Se você tem disposição e carinho para oferecer, venha conhecer o Bode. Ele pode ser o amigo que vai transformar seus dias.",
+    "descricao": "O Bode é um SRD de porte médio, com 4 anos. Já está castrado, vacinado e vermifugado. É ativo, instável e muito companheiro.",
     "foto": "/img/animais/Bode.jpeg"
   },
   {
@@ -85,7 +88,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Com cerca de 5 anos, essa peludinha é dócil, amorosa e carinhosa — uma companheira pronta para retribuir cada gesto de afeto com lealdade e ternura. Está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia, além de ter superado a cinomose com força e coragem. Desde 2023 no CCZ, ela aguarda por alguém que lhe ofereça o lar que tanto merece. Se você acredita em recomeços e quer fazer parte da história de uma sobrevivente cheia de amor, venha conhecê-la. Ela está pronta para ser sua melhor amiga.",
+    "descricao": "Com cerca de 5 anos, essa peludinha é dócil e amorosa. Vacinada contra a raiva, vermifugada e curada da cinomose.",
     "foto": "/img/animais/Branca.jpeg"
   },
   {
@@ -94,7 +97,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinha é uma verdadeira guerreira: curada da cinomose, hoje está saudável, forte e cheia de amor para dar! Ela está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia — prontinha para ser adotada com segurança e responsabilidade. Está no CCZ desde 2023, esperando por uma família que reconheça sua força e ofereça o carinho que ela tanto merece. Se você acredita no poder da superação e quer uma companheira leal e cheia de gratidão, venha conhecê-la. Ela pode ser o novo amor da sua vida!",
+    "descricao": "Verdadeira guerreira: curada da cinomose, hoje está saudável, forte e cheia de amor para dar! Vacinada e vermifugada.",
     "foto": "/img/animais/Cardosinha.jpeg"
   },
   {
@@ -103,7 +106,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Chicó é um SRD caramelo padrão, de porte médio, com cerca de 5 anos. Está castrado, vacinado, vermifugado e com a saúde em dia, pronto para viver uma nova fase ao lado de quem compreenda seu jeitinho. É um cão instável, que precisa de espaço e uma rotina tranquila para se sentir seguro. No CCZ desde 2025, ele aguarda por alguém que respeite seus limites e ofereça o ambiente ideal para que ele possa florescer. Se você tem um quintal, paciência e muito carinho para oferecer, o Chicó pode ser o companheiro que estava faltando na sua vida.",
+    "descricao": "O Chicó é um SRD caramelo, de porte médio, com cerca de 5 anos. Castrado, vacinado e vermifugado.",
     "foto": "/img/animais/Chicó.jpeg"
   },
   {
@@ -112,7 +115,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Cyclone é um Pitbull de porte grande, com 4 anos, que está no CCZ desde 2025. Já está castrado, vacinado e vermifugado, com a saúde em dia e pronto para um novo começo. É um cão instável, que precisa de espaço, paciência e alguém com experiência para ajudá-lo a se sentir seguro e equilibrado. Com o ambiente certo e uma rotina estruturada, ele tem potencial para se tornar um grande companheiro. Se você tem responsabilidade, tempo e disposição para acolher um cão com perfil mais exigente, o Cyclone pode ser o desafio mais recompensador da sua vida.",
+    "descricao": "Pitbull de porte grande, 4 anos. Castrado, vacinado e vermifugado.",
     "foto": "/img/animais/Cyclone.jpeg"
   },
   {
@@ -121,7 +124,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse SRD de porte médio tem 3 anos e está no CCZ desde 2022, sonhando com a chance de fazer parte de uma família. É dócil, alegre e muito companheiro — daqueles que estão sempre prontos para uma boa companhia, uma brincadeira ou um momento de carinho. Já está castrado, vacinado e vermifugado, pronto para ser acolhido com responsabilidade e afeto. Se você procura um amigo leal, divertido e cheio de amor pra dar, venha conhecer o Dupeladinho. Ele pode ser o parceiro ideal para completar sua família.",
+    "descricao": "SRD de porte médio, 3 anos. Dócil, alegre e muito companheiro. Castrado e vacinado.",
     "foto": "/img/animais/Dupeladinho.jpeg"
   },
   {
@@ -130,7 +133,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinha é dócil, carinhosa, amorosa e carente — daquelas que só querem um colo quentinho e alguém para chamar de família. Já está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia, prontinha para ser acolhida com responsabilidade e muito carinho. Está no CCZ desde 2024, esperando por uma família que enxergue seu jeitinho doce e ofereça o lar que ela tanto merece. Se você tem espaço no coração para uma amiga fiel e carente de afeto, venha conhecê-la. Ela pode ser o elo que faltava na sua vida.",
+    "descricao": "Dócil, carinhosa, amorosa e carente. Vacinada contra a raiva e vermifugada.",
     "foto": "/img/animais/Edinha.jpeg"
   },
   {
@@ -139,7 +142,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Evin é um SRD caramelo de porte médio, com 13 anos, que está no CCZ desde 2024. Já está castrado, vacinado e vermifugado, pronto para viver seus anos dourados com dignidade e carinho. Apesar de ser instável, quando conquista uma amizade, se revela muito amoroso e companheiro. Ele precisa de um ambiente calmo, com espaço e paciência, onde possa se sentir seguro e acolhido. Se você acredita que todo cão merece amor até o fim da vida, venha conhecer o Evin. Ele pode ser o amigo silencioso e fiel que vai tocar seu coração.",
+    "descricao": "SRD caramelo de porte médio, 13 anos. Castrado, vacinado e vermifugado, pronto para viver seus anos dourados.",
     "foto": "/img/animais/Evin.jpeg"
   },
   {
@@ -148,7 +151,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia — prontinho para ser acolhido com segurança e cuidado. Está no CCZ desde 2024, aguardando a chance de encontrar uma família que lhe ofereça amor, carinho e um lar definitivo. Cada dia que passa é uma nova esperança de ser escolhido! Se você acredita no poder da adoção responsável e quer transformar uma vida (e a sua também), venha conhecê-lo. Ele pode ser o companheiro que você estava esperando.",
+    "descricao": "Vacinado contra a raiva, vermifugado e com controle de ectoparasitas em dia.",
     "foto": "/img/animais/Fred.jpeg"
   },
   {
@@ -157,7 +160,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludo é vacinado contra a raiva, vermifugado e está com o controle de ectoparasitas em dia — pronto para ser acolhido com segurança e cuidado. Ele é dócil, amoroso e tem uma personalidade única, com momentos de instabilidade emocional que merecem compreensão e paciência. Está no CCZ desde 2024, aguardando uma família disposta a oferecer um lar responsável, com afeto e estabilidade. Se você acredita no poder da transformação através do amor, venha conhecê-lo. Ele pode ser o companheiro que vai te ensinar sobre empatia e retribuir com carinho verdadeiro.",
+    "descricao": "Vacinado contra a raiva, vermifugado, dócil e amoroso.",
     "foto": "/img/animais/Frederico.jpeg"
   },
   {
@@ -166,7 +169,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Jaqueline é SRD mestiça com pitbul, porte médio, dócil, carinhosa, com bastante energia, castrada, vermifugada e vacinada, tem 3 anos e está no CCZ desde 2025",
+    "descricao": "Mestiça com pitbull, porte médio, dócil, carinhosa, com energia, castrada e vacinada, 3 anos.",
     "foto": "/img/animais/Jaqueline.jpeg"
   },
   {
@@ -175,16 +178,16 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa guerreirinha está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia — prontinha para ser acolhida com segurança e responsabilidade. Está no CCZ desde 2021, aguardando a chance de conquistar uma família que lhe ofereça amor, carinho e um lar definitivo. Cada dia é uma nova esperança de ser escolhida! Se você acredita no poder da adoção e quer transformar uma vida (e a sua também), venha conhecê-la. Ela pode ser o amor que faltava na sua casa.",
+    "descricao": "Guerreirinha vacinada contra a raiva e vermifugada, à espera de um lar definitivo.",
     "foto": "/img/animais/Kelinha.jpeg"
   },
   {
     "id": 22,
-    "nome": "Lampiao",
+    "nome": "Lampião",
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Lampião é um SRD de porte grande, com 3 anos, que está no CCZ desde 2025 esperando por uma chance de mostrar o quanto pode ser especial. É dócil, brincalhão e tem bastante energia — ideal para quem gosta de movimento, passeios e uma companhia animada. Já está castrado, vacinado e vermifugado, prontinho para ser acolhido com responsabilidade e afeto. Se você procura um parceiro leal, divertido e cheio de vida, venha conhecer o Lampião. Ele pode ser o amigo que faltava no seu lar.",
+    "descricao": "SRD grande, 3 anos. Dócil, brincalhão, castrado, vacinado e vermifugado.",
     "foto": "/img/animais/Lampiao.jpeg"
   },
   {
@@ -193,7 +196,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinha é dócil, carinhosa, amorosa e carente — daquelas que só querem um colo quentinho e atenção sincera. Já está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia, prontinha para ser acolhida com responsabilidade e carinho. Está no CCZ desde 2025, sonhando com uma família que lhe ofereça o afeto e a estabilidade que ela tanto merece. Se você tem espaço no coração e na rotina para uma amiga fiel e carente de amor, venha conhecê-la. Ela pode ser o elo que faltava na sua vida.",
+    "descricao": "Dócil, carinhosa, amorosa e carente. Vacinada contra a raiva e vermifugada.",
     "foto": "/img/animais/Lola.jpeg"
   },
   {
@@ -202,7 +205,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "A Lorena é uma pastora mestiça de porte médio, com 5 anos, que está no CCZ desde 2024. Já está castrada, vacinada e vermifugada, prontinha para começar uma nova fase cheia de amor e aventuras. Ela é dócil, brincalhona e muito ativa — perfeita para quem gosta de passeios, brincadeiras e uma companhia vibrante. Lorena tem aquele jeitinho especial que conquista com afeto e disposição.",
+    "descricao": "Pastora mestiça de porte médio, 5 anos. Castrada, vacinada e brincalhona.",
     "foto": "/img/animais/Lorena.jpeg"
   },
   {
@@ -211,16 +214,16 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "A Luna é uma SRD de porte médio, com apenas 1 aninho, que já enfrentou grandes desafios. Ela superou a cinomose e, embora tenha ficado com algumas sequelas, continua sendo uma cadelinha dócil, amorosa e cheia de vontade de viver. Está castrada, vacinada e vermifugada, pronta para encontrar um lar que a acolha com carinho e responsabilidade. Desde 2024 no CCZ, ela espera por alguém que veja além das marcas da luta e reconheça a força e o amor que carrega no peito. Se você acredita que todo animal merece uma segunda chance, venha conhecer a Luna. Ela pode ser a companheira mais leal e grata que você já teve.",
+    "descricao": "SRD de porte médio, 1 aninho. Superou a cinomose, é muito dócil, castrada e vacinada.",
     "foto": "/img/animais/Luna.jpeg"
   },
   {
     "id": 26,
-    "nome": "Luna2",
+    "nome": "Luna 2",
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Cadelinha dócil, carinhosa e cheia de amor para dar, vacinada e pronta para encontrar uma nova família.",
+    "descricao": "Cadelinha dócil, carinhosa, vacinada e cheia de amor para dar.",
     "foto": "/img/animais/Luna2.jpeg"
   },
   {
@@ -229,7 +232,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "O Manqueta é um SRD caramelo padrão, de porte médio, com cerca de 4 anos. Está no CCZ desde 2025, esperando por alguém que acompanhe seu ritmo e ofereça o lar que ele merece. É dócil, brincalhão e tem muita energia — ideal para quem gosta de movimento, passeios e momentos de diversão. Já está castrado, vacinado e vermifugado, prontinho para começar uma nova fase com saúde e segurança. Se você procura um parceiro animado, afetuoso e cheio de disposição, venha conhecer o Manqueta. Ele pode ser o seu novo melhor amigo.",
+    "descricao": "SRD caramelo de porte médio, cerca de 4 anos. Dócil, brincalhão, castrado e vacinado.",
     "foto": "/img/animais/Manqueta.jpeg"
   },
   {
@@ -238,7 +241,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinha é puro afeto: dócil, carinhosa, amorosa e cheia de vontade de receber atenção — uma verdadeira companheira que vai te seguir com o olhar e o coração. Está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia, prontinha para começar uma nova fase da vida com saúde e segurança. Desde 2023 no CCZ, ela espera por alguém que enxergue seu valor e ofereça o lar que ela tanto merece. Cada dia é uma nova chance de ser escolhida — e talvez hoje seja o dia! Se você acredita que amor transforma, venha conhecê-la. Ela está pronta para te amar como ninguém.",
+    "descricao": "Dócil, carinhosa e muito amorosa. Vacinada contra a raiva e vermifugada.",
     "foto": "/img/animais/Meg.jpeg"
   },
   {
@@ -247,16 +250,16 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "A Mel é uma SRD de porte médio, com apenas 1 aninho, que já enfrentou grandes desafios. Ela superou a cinomose e, apesar de carregar algumas sequelas, continua sendo uma cadelinha dócil, amorosa e muito esperta. Está castrada, vacinada e vermifugada, pronta para viver uma nova fase cercada de carinho e cuidado. Desde 2024 no CCZ, ela espera por alguém que enxergue além das marcas da luta e valorize sua força e doçura. Se você acredita que todo animal merece uma segunda chance, venha conhecer a Mel. Ela pode ser a companheira mais leal e grata que você já teve.",
+    "descricao": "SRD de porte médio, 1 aninho. Curada da cinomose, castrada e vacinada.",
     "foto": "/img/animais/Mel.jpeg"
   },
   {
     "id": 31,
-    "nome": "Mel2",
+    "nome": "Mel 2",
     "especie": "Cachorro",
     "sexo": "femea",
-    "filhote": "false",
-    "descricao": "Mel é SRD, aproximadamente 8 meses, castrada, vermifugada e com controle de ectoparasitas em dia, vacinada para raiva. Está no CCZ há mais ou menos 4 meses. Dócil.",
+    "filhote": "true",
+    "descricao": "Mel é SRD, aproximadamente 8 meses, castrada, vermifugada, vacinada para raiva. Dócil.",
     "foto": "/img/animais/Mel2.jpeg"
   },
   {
@@ -264,8 +267,8 @@ const animaisDisponiveis = [
     "nome": "Moana",
     "especie": "Cachorro",
     "sexo": "femea",
-    "filhote": "false",
-    "descricao": "A Moana é uma SRD de porte pequeno, com apenas 3 meses, e já mostra que veio ao mundo para conquistar corações. Está no CCZ desde 2025, esperando por uma família que a acolha com responsabilidade e carinho. Ela é dócil, amorosa e muito carinhosa — perfeita para quem deseja acompanhar o crescimento de uma parceira leal desde os primeiros passos. Já está vacinada e vermifugada, pronta para começar uma nova história ao seu lado. Se você sonha em ter uma companheirinha para a vida toda, venha conhecer a Moana. Ela pode ser o início de uma linda jornada.",
+    "filhote": "true",
+    "descricao": "SRD de porte pequeno, filhotinha de 3 meses. Dócil, amorosa, vacinada e vermifugada.",
     "foto": "/img/animais/Moana.jpeg"
   },
   {
@@ -273,8 +276,8 @@ const animaisDisponiveis = [
     "nome": "Nala",
     "especie": "Cachorro",
     "sexo": "femea",
-    "filhote": "false",
-    "descricao": "Nala é uma American bully, de aproximadamente 6 meses de idade, vermifugada e com controle de ectoparasitas em dia. Não é castrada, vacinada para raiva. Está no CCZ há mais ou menos 2 semanas, resgatada de maus tratos.",
+    "filhote": "true",
+    "descricao": "American bully de aproximadamente 6 meses, vermifugada, vacinada contra raiva.",
     "foto": "/img/animais/Nala.jpeg"
   },
   {
@@ -283,7 +286,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Essa peludinha já está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia — prontinha para ser acolhida com segurança e muito amor. Está no CCZ desde 2023, sonhando com uma família que lhe ofereça carinho, cuidado e um lar definitivo. Cada dia é uma nova esperança de ser escolhida!",
+    "descricao": "Vacinado contra a raiva, vermifugado e pronto para ser acolhido com amor.",
     "foto": "/img/animais/Paçoca.jpeg"
   },
   {
@@ -292,7 +295,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "A Pantera é uma SRD de porte grande, com 3 anos, que está no CCZ desde 2025. Já está castrada, vacinada e vermifugada, pronta para ser acolhida com responsabilidade. É uma cadela ativa, com muita energia e personalidade. Por ser instável, precisa de espaço e de alguém com experiência e paciência para oferecer uma rotina segura e estruturada. Com o ambiente certo, ela tem tudo para se desenvolver e se tornar uma excelente companheira. Se você tem disposição, responsabilidade e um espaço adequado, venha conhecer a Pantera. Ela pode ser a parceira que vai transformar seus dias.",
+    "descricao": "SRD grande, 3 anos. Ativo, castrado, vacinado e vermifugado.",
     "foto": "/img/animais/Pantera.jpeg"
   },
   {
@@ -301,16 +304,16 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "femea",
     "filhote": "false",
-    "descricao": "Essa peludinho é pura afeto: dócil, carinhosa, brincalhona e carente daquelas que adoram companhia, carinho e uma boa brincadeira. Já está vacinada contra a raiva, vermifugada e com o controle de ectoparasitas em dia, prontinha para ser adotada com segurança e responsabilidade. Está no CCZ desde 2021, sonhando com um lar onde possa receber todo o amor que tem para oferecer. Cada dia é uma nova esperança de encontrar alguém que enxergue seu jeitinho especial. Se você busca um companheiro fiel e cheia de afeto, venha conhecê-lo. Ele pode ser o melhor amiga que você estava esperando.",
+    "descricao": "Dócil, carinhosa, brincalhona e carente. Vacinada contra a raiva e vermifugada.",
     "foto": "/img/animais/Pretinha.jpeg"
   },
   {
     "id": 38,
-    "nome": "Sr vicente",
+    "nome": "Sr. Vicente",
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho é dócil, carinhoso, amoroso e carente — daqueles que só querem um colo quentinho e alguém para chamar de família. Já está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia, prontinho para ser acolhido com responsabilidade e muito amor. Está no CCZ desde 2023, esperando por uma família que enxergue seu jeitinho doce e ofereça o lar que ele tanto merece. Se você tem espaço no coração para um amigo fiel e carente de afeto, venha conhecê-lo. Ele pode ser o elo que faltava na sua vida.",
+    "descricao": "Dócil, carinhoso, amoroso e carente. Vacinado contra a raiva e vermifugado.",
     "foto": "/img/animais/Sr_vicente.jpeg"
   },
   {
@@ -319,7 +322,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludo é castrado, vacinado contra a raiva, com controle de ectoparasitas em dia e vermifugado — prontinho para fazer parte da sua vida! Ele é dócil, brincalhão e carinhoso, mas tem uma exigência muito especial: não vive sem um carrinho de mão por perto! Isso mesmo — ele ama brincar com carrinhos de obra e faz deles seu companheiro inseparável. Está no CCZ desde filhote, esperando por uma família que entenda seu jeitinho único e ofereça muito amor (e um carrinho de mão, claro!). Se você tem espaço no coração e no quintal, venha conhecê-lo. Ele pode ser o parceiro que faltava na sua rotina.",
+    "descricao": "Castrado, vacinado e vermifugado. É brincalhão e ama carrinhos de mão de obra!",
     "foto": "/img/animais/Thiaguim.jpeg"
   },
   {
@@ -328,7 +331,7 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse carinha é dócil, carinhoso, brincalhão e carente — daqueles que adoram um cafuné, uma boa brincadeira e, principalmente, companhia. Está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia, prontinho para começar uma nova vida com saúde e segurança. Desde 2025 no CCZ, ele sonha com um lar cheio de amor, onde possa ser acolhido como parte da família. Cada abanar de rabo é um pedido silencioso por atenção e carinho. Se você procura um amigo leal e cheio de afeto, venha conhecê-lo. Ele pode ser exatamente o que faltava no seu dia a dia.",
+    "descricao": "Dócil, carinhoso, brincalhão e carente. Vacinado e vermifugado.",
     "foto": "/img/animais/Thor.jpeg"
   },
   {
@@ -337,40 +340,126 @@ const animaisDisponiveis = [
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho está vacinado contra a raiva, vermifugado e com o controle de ectoparasitas em dia — pronto para ser acolhido com responsabilidade e carinho. Ele é dócil, amoroso e tem uma personalidade instável, que pede compreensão e um ambiente tranquilo. Está no CCZ desde 2023, esperando por uma família que enxergue além das dificuldades e ofereça o cuidado que ele merece. Se você acredita no poder da adoção e tem espaço no coração para um companheiro que precisa de apoio e afeto, venha conhecê-lo. Ele pode ser a transformação que você nem sabia que precisava.",
+    "descricao": "Vacinado contra a raiva, vermifugado, dócil e amoroso.",
     "foto": "/img/animais/Tupam.jpeg"
   },
   {
     "id": 43,
-    "nome": "Ze",
+    "nome": "Zé",
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse peludinho já está castrado, vacinado contra a raiva, com controle de ectoparasitas em dia e vermifugado — ou seja, prontinho para ser adotado com segurança e responsabilidade! Ele é dócil, carinhoso e brincalhão, o tipo de companheiro que transforma qualquer dia comum em uma aventura cheia de afeto. Se você está em busca de um amigo fiel, alegre e cheio de amor para dar, venha conhecê-lo. Ele pode ser o novo integrante da sua família!",
+    "descricao": "Castrado, vacinado e vermifugado. Dócil, carinhoso e brincalhão.",
     "foto": "/img/animais/Ze.jpeg"
   },
   {
     "id": 44,
-    "nome": "Ze Grilo",
+    "nome": "Zé Grilo",
     "especie": "Cachorro",
     "sexo": "macho",
     "filhote": "false",
-    "descricao": "Esse SRD caramelo padrão, de porte médio, tem 5 anos e está no CCZ desde 2025, esperando por alguém que enxergue seu coração gigante. O Zé é dócil, brincalhão e muito companheiro — adora uma boa companhia, um momento de diversão e, claro, muito carinho. Já está castrado, vacinado e vermifugado, prontinho para ser acolhido com responsabilidade e afeto. Se você procura um amigo leal, divertido e cheio de amor pra dar, venha conhecer o Zé Grilo. Ele pode ser o parceiro ideal para completar sua família.",
+    "descricao": "SRD caramelo de porte médio, 5 anos. Dócil, brincalhão, castrado e vacinado.",
     "foto": "/img/animais/Ze_Grilo.jpeg"
   }
 ];
 
 export default function AdocaoPage() {
+  const [filtroEspecie, setFiltroEspecie] = useState('todos');
   const [filtroSexo, setFiltroSexo] = useState('todos');
+  const [filtroIdade, setFiltroIdade] = useState('todos');
   const [buscaNome, setBuscaNome] = useState('');
-  const [animalSelecionado, setAnimalSelecionado] = useState(null);
 
-  // FILTRAGEM DINÂMICA
+  // ESTADO DA PAGINAÇÃO
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 12;
+
+  // ESTADOS DO MODAL, PASSO A PASSO (TERMO -> FORM) E ENVIO
+  const [animalSelecionado, setAnimalSelecionado] = useState(null);
+  const [passoModal, setPassoModal] = useState('detalhes'); // 'detalhes' | 'termo' | 'formulario'
+  const [termoAceito, setTermoAceito] = useState(false);
+  const [dadosAdocao, setDadosAdocao] = useState({ nome: '', telefone: '', email: '', cidade: '' });
+  const [enviando, setEnviando] = useState(false);
+  const [enviadoSucesso, setEnviadoSucesso] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState(null);
+
+  // RESET DA PAGINAÇÃO
+  const handleFiltroEspecie = (valor) => { setFiltroEspecie(valor); setPaginaAtual(1); };
+  const handleFiltroSexo = (valor) => { setFiltroSexo(valor); setPaginaAtual(1); };
+  const handleFiltroIdade = (valor) => { setFiltroIdade(valor); setPaginaAtual(1); };
+  const handleBuscaNome = (valor) => { setBuscaNome(valor); setPaginaAtual(1); };
+
+  // FILTRAGEM
   const animaisFiltrados = animaisDisponiveis.filter(animal => {
-    const bateSexo = filtroSexo === 'todos' || animal.sexo.toLowerCase() === filtroSexo;
+    const bateEspecie = filtroEspecie === 'todos' || animal.especie.toLowerCase() === filtroEspecie.toLowerCase();
+    const bateSexo = filtroSexo === 'todos' || animal.sexo.toLowerCase() === filtroSexo.toLowerCase();
+    let bateIdade = true;
+    if (filtroIdade === 'filhote') bateIdade = animal.filhote === 'true';
+    else if (filtroIdade === 'adulto') bateIdade = animal.filhote === 'false';
     const bateNome = animal.nome.toLowerCase().includes(buscaNome.toLowerCase());
-    return bateSexo && bateNome;
+
+    return bateEspecie && bateSexo && bateIdade && bateNome;
   });
+
+  // PAGINAÇÃO
+  const totalPaginas = Math.ceil(animaisFiltrados.length / ITENS_POR_PAGINA);
+  const inicioIndice = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const animaisPagina = animaisFiltrados.slice(inicioIndice, inicioIndice + ITENS_POR_PAGINA);
+
+  const handleMudarPagina = (novaPagina) => {
+    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+      setPaginaAtual(novaPagina);
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+  };
+
+  const handleAbrirModal = (animal) => {
+    setAnimalSelecionado(animal);
+    setPassoModal('detalhes');
+    setTermoAceito(false);
+    setEnviadoSucesso(false);
+    setErroEnvio(null);
+  };
+
+  const handleFecharModal = () => {
+    setAnimalSelecionado(null);
+    setPassoModal('detalhes');
+    setTermoAceito(false);
+    setEnviadoSucesso(false);
+    setErroEnvio(null);
+    setDadosAdocao({ nome: '', telefone: '', email: '', cidade: '' });
+  };
+
+  // ENVIO PARA O GOOGLE SHEETS VIA GET
+  const handleEnviarFormulario = async (e) => {
+    e.preventDefault();
+    setEnviando(true);
+    setErroEnvio(null);
+
+    try {
+      // Monta os parâmetros URLSearchParams para a chamada GET
+      const params = new URLSearchParams({
+        tipo: 'adocao', // Sinalizador lido pela função salvarSolicitacaoAdocaoSite(e) no Apps Script
+        nome: dadosAdocao.nome,
+        telefone: dadosAdocao.telefone,
+        email: dadosAdocao.email,
+        cidade: dadosAdocao.cidade,
+        animal: animalSelecionado?.nome || 'Não especificado'
+      });
+
+      const urlFinal = `${GOOGLE_SCRIPT_URL}?${params.toString()}`;
+
+      await fetch(urlFinal, {
+        method: 'GET',
+        mode: 'no-cors'
+      });
+
+      setEnviadoSucesso(true);
+    } catch (err) {
+      setErroEnvio('Ocorreu um erro ao enviar sua solicitação. Tente novamente.');
+    } finally {
+      setEnviando(false);
+    }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -390,7 +479,7 @@ export default function AdocaoPage() {
           <span className={styles.heroBadge}>🐾 Posse Responsável</span>
           <h1 className={styles.heroTitle}>Adote um Amigo!</h1>
           <p className={styles.heroSubtitle}>
-            Conheça os animais protegidos pelo Centro de Controle de Zoonoses Manuela Pereira da Marta. Encontre seu novo companheiro de vida!
+            Conheça os animais protegidos pelo Centro de Controle de Zoonoses Manuela Pereira da Marta.
           </p>
         </div>
       </section>
@@ -398,137 +487,355 @@ export default function AdocaoPage() {
       <main className={styles.mainContainer}>
         <div className={styles.container}>
 
-          {/* BARRA DE BUSCA E FILTROS */}
-          <div className={styles.filterBarContainer}>
+          {/* BUSCA E FILTROS EXPANDIDOS */}
+          <div className={styles.filterSection}>
             <div className={styles.searchBox}>
               <span className={styles.searchIcon}>🔍</span>
               <input 
                 type="text" 
                 placeholder="Buscar pelo nome do animal..." 
                 value={buscaNome}
-                onChange={(e) => setBuscaNome(e.target.value)}
+                onChange={(e) => handleBuscaNome(e.target.value)}
                 className={styles.searchInput}
               />
               {buscaNome && (
-                <button className={styles.clearBtn} onClick={() => setBuscaNome('')}>✕</button>
+                <button className={styles.clearBtn} onClick={() => handleBuscaNome('')}>✕</button>
               )}
             </div>
 
-            <div className={styles.filterTabs}>
-              <button 
-                className={`${styles.filterBtn} ${filtroSexo === 'todos' ? styles.activeFilter : ''}`}
-                onClick={() => setFiltroSexo('todos')}
-              >
-                Todos ({animaisDisponiveis.length})
-              </button>
-              <button 
-                className={`${styles.filterBtn} ${filtroSexo === 'macho' ? styles.activeFilter : ''}`}
-                onClick={() => setFiltroSexo('macho')}
-              >
-                ♂️ Machos
-              </button>
-              <button 
-                className={`${styles.filterBtn} ${filtroSexo === 'femea' ? styles.activeFilter : ''}`}
-                onClick={() => setFiltroSexo('femea')}
-              >
-                ♀️ Fêmeas
-              </button>
+            <div className={styles.filterGroupRow}>
+              {/* Espécie */}
+              <div className={styles.filterSubGroup}>
+                <button 
+                  className={`${styles.filterBtn} ${filtroEspecie === 'todos' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroEspecie('todos')}
+                >
+                  Todos
+                </button>
+                <button 
+                  className={`${styles.filterBtn} ${filtroEspecie === 'cachorro' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroEspecie('cachorro')}
+                >
+                  🐶 Cachorros
+                </button>
+                <button 
+                  className={`${styles.filterBtn} ${filtroEspecie === 'gato' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroEspecie('gato')}
+                >
+                  🐱 Gatos
+                </button>
+              </div>
+
+              {/* Sexo */}
+              <div className={styles.filterSubGroup}>
+                <button 
+                  className={`${styles.filterBtn} ${filtroSexo === 'macho' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroSexo(filtroSexo === 'macho' ? 'todos' : 'macho')}
+                >
+                  ♂ Machos
+                </button>
+                <button 
+                  className={`${styles.filterBtn} ${filtroSexo === 'femea' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroSexo(filtroSexo === 'femea' ? 'todos' : 'femea')}
+                >
+                  ♀ Fêmeas
+                </button>
+              </div>
+
+              {/* Idade */}
+              <div className={styles.filterSubGroup}>
+                <button 
+                  className={`${styles.filterBtn} ${filtroIdade === 'filhote' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroIdade(filtroIdade === 'filhote' ? 'todos' : 'filhote')}
+                >
+                  🍼 Filhotes
+                </button>
+                <button 
+                  className={`${styles.filterBtn} ${filtroIdade === 'adulto' ? styles.activeFilter : ''}`}
+                  onClick={() => handleFiltroIdade(filtroIdade === 'adulto' ? 'todos' : 'adulto')}
+                >
+                  🐕 Adultos
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* GRID DE CARDS DOS ANIMAIS */}
-          {animaisFiltrados.length > 0 ? (
-            <div className={styles.animaisGrid}>
-              {animaisFiltrados.map((animal) => (
-                <div key={animal.id} className={styles.animalCard}>
-                  <div className={styles.imageWrapper}>
-                    <Image 
-                      src={animal.foto} 
-                      alt={animal.nome}
-                      width={400}
-                      height={260}
-                      unoptimized
-                      className={styles.animalImg}
-                    />
-                    <span className={styles.sexoBadge}>
-                      {animal.sexo.toLowerCase() === 'macho' ? '♂️ Macho' : '♀️ Fêmea'}
-                    </span>
+          {/* GRID DE CARDS DOS ANIMAIS (4 POR LINHA) */}
+          {animaisPagina.length > 0 ? (
+            <>
+              <div className={styles.animaisGrid}>
+                {animaisPagina.map((animal) => {
+                  const isMacho = animal.sexo.toLowerCase() === 'macho';
+                  const isFilhote = animal.filhote === 'true';
+
+                  return (
+                    <div key={animal.id} className={styles.animalCard}>
+                      <div className={styles.imageWrapper}>
+                        <Image 
+                          src={animal.foto} 
+                          alt={animal.nome}
+                          width={300}
+                          height={400}
+                          unoptimized
+                          className={styles.animalImg}
+                        />
+                        <span className={`${styles.sexoIconBadge} ${isMacho ? styles.badgeMacho : styles.badgeFemea}`}>
+                          {isMacho ? '♂' : '♀'}
+                        </span>
+                        {isFilhote && <span className={styles.badgeFilhote}>Filhote</span>}
+                      </div>
+
+                      <div className={styles.cardHeaderOnly}>
+                        <h3 className={styles.animalNome}>{animal.nome}</h3>
+                        <button 
+                          className={styles.btnVerMais}
+                          onClick={() => handleAbrirModal(animal)}
+                        >
+                          Saber mais →
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* BARRA DE PAGINAÇÃO */}
+              {totalPaginas > 1 && (
+                <div className={styles.paginationContainer}>
+                  <button 
+                    className={styles.paginationNavBtn} 
+                    disabled={paginaAtual === 1}
+                    onClick={() => handleMudarPagina(paginaAtual - 1)}
+                  >
+                    ← Anterior
+                  </button>
+
+                  <div className={styles.paginationNumbers}>
+                    {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((numPage) => (
+                      <button 
+                        key={numPage} 
+                        className={`${styles.pageNumberBtn} ${numPage === paginaAtual ? styles.activePageNumber : ''}`}
+                        onClick={() => handleMudarPagina(numPage)}
+                      >
+                        {numPage}
+                      </button>
+                    ))}
                   </div>
 
-                  <div className={styles.cardBody}>
-                    <h3 className={styles.animalNome}>{animal.nome}</h3>
-
-                    <p className={styles.animalDesc}>
-                      {animal.descricao || "Animal dócil, vacinado e pronto para encontrar um novo lar amoroso."}
-                    </p>
-
-                    <button 
-                      className={styles.btnInteresse}
-                      onClick={() => setAnimalSelecionado(animal)}
-                    >
-                      Quero Adotar o(a) {animal.nome} 💖
-                    </button>
-                  </div>
+                  <button 
+                    className={styles.paginationNavBtn} 
+                    disabled={paginaAtual === totalPaginas}
+                    onClick={() => handleMudarPagina(paginaAtual + 1)}
+                  >
+                    Próximo →
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className={styles.emptyState}>
               <span>🔍</span>
               <h3>Nenhum animal encontrado</h3>
-              <p>Não encontramos nenhum amiguinho com o nome ou filtro selecionado.</p>
+              <p>Não encontramos nenhum amiguinho com essa combinação de filtros.</p>
               <button 
                 className={styles.resetBtn} 
-                onClick={() => { setBuscaNome(''); setFiltroSexo('todos'); }}
+                onClick={() => { setBuscaNome(''); handleFiltroSexo('todos'); handleFiltroEspecie('todos'); handleFiltroIdade('todos'); }}
               >
-                Limpar Filtros
+                Limpar Todos os Filtros
               </button>
             </div>
           )}
 
-          {/* INFORMAÇÕES DE REQUISITOS PARA ADOÇÃO */}
+          {/* REQUISITOS PARA ADOÇÃO */}
           <section className={styles.requisitosBlock}>
             <h2>📋 Requisitos para Adoção Responsável</h2>
             <ul>
               <li>Ser maior de 18 anos;</li>
               <li>Apresentar documento oficial de identidade com foto (RG ou CNH) e CPF;</li>
               <li>Apresentar comprovante de residência recente;</li>
-              <li>Assinar o Termo de Adoção e Responsabilidade no local da visita.</li>
+              <li>Assinar o Termo de Adoção e Responsabilidade no local.</li>
             </ul>
           </section>
 
         </div>
       </main>
 
-      {/* MODAL DE CONTATO DE ADOÇÃO */}
+      {/* MODAL / POP-UP CLEAN DE ADOÇÃO COM FLUXO TERMO DE RESPONSABILIDADE */}
       {animalSelecionado && (
-        <div className={styles.modalOverlay} onClick={() => setAnimalSelecionado(null)}>
+        <div className={styles.modalOverlay} onClick={handleFecharModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setAnimalSelecionado(null)}>✕</button>
-            
-            <h2>Tenho interesse em adotar o(a) {animalSelecionado.nome}! 🐾</h2>
-            <p>
-              Para agendar uma visita e conhecer o(a) <strong>{animalSelecionado.nome}</strong> no Centro de Controle de Zoonoses Manuela Pereira da Marta, escolha uma das formas de contato abaixo:
-            </p>
+            <button className={styles.closeBtn} onClick={handleFecharModal} title="Fechar">✕</button>
 
-            <div className={styles.modalContacts}>
-              <a 
-                href={`https://api.whatsapp.com/send?phone=5532988544126&text=Olá!+Vi+o(a)+${encodeURIComponent(animalSelecionado.nome)}+no+portal+e+gostaria+de+agendar+uma+visita+para+adoção!`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.btnWhatsapp}
-              >
-                💬 Falar pelo WhatsApp do CCZ
-              </a>
+            {/* PASSO 1: DETALHES COMPACTOS DO ANIMAL */}
+            {passoModal === 'detalhes' && (
+              <div className={styles.modalBodyDetails}>
+                <div className={styles.modalImageWrapper}>
+                  <Image 
+                    src={animalSelecionado.foto} 
+                    alt={animalSelecionado.nome}
+                    width={200}
+                    height={266}
+                    unoptimized
+                    className={styles.modalImgSmall}
+                  />
+                </div>
 
-              <a href="tel:3220208123" className={styles.btnTelefone}>
-                📞 Ligar para (32) 2020-8123
-              </a>
-            </div>
+                <div className={styles.modalTitleRow}>
+                  <h2>{animalSelecionado.nome}</h2>
+                  <span className={animalSelecionado.sexo.toLowerCase() === 'macho' ? styles.symbolMacho : styles.symbolFemea}>
+                    {animalSelecionado.sexo.toLowerCase() === 'macho' ? '♂ Macho' : '♀ Fêmea'}
+                  </span>
+                </div>
 
-            <p className={styles.modalEndereco}>
-              📍 <strong>Atendimento Presencial:</strong> BR-356, sentido Muriaé–Ervália (Horário: Segunda a Sexta, das 07h às 16h).
-            </p>
+                <p className={styles.animalDescricao}>
+                  {animalSelecionado.descricao || "Animal dócil, vacinado e pronto para ser acolhido com responsabilidade e carinho."}
+                </p>
+
+                <div className={styles.modalActions}>
+                  <button 
+                    className={styles.btnFormDirect}
+                    onClick={() => setPassoModal('termo')}
+                  >
+                    📝 Solicitar Adoção (Formulário Direto)
+                  </button>
+
+                  <a href="tel:3220208123" className={styles.btnTelefone}>
+                    📞 Ligar para o CCZ: (32) 2020-8123
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* PASSO 2: TERMO DE RESPONSABILIDADE */}
+            {passoModal === 'termo' && (
+              <div className={styles.modalBodyTermo}>
+                <button 
+                  className={styles.btnVoltarModal} 
+                  onClick={() => setPassoModal('detalhes')}
+                >
+                  ← Voltar para a descrição do animal
+                </button>
+
+                <h2 className={styles.formTitle}>Termo de Responsabilidade</h2>
+                <p className={styles.termoIntro}>
+                  Ao assinar este termo, o(a) adotante declara estar ciente e comprometido(a) com as seguintes obrigações:
+                </p>
+
+                <div className={styles.termoScrollBox}>
+                  <ul>
+                    <li>✔ Garantir o bem-estar físico e emocional do animal, provendo alimentação adequada, água fresca e abrigo.</li>
+                    <li>✔ Garantir a saúde física do animal, com consultas veterinárias regulares, vacinação e vermifugação em dia.</li>
+                    <li>✔ Garantir a saúde psicológica do animal, proporcionando convívio social, afeto e estímulos adequados à espécie.</li>
+                    <li>✔ Garantir a segurança do animal, mantendo-o em ambiente protegido e seguro, evitando riscos de fuga ou acidentes.</li>
+                    <li>✔ Manter o animal em ambiente limpo e higienizado, adequado às suas necessidades.</li>
+                    <li>✔ Não manter o animal preso em correntes, gaiolas inadequadas ou em condições que restrinjam sua liberdade de forma cruel.</li>
+                    <li>✔ Garantir a esterilização do animal, caso ainda não tenha sido realizada, contribuindo para o controle populacional.</li>
+                    <li>✔ Nunca abandonar o animal. Em caso de impossibilidade de mantê-lo, comunicar ao CCZ para encaminhamento adequado.</li>
+                  </ul>
+                  <p className={styles.termoAvisoLei}>
+                    O descumprimento deste termo sujeita o adotante às penalidades previstas na Lei Federal nº 9.605/1998 (Lei de Crimes Ambientais) e demais legislações de proteção animal vigentes.
+                  </p>
+                </div>
+
+                <div className={styles.aceiteCheckboxContainer}>
+                  <label className={styles.checkboxLabel}>
+                    <input 
+                      type="checkbox" 
+                      checked={termoAceito}
+                      onChange={(e) => setTermoAceito(e.target.checked)}
+                    />
+                    <span>Li e concordo integralmente com os termos de responsabilidade de adoção.</span>
+                  </label>
+                </div>
+
+                <button 
+                  className={styles.btnAvancarForm}
+                  disabled={!termoAceito}
+                  onClick={() => setPassoModal('formulario')}
+                >
+                  Continuar para o Formulário →
+                </button>
+              </div>
+            )}
+
+            {/* PASSO 3: FORMULÁRIO DE ADOÇÃO */}
+            {passoModal === 'formulario' && (
+              <div className={styles.modalBodyForm}>
+                <button 
+                  className={styles.btnVoltarModal} 
+                  onClick={() => setPassoModal('termo')}
+                >
+                  ← Voltar para o Termo
+                </button>
+
+                <h2 className={styles.formTitle}>Solicitar Adoção: {animalSelecionado.nome}</h2>
+                <p className={styles.formSubtitle}>Preencha os dados abaixo e a equipe do CCZ entrará em contato com você:</p>
+
+                {enviadoSucesso ? (
+                  <div className={styles.msgSucesso}>
+                    <h3>🎉 Solicitação Enviada!</h3>
+                    <p>
+                      Sua demonstração de interesse em adotar o(a) <strong>{animalSelecionado.nome}</strong> foi registrada com sucesso no sistema. Nossa equipe entrará em contato.
+                    </p>
+                    <button className={styles.btnFecharSucesso} onClick={handleFecharModal}>
+                      Concluir
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleEnviarFormulario} className={styles.formAdocao}>
+                    {erroEnvio && <div className={styles.msgErro}>{erroEnvio}</div>}
+
+                    <div className={styles.formGroup}>
+                      <label>Seu Nome Completo *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={dadosAdocao.nome}
+                        onChange={(e) => setDadosAdocao({...dadosAdocao, nome: e.target.value})}
+                        placeholder="Ex: Maria da Silva"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Telefone / Celular *</label>
+                      <input 
+                        type="tel" 
+                        required 
+                        value={dadosAdocao.telefone}
+                        onChange={(e) => setDadosAdocao({...dadosAdocao, telefone: e.target.value})}
+                        placeholder="(32) 99999-9999"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>E-mail (opcional)</label>
+                      <input 
+                        type="email" 
+                        value={dadosAdocao.email}
+                        onChange={(e) => setDadosAdocao({...dadosAdocao, email: e.target.value})}
+                        placeholder="seu@email.com"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Cidade / Bairro *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={dadosAdocao.cidade}
+                        onChange={(e) => setDadosAdocao({...dadosAdocao, cidade: e.target.value})}
+                        placeholder="Ex: Muriaé - Bairro Centro"
+                      />
+                    </div>
+
+                    <button type="submit" disabled={enviando} className={styles.btnSubmitAdocao}>
+                      {enviando ? 'Enviando...' : 'Confirmar e Enviar Solicitação'}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
           </div>
         </div>
       )}

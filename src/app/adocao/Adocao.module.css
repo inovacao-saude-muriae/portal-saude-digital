@@ -1,15 +1,15 @@
 /* ==========================================================================
-   --- ESTRUTURA GERAL DA PÁGINA DE ADOÇÃO ---
+   --- ESTRUTURA E BASE DA PÁGINA ---
    ========================================================================== */
 .pageWrapper {
   width: 100%;
   min-height: 100vh;
   background-color: #f7f4eb;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -30,7 +30,7 @@
 .heroBanner {
   background-color: #003b5c;
   color: #ffffff;
-  padding: 50px 0 40px 0;
+  padding: 48px 0 36px 0;
   text-align: center;
 }
 
@@ -42,21 +42,20 @@
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .heroTitle {
-  font-size: 38px;
+  font-size: 36px;
   font-weight: 800;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
 }
 
 .heroSubtitle {
-  font-size: 16px;
+  font-size: 15.5px;
   color: #cbd5e1;
-  max-width: 650px;
+  max-width: 600px;
   margin: 0 auto;
-  line-height: 1.5;
 }
 
 .mainContainer {
@@ -64,21 +63,20 @@
 }
 
 /* ==========================================================================
-   --- BARRA DE FILTROS E BUSCA POR NOME ---
+   --- BUSCA E FILTROS COMPACTOS ---
    ========================================================================== */
-.filterBarContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+.filterSection {
   margin-bottom: 36px;
-  flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .searchBox {
   position: relative;
-  flex-grow: 1;
-  max-width: 450px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .searchIcon {
@@ -111,17 +109,29 @@
   font-size: 14px;
 }
 
-.filterTabs {
+.filterGroupRow {
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filterSubGroup {
+  display: flex;
+  gap: 6px;
+  background-color: #ffffff;
+  padding: 4px;
+  border-radius: 30px;
+  border: 1px solid #cbd5e1;
 }
 
 .filterBtn {
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-size: 14px;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13.5px;
   font-weight: 600;
   color: #475569;
   cursor: pointer;
@@ -129,46 +139,44 @@
 }
 
 .filterBtn:hover {
-  border-color: #008a83;
   color: #008a83;
 }
 
 .activeFilter {
   background-color: #008a83 !important;
   color: #ffffff !important;
-  border-color: #008a83 !important;
 }
 
 /* ==========================================================================
-   --- GRID DE CARDS DOS ANIMAIS ---
+   --- GRID DE CARDS COM 4 COLUNAS (960x1280 COM ASPA 3:4) ---
    ========================================================================== */
 .animaisGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-bottom: 48px;
+  grid-template-columns: repeat(4, 1fr); /* 4 CARDS POR LINHA */
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
 .animalCard {
   background-color: #ffffff;
-  border-radius: 20px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .animalCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
-  height: 240px;
+  aspect-ratio: 3 / 4;
   background-color: #f1f5f9;
 }
 
@@ -178,60 +186,385 @@
   object-fit: cover;
 }
 
-.sexoBadge {
+.sexoIconBadge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background-color: rgba(0, 0, 0, 0.7);
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
   color: #ffffff;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.cardBody {
-  padding: 20px;
+.badgeMacho { background-color: #0284c7; }
+.badgeFemea { background-color: #ec4899; }
+
+.badgeFilhote {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #d97706;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.cardHeaderOnly {
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  gap: 10px;
 }
 
 .animalNome {
-  font-size: 22px;
+  font-size: 18px;
   color: #0f172a;
-  margin: 0 0 10px 0;
+  margin: 0;
   font-weight: 800;
+  text-align: center;
 }
 
-.animalDesc {
-  font-size: 14px;
-  color: #475569;
-  line-height: 1.6;
-  margin: 0 0 20px 0;
-  flex-grow: 1;
-}
-
-.btnInteresse {
+.btnVerMais {
   width: 100%;
-  background-color: #22ab59;
+  background-color: #008a83;
   color: #ffffff;
   border: none;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.btnInteresse:hover {
-  background-color: #1b8a47;
+.btnVerMais:hover {
+  background-color: #005c8a;
 }
 
 /* ==========================================================================
-   --- ESTADO VAZIO / NENHUM ANIMAL ENCONTRADO ---
+   --- CONTROLES DA PAGINAÇÃO ---
    ========================================================================== */
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.paginationNavBtn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationNavBtn:hover:not(:disabled) {
+  background-color: #008a83;
+  color: #ffffff;
+  border-color: #008a83;
+}
+
+.paginationNavBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginationNumbers {
+  display: flex;
+  gap: 6px;
+}
+
+.pageNumberBtn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.pageNumberBtn:hover {
+  border-color: #008a83;
+  color: #008a83;
+}
+
+.activePageNumber {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+}
+
+/* ==========================================================================
+   --- MODAL CLEAN / SEM FUNDO ESCURO PESADO ---
+   ========================================================================== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modalContent {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #f1f5f9;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modalImageWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.modalImgSmall {
+  width: 160px;
+  height: 213px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.modalTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modalTitleRow h2 {
+  font-size: 24px;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 800;
+}
+
+.symbolMacho {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.symbolFemea {
+  background-color: #fce7f3;
+  color: #ec4899;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.animalDescricao {
+  font-size: 14.5px;
+  color: #334155;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btnFormDirect {
+  background-color: #22ab59;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btnTelefone {
+  background-color: #003b5c;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   --- FORMULÁRIO DE ADOÇÃO ---
+   ========================================================================== */
+.btnVoltarModal {
+  background: none;
+  border: none;
+  color: #008a83;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.formTitle {
+  font-size: 22px;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  font-weight: 800;
+}
+
+.formSubtitle {
+  font-size: 14px;
+  color: #475569;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.formAdocao {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.formGroup input {
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14.5px;
+  outline: none;
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+.formGroup input:focus {
+  border-color: #008a83;
+}
+
+.btnSubmitAdocao {
+  background-color: #22ab59;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btnSubmitAdocao:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.msgSucesso {
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  padding: 24px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.msgSucesso h3 {
+  color: #15803d;
+  margin: 0 0 8px 0;
+  font-size: 20px;
+}
+
+.msgSucesso p {
+  color: #166534;
+  font-size: 14.5px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btnFecharSucesso {
+  background-color: #15803d;
+  color: #ffffff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.msgErro {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+}
+
+/* ESTADO VAZIO & REQUISITOS */
 .emptyState {
   text-align: center;
   padding: 60px 20px;
@@ -248,14 +581,14 @@
 }
 
 .emptyState h3 {
-  font-size: 20px;
   color: #0f172a;
+  font-size: 20px;
   margin: 0 0 8px 0;
 }
 
 .emptyState p {
-  font-size: 14px;
   color: #64748b;
+  font-size: 14px;
   margin: 0 0 20px 0;
 }
 
@@ -269,9 +602,6 @@
   cursor: pointer;
 }
 
-/* ==========================================================================
-   --- BLOCO DE REQUISITOS PARA ADOÇÃO ---
-   ========================================================================== */
 .requisitosBlock {
   background-color: #ffffff;
   padding: 32px;
@@ -296,124 +626,106 @@
   margin-bottom: 10px;
   line-height: 1.5;
 }
-
 /* ==========================================================================
-   --- MODAL DE INTERESSE DE ADOÇÃO ---
+   --- ESTILOS DO TERMO DE RESPONSABILIDADE DENTRO DO MODAL ---
    ========================================================================== */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+.termoIntro {
+  font-size: 14px;
+  color: #334155;
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.termoScrollBox {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 16px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.termoScrollBox ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.modalContent {
-  position: relative;
-  background-color: #ffffff;
-  padding: 32px;
-  border-radius: 20px;
-  max-width: 520px;
-  width: 100%;
-}
-
-.closeBtn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #64748b;
-}
-
-.modalContent h2 {
-  font-size: 20px;
-  color: #0f172a;
-  margin: 0 0 12px 0;
-}
-
-.modalContent p {
-  font-size: 14.5px;
-  color: #475569;
+.termoScrollBox li {
+  font-size: 13px;
+  color: #334155;
   line-height: 1.5;
 }
 
-.modalContacts {
+.termoAvisoLei {
+  font-size: 12.5px;
+  color: #991b1b;
+  background-color: #fee2e2;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.aceiteCheckboxContainer {
+  margin-bottom: 20px;
+}
+
+.checkboxLabel {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 24px 0;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: #0f172a;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
-.btnWhatsapp {
-  background-color: #25d366;
+.checkboxLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #008a83;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.btnAvancarForm {
+  width: 100%;
+  background-color: #22ab59;
   color: #ffffff;
-  text-decoration: none;
+  border: none;
   padding: 14px;
   border-radius: 12px;
   font-weight: 700;
-  text-align: center;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
-.btnTelefone {
-  background-color: #003b5c;
-  color: #ffffff;
-  text-decoration: none;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  text-align: center;
+.btnAvancarForm:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+  .animaisGrid { grid-template-columns: repeat(3, 1fr); }
 }
 
-.modalEndereco {
-  font-size: 13px !important;
-  color: #64748b !important;
-  border-top: 1px dashed #e2e8f0;
-  padding-top: 16px;
-  margin-top: 16px;
+@media (max-width: 768px) {
+  .animaisGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ==========================================================================
-   --- RESPONSIVIDADE ---
-   ========================================================================== */
-@media (max-width: 992px) {
-  .animaisGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .animaisGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .filterBarContainer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .searchBox {
-    max-width: 100%;
-  }
-
-  .filterTabs {
-    justify-content: center;
-  }
-
-  .heroTitle {
-    font-size: 28px;
-  }
-
-  .modalContent {
-    padding: 24px;
-  }
+@media (max-width: 540px) {
+  .animaisGrid { grid-template-columns: 1fr; }
+  .filterGroupRow { flex-direction: column; }
+  .filterSubGroup { width: 100%; justify-content: center; }
+  .modalContent { padding: 20px; }
 }
