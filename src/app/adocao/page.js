@@ -6,7 +6,7 @@ import Image from 'next/image';
 import styles from './Adocao.module.css';
 
 // URL DO SEU SCRIPT DO GOOGLE SHEETS
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUUUek2JT-XM_zDaK44_4kYQq6gLNo4x8w4fe1kr46ubM4Kmn98suVymRL_XF14IYg/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJgl-EYVzUXS8KvJogh2yn_iiFwIC7NwDS8iwnIV23DcZaFnBtSBkY-pKz8tY5sA3xsg/exec";
 
 // BANCO DE DADOS DE ANIMAIS DO CCZ
 const animaisDisponiveis = [
