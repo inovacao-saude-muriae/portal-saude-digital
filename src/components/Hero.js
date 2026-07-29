@@ -28,7 +28,7 @@ export default function Hero() {
                         <Link href="/servicos" className={styles.btnPrimary}>
                             Nossos serviços <span>→</span>
                         </Link>
-                        <Link href="/contato" className={styles.btnSecondary}>
+                        <Link href="/contatos" className={styles.btnSecondary}>
                             Fale conosco
                         </Link>
                     </div>

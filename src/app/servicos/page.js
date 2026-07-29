@@ -8,6 +8,12 @@ import styles from './ServicesPage.module.css';
 export default function ServicesPage() {
     const servicos = [
         {
+        id: "aplicativos",
+        icon: <Stethoscope size={22} />,
+        title: "Aplicativo",
+        desc: "Consultas médicas, exames de rotina, curativos, pré-natal e acompanhamento de saúde da família nas UBS."
+        },
+        {
         id: "atendimento-domiciliar",
         icon: <Stethoscope size={22} />,
         title: "Atendimento Domiciliar",
@@ -43,6 +49,12 @@ export default function ServicesPage() {
         icon: <Truck size={22} />,
         title: "Vacina",
         desc: "SAMU 192, UPA 24 horas e atendimento pré-hospitalar em toda a cidade."
+        },
+        {
+        id: "vigilancia-sanitaria",
+        icon: <Truck size={22} />,
+        title: "Vigilância Sanitária",
+        desc: "Orientar e fiscalizar estabelecimentos e serviços de saúde ou de interesse à saúde."
         }
     ];
 

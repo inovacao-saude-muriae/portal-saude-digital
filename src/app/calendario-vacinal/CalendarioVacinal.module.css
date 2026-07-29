@@ -296,6 +296,8 @@
   border-radius: 16px;
   padding: 24px;
   min-height: 120px;
+  display: flex;
+  flex-direction: column;
 }
 
 .cardHeaderRow {
@@ -326,25 +328,90 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.vacinaList li {
-  font-size: 14.5px;
-  font-weight: 500;
+.vacinaItem {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  line-height: 1.5;
 }
 
 .bulletPoint {
   color: #008a83;
   font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
 }
 
 .vacinaTexto {
-  color: #1e293b;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+  display: block;
+}
+
+.vacinaDescricao {
+  font-size: 13px;
+  color: #64748b;
+  margin: 3px 0 6px 0;
+  line-height: 1.4;
+}
+
+.doencaTag {
+  display: inline-block;
+  font-size: 11.5px;
+  background-color: #e6f2f0;
+  color: #0f6251;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   --- PAINEL EXPANSÍVEL (LOCAL, HORÁRIO E DOCUMENTOS) --- 
+   ========================================================================== */
+.detalhesWrapper {
+  margin-top: auto; /* Empurra a sanfona de detalhes para o rodapé do card */
+  padding-top: 14px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.btnToggleInfo {
+  background: none;
+  border: none;
+  color: #008a83;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.btnToggleInfo:hover {
+  color: #0f6251;
+}
+
+.painelDetalhesExtra {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.infoRow {
+  font-size: 12.5px;
+  color: #334155;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.infoRow strong {
+  color: #0f172a;
 }
 
 /* ==========================================================================

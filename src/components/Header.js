@@ -72,7 +72,7 @@ export default function Header() {
                         <Link href="/servicos" className={`${styles.navItem} ${isActive('/servicos')}`}>Serviços</Link>
                         <Link href="/noticias" className={`${styles.navItem} ${isActive('/noticias')}`}>Notícias</Link>
                         <Link href="/eventos" className={`${styles.navItem} ${isActive('/eventos')}`}>Eventos</Link>
-                        <Link href="/contato" className={`${styles.navItem} ${isActive('/contato')}`}>Contato</Link>
+                        <Link href="/contatos" className={`${styles.navItem} ${isActive('/contatos')}`}>Contatos</Link>
                     </nav>
                 </div>
             </div>
