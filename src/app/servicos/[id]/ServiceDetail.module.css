@@ -23,7 +23,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 64px 0; /* Aumenta a altura para dar o porte imponente do print */
+  padding: 64px 0;
   box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.05);
 }
 
@@ -33,6 +33,7 @@
   display: flex;
   align-items: center;
 }
+
 .heroSubtitle {
   font-size: 11px;
   font-weight: 700;
@@ -46,7 +47,7 @@
 .heroTitle {
   font-size: 36px;
   font-weight: 800;
-  color: #ffffff; /* Fica visível perfeitamente sobre o gradiente azul */
+  color: #ffffff;
   margin: 0;
   letter-spacing: -0.5px;
 }
@@ -80,7 +81,7 @@
   padding: 40px 0 80px 0;
 }
 
-/* Bloco Informativo PNI */
+/* Bloco Informativo Padrão */
 .infoBlock {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -109,6 +110,66 @@
   line-height: 1.7;
   color: #475569;
   margin: 0;
+}
+
+/* ==========================================================================
+   --- BANNER DE ADOÇÃO DE ANIMAIS (EXCLUSIVO PARA O CCZ) --- 
+   ========================================================================== */
+.adocaoBanner {
+  background: linear-gradient(135deg, #008a83 0%, #005c8a 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 36px;
+  margin-bottom: 36px;
+  box-shadow: 0 8px 24px rgba(0, 138, 131, 0.2);
+}
+
+.adocaoBadge {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adocaoContent h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.adocaoContent p {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  margin: 0 0 24px 0;
+  max-width: 900px;
+}
+
+.btnAdocao {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffffff;
+  color: #008a83;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.btnAdocao:hover {
+  transform: translateY(-2px);
+  background-color: #f8fafc;
+  color: #005c8a;
 }
 
 /* --- NAVEGAÇÃO POR ABAS COESAS --- */
@@ -197,7 +258,6 @@
   padding-bottom: 0;
 }
 
-/* CORREÇÃO VISUAL: Títulos fortes e escuros para contraste total */
 .vacinaSection strong {
   display: block;
   font-size: 13px;
@@ -241,7 +301,6 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
 
-/* FAIXA DOS GRUPOS: Alinhada, moderna e espaçada */
 .grupoGrid {
   display: flex;
   justify-content: center;
@@ -254,10 +313,9 @@
   border: 1px solid #e2e8f0;
 }
 
-/* BOTÕES REDONDOS REESTILIZADOS */
 .grupoCircleBtn {
   display: flex;
-  flex-direction: row; /* Layout horizontal fica mais elegante e limpo */
+  flex-direction: row;
   align-items: center;
   gap: 10px;
   background: #ffffff;
@@ -277,7 +335,6 @@
   transform: translateY(-1px);
 }
 
-/* Estado Ativo: Destaque com o Azul do Portal */
 .grupoCircleActive {
   background: #003b5c !important;
   border-color: #003b5c !important;
@@ -306,7 +363,6 @@
   margin-bottom: 32px;
 }
 
-/* SANFONAS (ACCORDIONS) MODERNIZADAS */
 .timelineList {
   display: flex;
   flex-direction: column;
@@ -384,7 +440,7 @@
 }
 
 /* ==========================================================================
-   --- LAYOUT PADRÃO (OUTROS SERVIÇOS DO PORTAL) --- 
+   --- LAYOUT PADRÃO (OUTROS SERVIÇOS DO PORTAL COM SIDEBAR) --- 
    ========================================================================== */
 
 .infoLayout {
@@ -395,7 +451,7 @@
 }
 
 .docList {
-  margin: 0;
+  margin: 12px 0 0 0;
   padding-left: 20px;
   display: flex;
   flex-direction: column;
@@ -416,15 +472,17 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
   position: sticky;
   top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .widgetItem {
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .widgetItem:last-child {
-  margin-bottom: 0;
-  padding-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid #f1f5f9;
 }
 
@@ -454,6 +512,7 @@
   line-height: 1.6;
   margin: 0;
 }
+
 /* ==========================================================================
    --- SEÇÃO DE DOWNLOAD DOS APLICATIVOS (BOTÕES APP STORE E GOOGLE PLAY) ---
    ========================================================================== */
@@ -465,7 +524,6 @@
   margin-top: 12px;
 }
 
-/* Estilo Base dos Botões de Loja */
 .btnAppStore,
 .btnGooglePlay {
   display: inline-flex;
@@ -473,7 +531,7 @@
   justify-content: center;
   gap: 12px;
   padding: 14px 28px;
-  border-radius: 16px; /* Curvatura arredondada idêntica à imagem */
+  border-radius: 16px;
   text-decoration: none;
   font-weight: 700;
   font-size: 17px;
@@ -489,32 +547,18 @@
   opacity: 0.92;
 }
 
-/* Botão App Store (Preto Profundo) */
 .btnAppStore {
   background-color: #18181b;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Botão Google Play (Verde Vibrante idêntico à imagem) */
 .btnGooglePlay {
   background-color: #22ab59;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(34, 171, 89, 0.25);
 }
 
-/* Responsividade para telas de celulares */
-@media (max-width: 640px) {
-  .downloadContainer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .btnAppStore,
-  .btnGooglePlay {
-    width: 100%;
-  }
-}
 /* ==========================================================================
    --- RESPONSIVIDADE COMPLETA --- 
    ========================================================================== */
@@ -526,6 +570,9 @@
   }
   .vacinacaoGrid {
     grid-template-columns: 1fr;
+  }
+  .stickyWidget {
+    position: static;
   }
 }
 
@@ -544,7 +591,7 @@
   }
   .grupoCircleBtn {
     padding: 8px 16px;
-    width: 100%; /* Em telas pequenas viram blocos empilhados confortáveis */
+    width: 100%;
     justify-content: center;
   }
   .accordionHeader {
@@ -554,5 +601,26 @@
   }
   .timelineTime {
     margin-right: 0;
+  }
+  .adocaoBanner {
+    padding: 24px;
+  }
+  .adocaoContent h2 {
+    font-size: 22px;
+  }
+  .btnAdocao {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .downloadContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btnAppStore,
+  .btnGooglePlay {
+    width: 100%;
   }
 }

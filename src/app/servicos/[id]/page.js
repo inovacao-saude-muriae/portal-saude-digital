@@ -87,6 +87,24 @@ const dbServicos = {
     ],
     comunicacao: "Todas as pessoas que recebem remédios, materiais ou tratamentos pelo SUS poderão passar por perícias periódicas, seguindo as regras e critérios definidos pela Câmara Técnica de Saúde."
   },
+  "ccz": {
+  title: "Centro de Controle de Zoonoses",
+  desc: "O Centro de Controle de Zoonoses Manuela Pereira da Marta, vinculado à Secretaria Municipal de Saúde de Muriaé, é uma unidade fundamental para a promoção da saúde pública e para o controle de doenças que podem ser transmitidas entre animais e seres humanos.\n\nLocalizado na BR-356, no sentido Muriaé–Ervália, o CCZ atua diretamente ligado à vigilância e à prevenção dessas patologias, por meio de ações estratégicas voltadas à proteção e melhoria da qualidade de vida da população.",
+  onde: "BR-356, sentido Muriaé–Ervália",
+  secoesTexto: [
+    {
+      titulo: "Principais Atividades Desenvolvidas",
+      itens: [
+        "Monitoramento e controle ativo de doenças zoonóticas, como raiva, leishmaniose, escabiose e esporotricose;",
+        "Educação em saúde, com campanhas contínuas sobre prevenção de zoonoses e posse responsável de animais de estimação;",
+        "Campanhas estratégicas de adoção responsável, incentivando o bem-estar animal e o estreitamento de vínculos com a comunidade;",
+        "Vacinação antirrábica de cães e gatos durante os períodos de mobilização nacional promovidos pelo Governo de Minas Gerais;",
+        "Parcerias técnicas com o Instituto Mineiro de Agropecuária (IMA) para o controle da raiva, com foco no monitoramento de morcegos hematófagos;",
+        "Acolhimento e resgate direcionado de animais com suspeita clínica de zoonoses ou em estrito risco à saúde pública."
+      ]
+    }
+  ]
+},
   "farmacia-municipal": {
     title: "Acesso Gratuito a Medicamentos",
     desc: "A Assistência Farmacêutica garante à população o acesso gratuito a medicamentos por meio do Sistema Único de Saúde (SUS). Esses medicamentos são organizados em diferentes componentes, de acordo com o tipo de tratamento, a complexidade das doenças e as diretrizes do Ministério da Saúde.",
@@ -566,7 +584,19 @@ export default function ServiceDetailPage() {
 
             </div>
           )}
-
+          {/* BLOCO DE DESTAQUE PARA ADOÇÃO DE ANIMAIS */}
+          <div className={styles.adocaoBanner}>
+            <div className={styles.adocaoContent}>
+              <span className={styles.adocaoBadge}>🐶🐱 Posse Responsável</span>
+              <h2>Adote um Amigo!</h2>
+              <p>
+                O CCZ disponibiliza cães e gatos para adoção de forma totalmente responsável. Ao adotar, você oferece uma nova chance de vida digna para um animal e contribui diretamente para o controle populacional e bem-estar da nossa comunidade. Venha conhecer nossos animais protegidos e encontre seu novo companheiro de vida!
+              </p>
+              <Link href="/adocao" className={styles.btnAdocao}>
+                🐾 Conhecer Animais para Adoção →
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
     </div>

@@ -26,6 +26,12 @@ export default function ServicesPage() {
         desc: "Aplicação de vacinas do calendário nacional, campanhas sazonais e imunização de grupos prioritários."
         },
         {
+        id: "ccz",
+        icon: <Truck size={22} />,
+        title: "Centro de Controle de Zoonoses",
+        desc: "Orientar e fiscalizar estabelecimentos e serviços de saúde ou de interesse à saúde."
+        },
+        {
         id: "doacao-de-sangue",
         icon: <Pill size={22} />,
         title: "Doação de Sangue",
