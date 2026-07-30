@@ -5,7 +5,7 @@ import styles from './Header.module.css';
 import Image from 'next/image';
 import Link from 'next/link'; // <-- 1. IMPORTA O LINK DO NEXT.JS PARA NAVEGAÇÃO INTERNA
 import { usePathname } from 'next/navigation';
-
+import SearchBar from '@/components/SearchBar';
 const logoSecretaria = '/img/logo-Prefeitura.png'; 
 
 export default function Header() {

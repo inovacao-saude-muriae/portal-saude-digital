@@ -1,10 +1,11 @@
+// Arquivo: src/app/eventos/[id]/page.js
 'use client';
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { dbEventos, getStatusEvento } from '../page';
+import { dbEventos, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
 export default function EventoDetailPage() {
@@ -16,11 +17,8 @@ export default function EventoDetailPage() {
   const [formData, setFormData] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState(null);
-
-  // ESTADO PARA O ÍNDICE DA IMAGEM SELECIONADA NA GALERIA (null = fechado)
   const [fotoIndex, setFotoIndex] = useState(null);
 
-  // FUNÇÕES NAVEGADORAS DA GALERIA
   const proximaFoto = () => {
     if (!evento?.galeria) return;
     setFotoIndex((prev) => (prev === null ? 0 : (prev + 1) % evento.galeria.length));
@@ -31,18 +29,13 @@ export default function EventoDetailPage() {
     setFotoIndex((prev) => (prev === null ? 0 : (prev - 1 + evento.galeria.length) % evento.galeria.length));
   };
 
-  // SUPORTE A TECLAS DO TECLADO (SETA ESQUERDA, SETA DIREITA E ESC)
   useEffect(() => {
     if (fotoIndex === null || !evento?.galeria) return;
 
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        setFotoIndex((prev) => (prev === null ? 0 : (prev + 1) % evento.galeria.length));
-      } else if (e.key === 'ArrowLeft') {
-        setFotoIndex((prev) => (prev === null ? 0 : (prev - 1 + evento.galeria.length) % evento.galeria.length));
-      } else if (e.key === 'Escape') {
-        setFotoIndex(null);
-      }
+      if (e.key === 'ArrowRight') proximaFoto();
+      else if (e.key === 'ArrowLeft') fotoAnterior();
+      else if (e.key === 'Escape') setFotoIndex(null);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -59,10 +52,9 @@ export default function EventoDetailPage() {
     );
   }
 
-  const status = getStatusEvento(evento);
+  const status = getStatusEvento(evento, styles);
   const dataFormatada = new Date(`${evento.data}T00:00:00`).toLocaleDateString('pt-BR');
 
-  // ENVIO DO FORMULÁRIO PARA O GOOGLE SCRIPT
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -129,7 +121,6 @@ export default function EventoDetailPage() {
             <p>{evento.descricao}</p>
           </article>
 
-          {/* LOCALIZAÇÃO (SE HOUVER) */}
           {evento.local && (
             <div className={styles.infoBlock}>
               <h3>📍 Local de Realização</h3>
@@ -137,7 +128,6 @@ export default function EventoDetailPage() {
             </div>
           )}
 
-          {/* CRONOGRAMA DE HORÁRIOS (SE HOUVER) */}
           {evento.cronograma && evento.cronograma.length > 0 && (
             <div className={styles.infoBlock}>
               <h3>🕒 Programação / Cronograma</h3>
@@ -155,7 +145,6 @@ export default function EventoDetailPage() {
             </div>
           )}
 
-          {/* FORMULÁRIO DE INSCRIÇÃO */}
           {evento.formulario && status.label.includes('Aberto') && (
             <div className={styles.formSection}>
               <h3>📝 Formulário de Inscrição</h3>
@@ -187,7 +176,6 @@ export default function EventoDetailPage() {
             </div>
           )}
 
-          {/* GALERIA DE FOTOS COM EFEITO DE CLIQUE */}
           {evento.galeria && evento.galeria.length > 0 && (
             <div className={styles.infoBlock}>
               <h3>📸 Galeria de Fotos</h3>
@@ -216,56 +204,23 @@ export default function EventoDetailPage() {
         </div>
       </main>
 
-      {/* MODAL TELA CHEIA COM SETAS DE NAVEGAÇÃO */}
       {fotoIndex !== null && evento.galeria && (
-        <div 
-          className={styles.modalOverlay} 
-          onClick={() => setFotoIndex(null)}
-        >
+        <div className={styles.modalOverlay} onClick={() => setFotoIndex(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            
-            {/* BOTÃO FECHAR */}
-            <button 
-              className={styles.closeBtn} 
-              onClick={() => setFotoIndex(null)}
-              title="Fechar (Esc)"
-            >
-              ✕
-            </button>
+            <button className={styles.closeBtn} onClick={() => setFotoIndex(null)}>✕</button>
+            <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={fotoAnterior}>❮</button>
 
-            {/* SETA ANTERIOR */}
-            <button 
-              className={`${styles.navBtn} ${styles.prevBtn}`} 
-              onClick={fotoAnterior}
-              title="Anterior (Seta Esquerda)"
-            >
-              ❮
-            </button>
-
-            {/* IMAGEM AMPLIADA */}
             <Image 
               src={evento.galeria[fotoIndex]} 
-              alt={`Foto ${fotoIndex + 1} de ${evento.galeria.length}`} 
+              alt={`Foto ${fotoIndex + 1}`} 
               width={1200} 
               height={800} 
               unoptimized 
               className={styles.modalImage}
             />
 
-            {/* SETA PRÓXIMA */}
-            <button 
-              className={`${styles.navBtn} ${styles.nextBtn}`} 
-              onClick={proximaFoto}
-              title="Próxima (Seta Direita)"
-            >
-              ❯
-            </button>
-
-            {/* CONTADOR DE FOTOS (Ex: 3 / 16) */}
-            <div className={styles.counterBadge}>
-              {fotoIndex + 1} / {evento.galeria.length}
-            </div>
-
+            <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={proximaFoto}>❯</button>
+            <div className={styles.counterBadge}>{fotoIndex + 1} / {evento.galeria.length}</div>
           </div>
         </div>
       )}

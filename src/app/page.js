@@ -1,4 +1,5 @@
 import Hero from "@/components/Hero";
+import SearchBar from "@/components/SearchBar";
 import ServiceSection from "@/components/ServiceSection";
 import Carousel from "@/components/Carousel";
 import NewsSection from "@/components/NewsSection";
@@ -9,6 +10,8 @@ export default function Home() {
         <>
         {/* BANNER */}
         <Hero />
+
+        <SearchBar/>
         
         {/* SERVIÇOS */}
         <ServiceSection />

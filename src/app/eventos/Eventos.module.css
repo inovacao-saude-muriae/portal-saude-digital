@@ -10,6 +10,7 @@
   padding: 0 24px;
 }
 
+/* HERO BANNER */
 .heroBanner {
   background-color: #003b5c;
   color: #ffffff;
@@ -45,29 +46,47 @@
   padding: 40px 0 80px 0;
 }
 
+/* BARRA DE PESQUISA MODERNA E LIMPA */
 .searchBox {
   position: relative;
   max-width: 500px;
   margin: 0 auto 40px auto;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 30px;
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.searchBox:focus-within {
+  border-color: #008a83;
+  box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.1);
 }
 
 .searchIcon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
   color: #64748b;
+  flex-shrink: 0;
+  margin-right: 10px;
 }
 
 .searchInput {
   width: 100%;
-  padding: 14px 20px 14px 48px;
-  border: 2px solid #cbd5e1;
-  border-radius: 30px;
-  font-size: 15px;
+  padding: 14px 0;
+  border: none;
   outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #0f172a;
 }
 
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+/* GRELHA DE CARDS */
 .eventosGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -81,7 +100,13 @@
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eventoCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .cardImageWrapper {
@@ -106,7 +131,7 @@
   font-size: 12px;
   font-weight: 700;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .statusAberto { background-color: #16a34a; }
@@ -154,10 +179,107 @@
   text-decoration: underline;
 }
 
+/* CONTROLES DA PAGINAÇÃO */
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 50px;
+  padding-top: 20px;
+}
+
+.paginationNavBtn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #008a83;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.paginationNavBtn:hover:not(:disabled) {
+  background-color: #008a83;
+  color: #ffffff;
+  border-color: #008a83;
+}
+
+.paginationNavBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.paginationNumbers {
+  display: flex;
+  gap: 6px;
+}
+
+.pageNumberBtn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.pageNumberBtn:hover {
+  border-color: #008a83;
+  color: #008a83;
+}
+
+.activePageNumber {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+}
+
+/* ESTADO VAZIO (NENHUM RESULTADO) */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emptyIcon {
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.emptyState h3 {
+  font-size: 20px;
+  color: #0f172a;
+  margin: 8px 0;
+}
+
+.emptyState p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* RESPONSIVIDADE */
 @media (max-width: 992px) {
   .eventosGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
   .eventosGrid { grid-template-columns: 1fr; }
+  .paginationContainer { flex-wrap: wrap; }
 }
