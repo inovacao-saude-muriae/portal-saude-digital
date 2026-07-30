@@ -1,56 +1,88 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { dbNoticias } from '../page';
+import { dbNoticias } from '@/data/noticiasData';
 import styles from './NoticiasDetail.module.css';
 
-export default function NoticiaDetailPage() {
-  const params = useParams();
-  const id = params?.id;
+export default function NoticiaDetalhePage({ params }) {
+  const resolvedParams = use(params);
+  const idNoticia = resolvedParams.id;
 
-  const noticia = dbNoticias[id];
+  const noticia = dbNoticias[idNoticia];
 
   if (!noticia) {
     return (
-      <div className={styles.containerErro}>
+      <div className={styles.containerNotFound}>
         <h2>Notícia não encontrada</h2>
-        <p>O conteúdo que procura foi removido ou não existe.</p>
-        <Link href="/noticias" className={styles.backLink}>Voltar para Notícias</Link>
+        <p>A notícia que você está procurando não existe ou foi removida.</p>
+        <Link href="/" className={styles.btnVoltar}>
+          ← Voltar para a página inicial
+        </Link>
       </div>
     );
   }
 
   return (
     <div className={styles.pageWrapper}>
+      
+      {/* BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
-        <Link href="/noticias" className={styles.backLink}>
-          ← Voltar para Notícias
-        </Link>
+        <div className={styles.container}>
+          <Link href="/" className={styles.backLink}>
+            ← Voltar para as notícias
+          </Link>
+        </div>
       </div>
 
-      <main className={styles.contentContainer}>
-        <span className={styles.noticiaData}>Publicado em: {noticia.data}</span>
-        <h1 className={styles.noticiaTitulo}>{noticia.titulo}</h1>
-        <p className={styles.noticiaResumo}>{noticia.resumo}</p>
-        
-        <div className={styles.noticiaBanner}>
-          {/* CORRIGIDO: Substituído img por Image com proporções fluidas */}
-          <Image 
-            src={noticia.imagem} 
-            alt={noticia.titulo} 
-            width={800}
-            height={400}
-            priority
-            unoptimized
-            className={styles.bannerImageSrc}
-          />
-        </div>
+      <main className={styles.mainContent}>
+        <div className={styles.container}>
+          
+          {/* CARD BRANCO PRINCIPAL (IGUAL À IMAGEM) */}
+          <article className={styles.articleCard}>
+            
+            {/* DATA DE PUBLICAÇÃO DISCRETA NO TOPO */}
+            <span className={styles.dataPublicacao}>
+              Publicado em: {noticia.data}
+            </span>
 
-        <article className={styles.noticiaTextoCompleto}>
-          {noticia.conteudo}
-        </article>
+            {/* TÍTULO PRINCIPAL DESTACADO */}
+            <h1 className={styles.titulo}>{noticia.titulo}</h1>
+
+            {/* RESUMO / SUBTÍTULO */}
+            {noticia.resumo && (
+              <p className={styles.resumo}>{noticia.resumo}</p>
+            )}
+
+            {/* IMAGEM COM BORDAS ARREDONDADAS */}
+            {noticia.imagem && (
+              <div className={styles.imageWrapper}>
+                <Image 
+                  src={noticia.imagem} 
+                  alt={noticia.titulo}
+                  width={900}
+                  height={500}
+                  className={styles.imagemCapa}
+                  priority
+                />
+              </div>
+            )}
+
+            {/* CORPO DO TEXTO DA NOTÍCIA */}
+            <div className={styles.corpoNoticia}>
+              {Array.isArray(noticia.conteudo) ? (
+                noticia.conteudo.map((paragrafo, index) => (
+                  <p key={index}>{paragrafo}</p>
+                ))
+              ) : (
+                <p>{noticia.conteudo}</p>
+              )}
+            </div>
+
+          </article>
+
+        </div>
       </main>
     </div>
   );
