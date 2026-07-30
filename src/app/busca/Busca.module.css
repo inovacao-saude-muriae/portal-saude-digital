@@ -1,29 +1,134 @@
 .pageWrapper {
-  padding: 60px 0;
+  width: 100%;
   background-color: #f8fafc;
-  min-height: 80vh;
+  min-height: 85vh;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-.header {
-  margin-bottom: 32px;
+/* BANNER HERO */
+.heroBanner {
+  background-color: #003b5c;
+  padding: 40px 0;
+  color: #ffffff;
 }
 
-.header h1 {
-  font-size: 28px;
-  color: #0f172a;
-  margin: 0 0 8px 0;
+.heroBadge {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #38bdf8;
+  display: block;
+  margin-bottom: 8px;
 }
 
-.header p {
-  font-size: 15px;
-  color: #64748b;
+.heroTitle {
+  font-size: 32px;
+  font-weight: 700;
   margin: 0;
+}
+
+/* BARRA DE NAVEGAÇÃO */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.mainContent {
+  padding: 40px 0 80px 0;
+}
+
+/* CAMPO DE PESQUISA INTERNO */
+.searchBox {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff !important;
+  border: 2px solid #cbd5e1;
+  border-radius: 30px;
+  padding: 4px 6px 4px 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchBox:focus-within {
+  border-color: #008a83;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.12);
+}
+
+.searchIcon {
+  color: #64748b;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #0f172a !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+.searchInput:focus {
+  background-color: transparent !important;
+  color: #0f172a !important;
+}
+
+/* Evita que o recurso de Autocompletar do navegador altere a cor do fundo para escuro/amarelo */
+.searchInput:-webkit-autofill,
+.searchInput:-webkit-autofill:hover,
+.searchInput:-webkit-autofill:focus,
+.searchInput:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.searchBtn {
+  background-color: #008a83;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.searchBtn:hover {
+  background-color: #006097;
+}
+
+.headerInfo {
+  margin-bottom: 24px;
+  font-size: 15px;
+  color: #475569;
 }
 
 .resultsList {
@@ -37,92 +142,32 @@
   border-radius: 12px;
   padding: 20px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.categoryBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #008a83;
-  background-color: #e6f4ea;
-  padding: 4px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
+.resultCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeaderRow {
   margin-bottom: 10px;
 }
 
-.categoryBadgeInstitucional {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #006097;
-  background-color: #e6f2f8;
-  padding: 4px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
+/* BADGES DE CATEGORIA */
+.badgeEvento { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #16a34a; background-color: #dcfce7; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.badgeNoticia { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #ea580c; background-color: #ffedd5; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.badgeAdocao { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #9333ea; background-color: #f3e8ff; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.badgeContato { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #0d9488; background-color: #ccfbf1; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.badgeServico { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #0284c7; background-color: #e0f2fe; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.badgeVacina { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #e11d48; background-color: #ffe4e6; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
 
-.cardTitle {
-  font-size: 18px;
-  color: #0f172a;
-  margin: 0 0 8px 0;
-}
+.cardTitle { font-size: 18px; color: #0f172a; margin: 0 0 8px 0; font-weight: 700; }
+.cardResumo { font-size: 14px; color: #475569; margin: 0 0 14px 0; line-height: 1.5; }
+.cardLink { display: inline-flex; align-items: center; gap: 6px; color: #008a83; font-weight: 700; font-size: 14px; text-decoration: none; }
+.cardLink:hover { text-decoration: underline; }
 
-.cardResumo {
-  font-size: 14px;
-  color: #475569;
-  margin: 0 0 14px 0;
-  line-height: 1.5;
-}
-
-.cardLink {
-  color: #008a83;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-}
-
-.cardLink:hover {
-  text-decoration: underline;
-}
-
-.emptyState {
-  text-align: center;
-  padding: 60px 20px;
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-}
-
-.emptyIcon {
-  color: #94a3b8;
-  margin-bottom: 12px;
-}
-
-.emptyState h2 {
-  font-size: 20px;
-  color: #0f172a;
-  margin-bottom: 8px;
-}
-
-.emptyState p {
-  color: #64748b;
-  margin-bottom: 20px;
-}
-
-.backHomeBtn {
-  display: inline-block;
-  background-color: #008a83;
-  color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-}
+/* ESTADO VAZIO */
+.emptyState { text-align: center; padding: 50px 20px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; }
+.emptyIcon { color: #94a3b8; margin-bottom: 12px; }
+.backHomeBtn { display: inline-block; margin-top: 16px; background-color: #008a83; color: #ffffff; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 14px; }

@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; 
-import { dbNoticias } from '@/app/noticias/page'; // Puxa o banco de dados oficial das notícias
+import { dbNoticias } from '@/data/noticiasData'; // Puxa o banco de dados oficial das notícias
 import styles from './NewsSection.module.css';
 
 // Dicionário para converter o nome dos meses por extenso para número indexável pelo JS

@@ -5,12 +5,11 @@
 }
 
 .container {
-  width: 100%; /* Força o bloco a ocupar a largura total disponível */
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
-
 
 /* --- HERO BANNER --- */
 .heroBanner {
@@ -31,7 +30,6 @@
   height: 100%;
   display: flex;
   align-items: center;
-  /* Removido o padding lateral para o container alinhar perfeitamente com a margem do site */
   padding: 40px 0; 
   background: linear-gradient(to right, rgba(0, 59, 92, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
 }
@@ -62,14 +60,36 @@
   margin: 0;
 }
 
+/* --- BARRA DE NAVEGAÇÃO (FUNDO BRANCO + FONTE AZUL) --- */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+  text-decoration: underline;
+}
+
 /* --- CONTEÚDO CENTRAL --- */
 .contentSection {
-  padding: 60px 0 80px 0;
+  padding: 50px 0 80px 0;
 }
 
 .introBlock {
   max-width: 900px;
-  margin-bottom: 45px;
+  margin-bottom: 30px;
 }
 
 .introBlock p {
@@ -79,7 +99,54 @@
   margin: 0;
 }
 
-/* Grelha de 3 colunas */
+/* --- CAMPO DE BUSCA INTERNO --- */
+.searchBox {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff !important;
+  border: 2px solid #cbd5e1;
+  border-radius: 30px;
+  padding: 4px 16px;
+  margin-bottom: 35px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchBox:focus-within {
+  border-color: #008a83;
+  box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.12);
+}
+
+.searchIcon {
+  color: #64748b;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #0f172a !important;
+  background-color: transparent !important;
+}
+
+.clearBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.clearBtn:hover {
+  color: #0f172a;
+}
+
+/* --- GRELHA DE CARDS --- */
 .servicesGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -140,6 +207,53 @@
   gap: 6px;
 }
 
+.cardLink:hover {
+  text-decoration: underline;
+}
+
+/* --- ESTADO VAZIO / SEM RESULTADOS --- */
+.emptyState {
+  text-align: center;
+  padding: 50px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.emptyIcon {
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.emptyState h3 {
+  font-size: 18px;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.emptyState p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 16px 0;
+}
+
+.resetBtn {
+  background-color: #008a83;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.resetBtn:hover {
+  background-color: #006097;
+}
+
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 1024px) {
   .servicesGrid { grid-template-columns: repeat(2, 1fr); }
 }
