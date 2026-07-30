@@ -3,11 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Search } from 'lucide-react';
 import { animaisDisponiveis } from '@/data/animaisData';
 import styles from './Adocao.module.css';
 
 // URL DO SCRIPT DO GOOGLE SHEETS
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJgl-EYVzUXS8KvJogh2yn_iiFwIC7NwDS8iwnIV23DcZaFnBtSBkY-pKz8tY5sA3xsg/exec";
+
+// FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
+function normalizarTexto(texto) {
+  if (!texto) return '';
+  return texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
 
 export default function AdocaoPage() {
   const [filtroEspecie, setFiltroEspecie] = useState('todos');
@@ -21,10 +31,9 @@ export default function AdocaoPage() {
 
   // ESTADOS DO MODAL, PASSO A PASSO (TERMO -> FORM) E ENVIO
   const [animalSelecionado, setAnimalSelecionado] = useState(null);
-  const [passoModal, setPassoModal] = useState('detalhes'); // 'detalhes' | 'termo' | 'formulario'
+  const [passoModal, setPassoModal] = useState('detalhes');
   const [termoAceito, setTermoAceito] = useState(false);
   
-  // ESTADO DOS DADOS DO FORMULÁRIO COM CAMPOS SEPARADOS
   const [dadosAdocao, setDadosAdocao] = useState({ 
     nome: '', 
     cpf: '',
@@ -40,20 +49,24 @@ export default function AdocaoPage() {
   const [enviadoSucesso, setEnviadoSucesso] = useState(false);
   const [erroEnvio, setErroEnvio] = useState(null);
 
-  // RESET DA PAGINAÇÃO
+  // RESET DA PAGINAÇÃO NOS FILTROS
   const handleFiltroEspecie = (valor) => { setFiltroEspecie(valor); setPaginaAtual(1); };
   const handleFiltroSexo = (valor) => { setFiltroSexo(valor); setPaginaAtual(1); };
   const handleFiltroIdade = (valor) => { setFiltroIdade(valor); setPaginaAtual(1); };
   const handleBuscaNome = (valor) => { setBuscaNome(valor); setPaginaAtual(1); };
 
-  // FILTRAGEM
+  // FILTRAGEM COM NORMALIZAÇÃO DE ACENTOS
+  const termoBusca = normalizarTexto(buscaNome.trim());
+
   const animaisFiltrados = animaisDisponiveis.filter(animal => {
     const bateEspecie = filtroEspecie === 'todos' || animal.especie.toLowerCase() === filtroEspecie.toLowerCase();
     const bateSexo = filtroSexo === 'todos' || animal.sexo.toLowerCase() === filtroSexo.toLowerCase();
     let bateIdade = true;
     if (filtroIdade === 'filhote') bateIdade = animal.filhote === 'true';
     else if (filtroIdade === 'adulto') bateIdade = animal.filhote === 'false';
-    const bateNome = animal.nome.toLowerCase().includes(buscaNome.toLowerCase());
+    
+    const bateNome = normalizarTexto(animal.nome).includes(termoBusca) ||
+                     normalizarTexto(animal.descricao).includes(termoBusca);
 
     return bateEspecie && bateSexo && bateIdade && bateNome;
   });
@@ -87,7 +100,11 @@ export default function AdocaoPage() {
     setDadosAdocao({ nome: '', cpf: '', telefone: '', email: '', rua: '', numero: '', bairro: '', cidade: '' });
   };
 
-  // ENVIO PARA O GOOGLE SHEETS VIA GET
+  const handleSubmeterBusca = (e) => {
+    e.preventDefault();
+  };
+
+  // ENVIO PARA O GOOGLE SHEETS
   const handleEnviarFormulario = async (e) => {
     e.preventDefault();
     setEnviando(true);
@@ -128,7 +145,7 @@ export default function AdocaoPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER NO TOPO DA PÁGINA */}
+      {/* HERO BANNER */}
       <section className={styles.heroBanner}>
         <div className={styles.container}>
           <span className={styles.heroBadge}>🐾 Posse Responsável</span>
@@ -139,7 +156,7 @@ export default function AdocaoPage() {
         </div>
       </section>
 
-      {/* 2. BARRA DE NAVEGAÇÃO POSICIONADA LOGO ABAIXO DO BANNER HERO */}
+      {/* BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/servicos/ccz" className={styles.backLink}>
@@ -151,21 +168,29 @@ export default function AdocaoPage() {
       <main className={styles.mainContainer}>
         <div className={styles.container}>
 
-          {/* BUSCA E FILTROS EXPANDIDOS */}
+          {/* BUSCA COM BOTÃO "BUSCAR" E FILTROS */}
           <div className={styles.filterSection}>
-            <div className={styles.searchBox}>
-              <span className={styles.searchIcon}>🔍</span>
+            <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
+              <Search size={18} className={styles.searchIcon} />
               <input 
                 type="text" 
-                placeholder="Buscar pelo nome do animal..." 
+                placeholder="Buscar por um animal" 
                 value={buscaNome}
                 onChange={(e) => handleBuscaNome(e.target.value)}
                 className={styles.searchInput}
               />
               {buscaNome && (
-                <button className={styles.clearBtn} onClick={() => handleBuscaNome('')}>✕</button>
+                <button 
+                  type="button" 
+                  className={styles.clearBtn} 
+                  onClick={() => handleBuscaNome('')}
+                  title="Limpar busca"
+                >
+                  ✕
+                </button>
               )}
-            </div>
+              <button type="submit" className={styles.searchBtn}>Buscar</button>
+            </form>
 
             <div className={styles.filterGroupRow}>
               {/* Espécie */}
@@ -298,9 +323,9 @@ export default function AdocaoPage() {
             </>
           ) : (
             <div className={styles.emptyState}>
-              <span>🔍</span>
+              <Search size={40} className={styles.emptyIcon} />
               <h3>Nenhum animal encontrado</h3>
-              <p>Não encontramos nenhum amiguinho com essa combinação de filtros.</p>
+              <p>Não encontramos nenhum amiguinho correspondente a {`"${buscaNome}"`}.</p>
               <button 
                 className={styles.resetBtn} 
                 onClick={() => { setBuscaNome(''); handleFiltroSexo('todos'); handleFiltroEspecie('todos'); handleFiltroIdade('todos'); }}
@@ -330,7 +355,7 @@ export default function AdocaoPage() {
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button className={styles.closeBtn} onClick={handleFecharModal} title="Fechar">✕</button>
 
-            {/* PASSO 1: DETALHES COMPACTOS DO ANIMAL */}
+            {/* PASSO 1: DETALHES */}
             {passoModal === 'detalhes' && (
               <div className={styles.modalBodyDetails}>
                 <div className={styles.modalImageWrapper}>
@@ -492,7 +517,6 @@ export default function AdocaoPage() {
                       />
                     </div>
 
-                    {/* CAMPOS DE ENDEREÇO SEPARADOS */}
                     <div className={styles.formGroup}>
                       <label>Rua / Logradouro *</label>
                       <input 

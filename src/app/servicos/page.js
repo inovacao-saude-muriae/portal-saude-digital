@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { servicos } from '@/data/listaServicosData';
+import { servicos } from '@/data/servicosData';
 import styles from './ServicesPage.module.css';
 
 // FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
@@ -28,6 +28,10 @@ export default function ServicesPage() {
 
     return bateTitulo || bateDesc || bateId;
   });
+
+  const handleSubmeterBusca = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -60,6 +64,31 @@ export default function ServicesPage() {
       {/* 3. CONTEÚDO CENTRAL */}
       <section className={styles.contentSection}>
         <div className={styles.container}>                
+
+          {/* CAMPO DE BUSCA (AGORA ACIMA DO TEXTO INICIAL) */}
+          <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
+            <Search size={18} className={styles.searchIcon} />
+            <input 
+              type="text" 
+              placeholder="Buscar serviço"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className={styles.searchInput}
+            />
+            {busca && (
+              <button 
+                type="button" 
+                className={styles.clearBtn} 
+                onClick={() => setBusca('')}
+                title="Limpar busca"
+              >
+                ✕
+              </button>
+            )}
+            <button type="submit" className={styles.searchBtn}>Buscar</button>
+          </form>
+
+          {/* TEXTO INICIAL INTRODUTÓRIO */}
           <div className={styles.introBlock}>
             <p>
               A Secretaria Municipal de Saúde oferece um amplo conjunto de serviços organizados em 
@@ -68,35 +97,21 @@ export default function ServicesPage() {
             </p>
           </div>
 
-          {/* CAMPO DE BUSCA INTERNO EM TEMPO REAL */}
-          <div className={styles.searchBox}>
-            <Search size={18} className={styles.searchIcon} />
-            <input 
-              type="text" 
-              placeholder="Buscar serviço por nome ou descrição (ex: farmácia, vacina)..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className={styles.searchInput}
-            />
-            {busca && (
-              <button className={styles.clearBtn} onClick={() => setBusca('')}>✕</button>
-            )}
-          </div>
-
           {/* GRELHA DE CARTÕES OU MENSAGEM DE 'NENHUM RESULTADO' */}
           {servicosFiltrados.length > 0 ? (
             <div className={styles.servicesGrid}>
               {servicosFiltrados.map((item) => (
-                <div key={item.id} className={styles.serviceCard}>
+                <Link key={item.id} href={`/servicos/${item.id}`} className={styles.serviceCard}>
                   <div className={styles.iconBox}>
                     {item.icon}
                   </div>
                   <h2 className={styles.cardTitle}>{item.title}</h2>
                   <p className={styles.cardDesc}>{item.desc}</p>
-                  <Link href={`/servicos/${item.id}`} className={styles.cardLink}>
+                  
+                  <span className={styles.cardLink}>
                     Saiba mais <span>→</span>
-                  </Link>
-                </div>
+                  </span>
+                </Link>
               ))}
             </div>
           ) : (

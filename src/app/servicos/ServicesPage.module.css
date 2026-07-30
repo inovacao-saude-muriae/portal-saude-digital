@@ -1,6 +1,6 @@
 .pageWrapper {
   width: 100%;
-  background-color: #ffffff;
+  background-color: #eaf3f8;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -99,15 +99,17 @@
   margin: 0;
 }
 
-/* --- CAMPO DE BUSCA INTERNO --- */
+/* --- CAMPO DE BUSCA COM LARGURA MENOR E ALTURA PADRÃO --- */
 .searchBox {
   display: flex;
   align-items: center;
   background-color: #ffffff !important;
   border: 2px solid #cbd5e1;
   border-radius: 30px;
-  padding: 4px 16px;
-  margin-bottom: 35px;
+  padding: 4px 6px 4px 16px;
+  margin: 0 auto 35px auto; /* Centralizado e com largura ajustada */
+  max-width: 600px; /* Largura menor que não ocupa a tela toda */
+  width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -125,7 +127,7 @@
 
 .searchInput {
   width: 100%;
-  padding: 12px 0;
+  padding: 10px 0;
   border: none;
   outline: none;
   font-size: 15px;
@@ -139,11 +141,30 @@
   color: #94a3b8;
   font-size: 16px;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 8px;
+  margin-right: 4px;
 }
 
 .clearBtn:hover {
   color: #0f172a;
+}
+
+/* BOTÃO DE BUSCA IGUAL DA PÁGINA INICIAL / BUSCA GLOBAL */
+.searchBtn {
+  background-color: #008a83;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.searchBtn:hover {
+  background-color: #006097;
 }
 
 /* --- GRELHA DE CARDS --- */

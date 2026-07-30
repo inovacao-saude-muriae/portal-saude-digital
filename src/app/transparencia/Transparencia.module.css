@@ -1,0 +1,362 @@
+/* ==========================================================================
+   --- CONFIGURAÇÕES GERAIS DA PÁGINA DE TRANSPARÊNCIA ---
+   ========================================================================== */
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==========================================================================
+   --- HERO BANNER INSTITUCIONAL ---
+   ========================================================================== */
+.heroBanner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 355; 
+  background-image: url('/img/banner-paginas.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 40px 0; 
+  background: linear-gradient(to right, rgba(0, 59, 92, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.heroSubtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.heroTitle {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.heroDesc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 650px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   --- BARRA DE NAVEGAÇÃO DE VOLTAR ---
+   ========================================================================== */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+  text-decoration: underline;
+}
+
+.mainContainer {
+  padding: 50px 0 80px 0;
+}
+
+/* ==========================================================================
+   --- TRILHO DE ABAS INTERATIVAS DE SELEÇÃO ---
+   ========================================================================== */
+.tabContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 35px;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.tabBtn:hover {
+  border-color: #008a83;
+  color: #008a83;
+  background-color: #f0fdfa;
+}
+
+.tabBtnActive {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+  box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
+}
+
+.tabIcon {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   --- CARD CONTAINER DO POWER BI ---
+   ========================================================================== */
+.dashboardCard {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 59, 92, 0.04);
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badgeLive {
+  display: inline-block;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.dashboardTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003b5c;
+  margin: 0;
+}
+
+.openExternalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #005c8a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.openExternalBtn:hover {
+  background-color: #008a83;
+  color: #ffffff;
+  border-color: #008a83;
+}
+
+/* ==========================================================================
+   --- IFRAME RESPONSIVO DO POWER BI ---
+   ========================================================================== */
+.iframeWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Mantém a proporção padrão do Power BI */
+  min-height: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.powerBiIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ==========================================================================
+   --- RESPONSIVIDADE ---
+   ========================================================================== */
+@media (max-width: 992px) {
+  .dashboardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .iframeWrapper {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroBanner { 
+    aspect-ratio: auto; 
+    min-height: 240px; 
+  }
+
+  .heroTitle { 
+    font-size: 32px; 
+  }
+
+  .tabContainer {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .tabBtn {
+    white-space: nowrap;
+  }
+
+  .iframeWrapper {
+    min-height: 400px;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* CATEGORIAS PRINCIPAIS (NÍVEL 1) */
+.categoryTrack {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.categoryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f8fafc;
+  color: #0f172a;
+  border: 2px solid #cbd5e1;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoryBtn:hover {
+  border-color: #008a83;
+  color: #008a83;
+  background-color: #f0fdfa;
+}
+
+.categoryBtnActive {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+  box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
+}
+
+/* SUB-ABAS (NÍVEL 2) */
+.subTabContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 30px;
+  background-color: #f1f5f9;
+  padding: 8px;
+  border-radius: 30px;
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.subTabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  color: #475569;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subTabBtn:hover {
+  color: #008a83;
+}
+
+.subTabBtnActive {
+  background-color: #ffffff !important;
+  color: #008a83 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ESTADO VAZIO / PAINEL SEM LINK */
+.emptyDashboardState {
+  padding: 80px 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.emptyIcon {
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.emptyDashboardState h3 {
+  font-size: 20px;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.emptyDashboardState p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}

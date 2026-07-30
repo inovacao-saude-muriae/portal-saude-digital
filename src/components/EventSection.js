@@ -46,7 +46,12 @@ export default function EventSection() {
             const status = getStatusEvento(evento, styles);
 
             return (
-              <div key={evento.id} className={styles.eventCard}>
+              /* TRANSFORMAMOS O CARD INTEIRO EM UM LINK CLICÁVEL */
+              <Link 
+                key={evento.id} 
+                href={`/eventos/${evento.id}`}
+                className={styles.eventCard}
+              >
                 
                 {/* BLOCO DA DATA (AZUL) */}
                 <div className={styles.dateBox}>
@@ -81,22 +86,21 @@ export default function EventSection() {
                     </span>
                   </div>
 
-                  <Link 
-                    href={`/eventos/${evento.id}`} 
+                  {/* BOTÃO/TEXTO "VER MAIS" APENAS VISUAL */}
+                  <span 
                     style={{ 
                       marginTop: '12px', 
                       display: 'inline-block', 
                       fontSize: '13px', 
                       color: '#008a83', 
-                      fontWeight: '700', 
-                      textDecoration: 'none' 
+                      fontWeight: '700' 
                     }}
                   >
                     Ver mais →
-                  </Link>
+                  </span>
                 </div>
 
-              </div>
+              </Link>
             );
           })}
         </div>

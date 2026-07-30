@@ -3,21 +3,26 @@
 import React, { useState } from 'react';
 import styles from './Header.module.css'; 
 import Image from 'next/image';
-import Link from 'next/link'; // <-- 1. IMPORTA O LINK DO NEXT.JS PARA NAVEGAÇÃO INTERNA
+import Link from 'next/link'; 
 import { usePathname } from 'next/navigation';
-import SearchBar from '@/components/SearchBar';
 const logoSecretaria = '/img/logo-Prefeitura.png'; 
 
 export default function Header() {
     const [menuAberto, setMenuAberto] = useState(false);
-    const pathname = usePathname(); // Captura a página real atual
+    const pathname = usePathname(); 
+
     const toggleMenu = () => {
         setMenuAberto(!menuAberto);
     };
 
-    // Função que verifica se a rota do botão é a mesma da URL do navegador
+    // Ativo para o menu principal
     const isActive = (path) => {
         return pathname === path ? styles.activeLink : "";
+    };
+
+    // Ativo exclusivo para a barra superior (Ouvidoria / Transparência)
+    const isTopBarActive = (path) => {
+        return pathname === path ? styles.topBarActiveLink : "";
     };
 
     return (
@@ -30,9 +35,13 @@ export default function Header() {
                         <span>📍 Av. Maestro Sansão</span>
                     </div>
                     <div className={styles.topBarRight}>
-                        <Link href="/ouvidoria" className={isActive('/ouvidoria')}>Ouvidoria</Link>
-                        <span className={styles.divisor}>|</span> 
-                        <Link href="/transparencia" className={isActive('/transparencia')}>Transparência</Link>
+                        <Link href="/ouvidoria" className={isTopBarActive('/ouvidoria')}>
+                            Ouvidoria
+                        </Link>
+                        <span className={styles.divider}>|</span> 
+                        <Link href="/transparencia" className={isTopBarActive('/transparencia')}>
+                            Transparência
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -40,7 +49,7 @@ export default function Header() {
             {/* MENU PRINCIPAL */}
             <div className={styles.mainHeader}>
                 <div className={`${styles.container} ${styles.mainHeaderContainer}`}>
-                    {/* LOGO E TITULOS */}
+                    {/* LOGO E TÍTULOS */}
                     <div className={styles.brand}>
                         <div className={styles.logoBox}>
                             <Image 
@@ -58,14 +67,14 @@ export default function Header() {
                         </div>
                     </div>
 
-                    {/* BOTÃO HAMBURGUER */}
+                    {/* BOTÃO HAMBÚRGUER */}
                     <button className={styles.hamburger} onClick={toggleMenu} aria-label="Abrir menu">
                         <span className={`${styles.bar} ${menuAberto ? styles.transform : ""}`}></span>
                         <span className={`${styles.bar} ${menuAberto ? styles.transform : ""}`}></span>
                         <span className={`${styles.bar} ${menuAberto ? styles.transform : ""}`}></span>
                     </button>
 
-                    {/* LINKS DE NAVEGAÇÃO CORRIGIDOS */}
+                    {/* LINKS DE NAVEGAÇÃO */}
                     <nav className={`${styles.navMenu} ${menuAberto ? styles.active : ""}`}>
                         <Link href="/" className={`${styles.navItem} ${isActive('/')}`}>Início</Link>
                         <Link href="/secretaria" className={`${styles.navItem} ${isActive('/secretaria')}`}>A Secretaria</Link>

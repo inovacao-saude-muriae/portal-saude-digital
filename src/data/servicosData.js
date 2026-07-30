@@ -1,5 +1,78 @@
-// src/data/servicosData.js
+import { 
+  Smartphone, 
+  Home, 
+  ClipboardList, 
+  Dog, 
+  Droplets, 
+  Pill, 
+  FlaskConical, 
+  Syringe, 
+  ShieldCheck 
+} from 'lucide-react';
 
+/* ==========================================================================
+   1. ARRAY PARA A LISTAGEM / PÁGINA INICIAL DE SERVIÇOS
+   ========================================================================== */
+export const servicos = [
+  {
+    id: 'aplicativos',
+    title: 'Aplicativos da Saúde',
+    desc: 'Acesso rápido aos serviços digitais de saúde na palma da sua mão.',
+    icon: <Smartphone size={24} />
+  },
+  {
+    id: 'atendimento-domiciliar',
+    title: 'Atendimento Domiciliar',
+    desc: 'Cuidado em saúde diretamente no aconchego do seu lar para acamados ou com mobilidade reduzida.',
+    icon: <Home size={24} />
+  },
+  {
+    id: 'camara-tecnica',
+    title: 'Câmara Técnica',
+    desc: 'Avaliação especializada para apoio às decisões em tratamentos e medicamentos.',
+    icon: <ClipboardList size={24} />
+  },
+  {
+    id: 'ccz',
+    title: 'Centro de Controle de Zoonoses',
+    desc: 'Prevenção, vigilância e controle de doenças transmissíveis por animais.',
+    icon: <Dog size={24} />
+  },
+  {
+    id: 'doacao-de-sangue',
+    title: 'Doação de Sangue e Medula',
+    desc: 'Saiba onde e como doar sangue e cadastrar-se para doação de medula óssea.',
+    icon: <Droplets size={24} />
+  },
+  {
+    id: 'farmacia-municipal',
+    title: 'Farmácia Municipal',
+    desc: 'Fornecimento gratuito de medicamentos essenciais e especializados.',
+    icon: <Pill size={24} />
+  },
+  {
+    id: 'laboratorio-municipal',
+    title: 'Laboratório Municipal',
+    desc: 'Exames laboratoriais gratuitos com precisão e agilidade.',
+    icon: <FlaskConical size={24} />
+  },
+  {
+    id: 'vacina',
+    title: 'Vacina',
+    desc: 'Imunização para todas as faixas etárias segundo o calendário oficial.',
+    icon: <Syringe size={24} />
+  },
+  {
+    id: 'vigilancia-sanitaria',
+    title: 'Vigilância Sanitária',
+    desc: 'Fiscalização e orientação para segurança alimentar, ambiental e sanitária.',
+    icon: <ShieldCheck size={24} />
+  }
+];
+
+/* ==========================================================================
+   2. OBJETO DE DETALHES DE CADA SERVIÇO (BANCO DE DADOS DA PÁGINA INTERNA)
+   ========================================================================== */
 export const dbServicos = {
   "aplicativos": {
     title: "Aplicativos da Saúde",
@@ -138,7 +211,7 @@ export const dbServicos = {
   },
   "laboratorio-municipal": {
     title: "Diagnóstico e Apoio à Saúde da População",
-    desc: "O Laboratório Municipal é responsável pela realização de exames laboratoriais offeredidos pelo Sistema Único de Saúde (SUS), desempenhando um papel essencial no diagnóstico, prevenção e acompanhamento de doenças.\n\nPor meio desse serviço, a população tem acesso gratuito a exames que auxiliam os profissionais de saúde na identificação precoce de alterações e na condução adequada dos tratamentos.",
+    desc: "O Laboratório Municipal é responsável pela realização de exames laboratoriais oferecidos pelo Sistema Único de Saúde (SUS), desempenhando um papel essencial no diagnóstico, prevenção e acompanhamento de doenças.\n\nPor meio desse serviço, a população tem acesso gratuito a exames que auxiliam os profissionais de saúde na identificação precoce de alterações e na condução adequada dos tratamentos.",
     horario: "Segunda a sexta-feira, das 12h às 17h",
     onde: "Rua Coronel Izalino, s/n - Muriaé/MG | Telefone: (32) 2020-8074",
     secoesTexto: [
@@ -230,6 +303,9 @@ export const dbServicos = {
   }
 };
 
+/* ==========================================================================
+   3. TIPOS DE VACINAS
+   ========================================================================== */
 export const tiposVacinas = [
   {
     id: 1,

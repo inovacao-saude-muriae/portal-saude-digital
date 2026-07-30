@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; 
-import { dbNoticias } from '@/data/noticiasData'; // Puxa o banco de dados oficial das notícias
+import { dbNoticias } from '@/data/noticiasData'; 
 import styles from './NewsSection.module.css';
 
 // Dicionário para converter o nome dos meses por extenso para número indexável pelo JS
@@ -28,10 +28,9 @@ export default function NewsSection() {
       ...dbNoticias[chave]
     }))
     .sort((a, b) => {
-      // Ordenação decrescente: o maior timestamp (mais novo) fica no topo do array
       return converterParaDate(b.data).getTime() - converterParaDate(a.data).getTime();
     })
-    .slice(0, 3); // Corta e isola apenas as 3 primeiras notícias ordenadas
+    .slice(0, 3); 
 
   return (
     <section className={styles.newsSection}>
@@ -51,15 +50,19 @@ export default function NewsSection() {
         {/* GRELHA DE CARTÕES DINÂMICOS POR DATA */}
         <div className={styles.newsGrid}>
           {noticiasHome.map((item, idx) => (
-            <article key={item.id} className={styles.newsCard}>
-              
+            /* TRANSFORMAMOS O PRÓPRIO LINK NO CARD */
+            <Link 
+              key={item.id} 
+              href={`/noticias/${item.id}`} 
+              className={styles.newsCard}
+            >
               {/* MOLDURA DA IMAGEM */}
               <div className={styles.imageWrapper}>
                 <Image
                   src={item.imagem} 
                   alt={item.titulo} 
                   fill
-                  unoptimized // Mantém a compatibilidade com caminhos locais no Turbopack
+                  unoptimized
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px"
                   className={styles.cardImage}
                   priority={idx === 0}
@@ -80,12 +83,13 @@ export default function NewsSection() {
                 <h3 className={styles.cardTitle}>{item.titulo}</h3>
                 <p className={styles.cardDescription}>{item.resumo}</p>
                 
-                <Link href={`/noticias/${item.id}`} className={styles.readMore}>
+                {/* BOTÃO/TEXTO LER MAIS APENAS VISUAL */}
+                <span className={styles.readMore}>
                   Ler mais <span>→</span>
-                </Link>
+                </span>
               </div>
 
-            </article>
+            </Link>
           ))}
         </div>
 
