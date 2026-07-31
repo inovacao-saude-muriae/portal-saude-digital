@@ -1,0 +1,224 @@
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mainContent {
+  padding: 40px 20px 80px 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- HERO BANNER --- */
+.heroBanner {
+  background-color: #003b5c;
+  color: #ffffff;
+  padding: 48px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badgeHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.heroDesc {
+  font-size: 16px;
+  color: #e2e8f0;
+  max-width: 750px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* --- BARRA DE NAVEGAÇÃO DE RETORNO --- */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+}
+
+.navTag {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* --- LAYOUT DUAS COLUNAS --- */
+.serviceLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+}
+
+.infoBlock {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.infoBlock h2, .infoBlock h3 {
+  font-size: 20px;
+  color: #003b5c;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.infoBlock p {
+  font-size: 15.5px;
+  color: #334155;
+  line-height: 1.7;
+  margin: 0 0 12px 0;
+}
+
+/* --- BANNER DE ADOÇÃO DE ANIMAIS --- */
+.adocaoBanner {
+  background: linear-gradient(135deg, #005c8a 0%, #008a83 100%);
+  border-radius: 20px;
+  padding: 36px;
+  color: #ffffff;
+  margin-top: 12px;
+  box-shadow: 0 8px 24px rgba(0, 92, 138, 0.15);
+}
+
+.adocaoBadge {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adocaoContent h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 14px 0 12px 0;
+  color: #ffffff;
+}
+
+.adocaoContent p {
+  line-height: 1.7;
+  max-width: 850px;
+  margin-bottom: 24px;
+  font-size: 15.5px;
+  color: #f1f5f9;
+}
+
+.btnAdocao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  color: #005c8a;
+  padding: 12px 26px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btnAdocao:hover {
+  transform: translateY(-2px);
+  background-color: #f8fafc;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* --- BARRA LATERAL (SIDEBAR) --- */
+.sidebarArea {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.widgetBox {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.widgetText {
+  margin: 0;
+  font-size: 14.5px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 900px) {
+  .serviceLayout {
+    grid-template-columns: 1fr;
+  }
+}

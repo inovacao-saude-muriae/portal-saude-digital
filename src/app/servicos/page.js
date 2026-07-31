@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { servicos } from '@/data/servicosData';
 import styles from './ServicesPage.module.css';
 
-// FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
+// Função auxiliar para remover acentos e facilitar a busca
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
@@ -18,9 +18,8 @@ function normalizarTexto(texto) {
 export default function ServicesPage() {
   const [busca, setBusca] = useState('');
 
-  // FILTRAGEM EM TEMPO REAL IGNORANDO ACENTOS
   const termo = normalizarTexto(busca.trim());
-  
+
   const servicosFiltrados = servicos.filter((item) => {
     const bateTitulo = normalizarTexto(item.title).includes(termo);
     const bateDesc = normalizarTexto(item.desc).includes(termo);
@@ -36,7 +35,7 @@ export default function ServicesPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. BANNER DE TOPO COM IMAGEM DE FUNDO */}
+      {/* 1. BANNER DE TOPO */}
       <section 
         className={styles.heroBanner}
         style={{ backgroundImage: "url('/img/banner-paginas.png')" }} 
@@ -52,7 +51,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* 2. BARRA DE NAVEGAÇÃO SUPERIOR / VOLTAR PARA A PÁGINA PRINCIPAL */}
+      {/* 2. BARRA DE NAVEGAÇÃO SUPERIOR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/" className={styles.backLink}>
@@ -65,7 +64,7 @@ export default function ServicesPage() {
       <section className={styles.contentSection}>
         <div className={styles.container}>                
 
-          {/* CAMPO DE BUSCA (AGORA ACIMA DO TEXTO INICIAL) */}
+          {/* CAMPO DE BUSCA INTERATIVO */}
           <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
             <input 
@@ -82,26 +81,36 @@ export default function ServicesPage() {
                 onClick={() => setBusca('')}
                 title="Limpar busca"
               >
-                ✕
+                <X size={18} />
               </button>
             )}
             <button type="submit" className={styles.searchBtn}>Buscar</button>
           </form>
 
-          {/* TEXTO INICIAL INTRODUTÓRIO */}
+          {/* FEEDBACK DE RESULTADOS */}
           <div className={styles.introBlock}>
-            <p>
-              A Secretaria Municipal de Saúde oferece um amplo conjunto de serviços organizados em 
-              diferentes níveis de atenção, com o objetivo de garantir atendimento integral em todas as 
-              etapas da vida do cidadão.
-            </p>
+            {busca ? (
+              <p className={styles.searchResultText}>
+                Exibindo <strong>{servicosFiltrados.length}</strong> resultado(s) para <strong>&quot;{busca}&quot;</strong>:
+              </p>
+            ) : (
+              <p>
+                A Secretaria Municipal de Saúde oferece um amplo conjunto de serviços organizados em 
+                diferentes níveis de atenção, com o objetivo de garantir atendimento integral em todas as 
+                etapas da vida do cidadão.
+              </p>
+            )}
           </div>
 
-          {/* GRELHA DE CARTÕES OU MENSAGEM DE 'NENHUM RESULTADO' */}
+          {/* GRELHA DE CARDS COM LINK PARA AS PASTAS DEDICADAS */}
           {servicosFiltrados.length > 0 ? (
             <div className={styles.servicesGrid}>
               {servicosFiltrados.map((item) => (
-                <Link key={item.id} href={`/servicos/${item.id}`} className={styles.serviceCard}>
+                <Link 
+                  key={item.id} 
+                  href={`/servicos/${item.id}`} 
+                  className={styles.serviceCard}
+                >
                   <div className={styles.iconBox}>
                     {item.icon}
                   </div>
@@ -118,7 +127,7 @@ export default function ServicesPage() {
             <div className={styles.emptyState}>
               <Search size={40} className={styles.emptyIcon} />
               <h3>Nenhum serviço encontrado</h3>
-              <p>Não encontramos nenhum serviço correspondente a {`"${busca}"`}.</p>
+              <p>Não encontramos nenhum serviço correspondente a &quot;{busca}&quot;.</p>
               <button className={styles.resetBtn} onClick={() => setBusca('')}>
                 Limpar busca
               </button>

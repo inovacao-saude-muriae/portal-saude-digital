@@ -60,7 +60,7 @@
   margin: 0;
 }
 
-/* --- BARRA DE NAVEGAÇÃO (FUNDO BRANCO + FONTE AZUL) --- */
+/* --- BARRA DE NAVEGAÇÃO --- */
 .navigationBar {
   background-color: #ffffff;
   border-bottom: 1px solid #e2e8f0;
@@ -99,7 +99,19 @@
   margin: 0;
 }
 
-/* --- CAMPO DE BUSCA COM LARGURA MENOR E ALTURA PADRÃO --- */
+/* TEXTO DE FEEDBACK DE RESULTADOS DA BUSCA */
+.searchResultText {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #2c4a5e;
+  margin: 0;
+}
+
+.searchResultText strong {
+  color: #003b5c;
+}
+
+/* --- CAMPO DE BUSCA --- */
 .searchBox {
   display: flex;
   align-items: center;
@@ -107,8 +119,8 @@
   border: 2px solid #cbd5e1;
   border-radius: 30px;
   padding: 4px 6px 4px 16px;
-  margin: 0 auto 35px auto; /* Centralizado e com largura ajustada */
-  max-width: 600px; /* Largura menor que não ocupa a tela toda */
+  margin: 0 auto 35px auto;
+  max-width: 600px;
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -143,13 +155,16 @@
   cursor: pointer;
   padding: 0 8px;
   margin-right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
 }
 
 .clearBtn:hover {
   color: #0f172a;
 }
 
-/* BOTÃO DE BUSCA IGUAL DA PÁGINA INICIAL / BUSCA GLOBAL */
 .searchBtn {
   background-color: #008a83;
   color: #ffffff;
@@ -174,7 +189,6 @@
   gap: 24px;
 }
 
-/* Cards */
 .serviceCard {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
@@ -184,6 +198,7 @@
   flex-direction: column;
   align-items: flex-start;
   transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
 }
 
 .serviceCard:hover {
@@ -276,10 +291,16 @@
 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 1024px) {
-  .servicesGrid { grid-template-columns: repeat(2, 1fr); }
+  .servicesGrid { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
 }
 
 @media (max-width: 768px) {
-  .heroTitle { font-size: 32px; }
-  .servicesGrid { grid-template-columns: 1fr; }
+  .heroTitle { 
+    font-size: 32px; 
+  }
+  .servicesGrid { 
+    grid-template-columns: 1fr; 
+  }
 }

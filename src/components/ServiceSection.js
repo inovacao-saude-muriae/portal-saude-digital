@@ -1,19 +1,18 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import styles from './ServiceSection.module.css';
 import { 
-  Home,           // Para Atendimento Domiciliar
-  ClipboardList,  // Para Câmara Técnica
-  Pill,           // Para Farmácia Municipal
-  Ambulance,      // Para Fluxos Assistenciais / Urgência
-  Syringe,        // Para Vacinação (Universal)
-  ChartNoAxesCombined     // Para Transparência / Conformidade (ou BarChart / Eye)
+  Home, 
+  ClipboardList, 
+  Pill, 
+  Ambulance, 
+  Syringe, 
+  ChartNoAxesCombined 
 } from 'lucide-react';
 
 export default function ServiceSection() {
-    
     const servicos = [
         {
             id: 1,
@@ -39,7 +38,7 @@ export default function ServiceSection() {
         {
             id: 4,
             title: "Fluxos Assistenciais",
-            description: "Atendimento móvel de urgência 24h e encaminhamentos.",
+            description: "Diretrizes, itinerários terapêuticos e pactuações.",
             icon: <Ambulance size={22} className={styles.icon} />,
             link: "/servicos/fluxos-assistenciais"
         },
@@ -55,15 +54,13 @@ export default function ServiceSection() {
             title: "Transparência",
             description: "Prestação de contas, relatórios e dados da saúde.",
             icon: <ChartNoAxesCombined size={22} className={styles.icon} />,
-            link: "/transparencia" // Atualizado para /transparencia
+            link: "/transparencia"
         }
     ];
 
     return (
         <section className={styles.servicesSection}>
             <div className={styles.container}>
-
-                {/* CABEÇALHO DA SEÇÃO */}
                 <div className={styles.headerArea}>
                     <div className={styles.titleWrapper}>
                         <span className={styles.subtitle}>SERVIÇOS</span>
@@ -74,7 +71,6 @@ export default function ServiceSection() {
                     </Link>
                 </div>
 
-                {/* GRID DE CARDS */}
                 <div className={styles.grid}>
                     {servicos.map((servico) => (
                         <Link href={servico.link} key={servico.id} className={styles.card}>

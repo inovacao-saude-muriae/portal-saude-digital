@@ -20,7 +20,7 @@ export default function Hero() {
                     </h1>
                     
                     <p className={styles.description}>
-                        Acesse serviços, agende consultas, acompanhe campanhas e 
+                        Acesse serviços, acompanhe campanhas e 
                         mantenha-se informado sobre a saúde do seu município.
                     </p>
                     

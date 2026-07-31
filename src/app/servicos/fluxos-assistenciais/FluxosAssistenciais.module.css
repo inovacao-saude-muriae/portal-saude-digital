@@ -1,0 +1,480 @@
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mainContent {
+  padding: 40px 20px 80px 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- HERO BANNER --- */
+.heroBanner {
+  background-color: #003b5c;
+  color: #ffffff;
+  padding: 48px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badgeHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.heroDesc {
+  font-size: 16px;
+  color: #e2e8f0;
+  max-width: 750px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* --- BARRA DE NAVEGAÇÃO DE RETORNO --- */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+}
+
+.navTag {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* --- SELETOR DE CATEGORIAS (ABAS SUPERIORES) --- */
+.categoryCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  margin-bottom: 28px;
+}
+
+.categoryLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.categoryGrid {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.categoryButton {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoryButton:hover {
+  border-color: #008a83;
+  color: #008a83;
+}
+
+.categoryButtonActive {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+  box-shadow: 0 4px 12px rgba(0, 138, 131, 0.25);
+}
+
+/* --- SUB-ABAS (SUB-CATEGORIAS DO PROCEDIMENTO) --- */
+.subTabGrid {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+  background-color: #f1f5f9;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.subTabButton {
+  background-color: #ffffff;
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.subTabButton:hover {
+  border-color: #005c8a;
+  color: #005c8a;
+  transform: translateY(-1px);
+}
+
+.subTabButtonActive {
+  background-color: #003b5c !important;
+  color: #ffffff !important;
+  border-color: #00273d !important;
+  box-shadow: 0 4px 10px rgba(0, 59, 92, 0.25) !important;
+}
+
+/* --- CARD DE DETALHES E TEXTOS --- */
+.detailCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 59, 92, 0.04);
+  padding: 36px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.headerIconBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIconCircle {
+  background-color: #e6f4f2;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #008a83;
+}
+
+.headerTag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #008a83;
+  text-transform: uppercase;
+}
+
+.headerTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #003b5c;
+  margin: 0;
+}
+
+.flowTextContent {
+  color: #334155;
+  font-size: 15.5px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.flowParagraph {
+  margin-bottom: 16px;
+}
+
+/* --- FLUXOGRAMAS E IMAGENS --- */
+.diagramsSection {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.diagramsHeader {
+  margin-bottom: 20px;
+}
+
+.diagramsTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #003b5c;
+  margin: 0 0 4px 0;
+}
+
+.diagramsSub {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.diagramsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.diagramCard {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease-in-out;
+}
+
+.diagramCard:hover {
+  transform: translateY(-3px);
+  border-color: #008a83;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.diagramImageWrapper {
+  padding: 12px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.diagramImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.diagramCardFooter {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #008a83;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.zoomPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f0fdfa;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* --- LIGHTBOX MODAL COM FUNDO CLARO --- */
+.lightboxModal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  user-select: none;
+}
+
+.lightboxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  z-index: 10000;
+}
+
+.lightboxTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lightboxTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #003b5c;
+}
+
+.dragHintPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #e6f4f2;
+  color: #008a83;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.lightboxControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.controlBtn {
+  background-color: #f1f5f9;
+  color: #003b5c;
+  border: 1px solid #cbd5e1;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.controlBtn:hover {
+  background-color: #e2e8f0;
+}
+
+.closeBtn {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 0 18px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.closeBtn:hover {
+  background-color: #dc2626;
+}
+
+.lightboxStage {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.stageDefault {
+  cursor: default;
+}
+
+.stageGrab {
+  cursor: grab;
+}
+
+.stageGrabbing {
+  cursor: grabbing;
+}
+
+.zoomContainer {
+  max-width: 90vw;
+  max-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxImage {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.lightboxFooter {
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .detailCard {
+    padding: 20px;
+  }
+  .lightboxHeader {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}
