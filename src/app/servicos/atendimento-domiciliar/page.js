@@ -11,15 +11,32 @@ import {
   FileText, 
   CheckCircle2, 
   ListOrdered,
-  AlertCircle
+  Info
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './AtendimentoDomiciliar.module.css';
 
 export default function AtendimentoDomiciliarPage() {
-  const servico = dbServicos['atendimento-domiciliar'];
-
-  if (!servico) return null;
+  const dados = {
+    title: "Serviço de Atendimento Domiciliar (SAD)",
+    subtituloHero: "Cuidado em casa para quem mais precisa",
+    desc: "O Serviço de Atendimento Domiciliar (SAD) destina-se a pessoas acamadas ou com dificuldade de mobilidade, de forma temporária ou permanente. Nesse modelo de cuidado, a equipe de saúde realiza o atendimento na própria casa do paciente, garantindo acompanhamento contínuo e humanizado.",
+    onde: "Atendimento prestado diretamente no domicílio do paciente cadastrado em Muriaé.",
+    horario: "Segunda a Sexta-feira, das 07h00 às 17h00",
+    passoAPasso: [
+      "O familiar ou responsável deve procurar a UBS onde o paciente já é atendido;",
+      "Um profissional da equipe preencherá uma ficha de pedido para inclusão;",
+      "A ficha será encaminhada à equipe do SAD, que fará a avaliação."
+    ],
+    requisitos: [
+      "Morar em Muriaé;",
+      "Idade a partir de 01 mês de vida;",
+      "Ser usuário do SUS;",
+      "Apresentar quadro clínico que justifique atendimento domiciliar;",
+      "Apresentar CPF, RG e Cartão do SUS atualizado;",
+      "Comprovante de residência no município."
+    ],
+    comunicacao: "Comunicação com o Usuário: Após o encaminhamento, o Agente Comunitário de Saúde entrará em contato com a família para informar sobre a visita de avaliação. Caso o paciente seja admitido, a equipe elaborará um plano de cuidados individualizado."
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -30,9 +47,9 @@ export default function AtendimentoDomiciliarPage() {
           <div className={styles.badgeHeader}>
             <Hospital size={14} /> Rede Pública de Saúde de Muriaé
           </div>
-          <h1 className={styles.heroTitle}>{servico.title}</h1>
+          <h1 className={styles.heroTitle}>{dados.title}</h1>
           <p className={styles.heroDesc}>
-            O Serviço de Atendimento Domiciliar (SAD) leva cuidados médicos, de enfermagem e multiprofissionais diretamente à residência de pacientes com restrição de mobilidade.
+            {dados.subtituloHero}
           </p>
         </div>
       </section>
@@ -53,80 +70,69 @@ export default function AtendimentoDomiciliarPage() {
           
           <div className={styles.serviceLayout}>
             
-            {/* COLUNA PRINCIPAL - INFORMAÇÕES E PASSO A PASSO */}
+            {/* COLUNA PRINCIPAL */}
             <div>
-              {/* SOBRE O SERVIÇO */}
+              {/* SOBRE O SAD */}
               <div className={styles.infoBlock}>
                 <h2>
                   <Home size={22} color="#008a83" /> Sobre o Atendimento Domiciliar
                 </h2>
-                <p>{servico.desc}</p>
-                <p>
-                  O acompanhamento visa proporcionar melhor qualidade de vida, reabilitação humanizada, além de evitar internações hospitalares desnecessárias e reduzir o tempo de permanência em leitos hospitalares.
-                </p>
+                <p>{dados.desc}</p>
               </div>
 
-              {/* PASSO A PASSO PARA SOLICITAR */}
-              {servico.passoAPasso && servico.passoAPasso.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <ListOrdered size={22} color="#008a83" /> Como Solicitar o Acompanhamento
-                  </h3>
-                  <ol className={styles.docList}>
-                    {servico.passoAPasso.map((passo, idx) => (
-                      <li key={idx}>{passo}</li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+              {/* PASSO A PASSO PARA INCLUSÃO */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <ListOrdered size={22} color="#008a83" /> Passo a Passo para Inclusão no SAD
+                </h3>
+                <ol className={styles.docList}>
+                  {dados.passoAPasso.map((passo, idx) => (
+                    <li key={idx}>{passo}</li>
+                  ))}
+                </ol>
+              </div>
 
-              {/* DOCUMENTAÇÃO EXIGIDA */}
-              {servico.documentos && servico.documentos.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <FileText size={22} color="#008a83" /> Documentação Necessária
-                  </h3>
-                  <ul className={styles.docList}>
-                    {servico.documentos.map((doc, idx) => (
-                      <li key={idx}>{doc}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* INFORMAÇÃO / COMUNICAÇÃO COM O USUÁRIO */}
+              <div className={styles.infoBlock} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
+                <h3 style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
+                  <Info size={22} color="#008a83" /> Informações Importantes
+                </h3>
+                <p style={{ margin: 0, fontWeight: 500, color: '#0f766e' }}>
+                  {dados.comunicacao}
+                </p>
+              </div>
             </div>
 
-            {/* BARRA LATERAL - ONDE ENCONTRAR E HORÁRIOS */}
+            {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              {/* REQUISITOS DE ACESSO */}
-              {servico.requisitos && (
-                <div className={`${styles.widgetBox} ${styles.requisitosCard}`}>
-                  <div className={styles.widgetHeader}>
-                    <CheckCircle2 size={20} /> Quem Tem Direito
-                  </div>
-                  <p className={styles.widgetText}>{servico.requisitos}</p>
+              {/* REQUISITOS PARA ACESSAR O SERVIÇO */}
+              <div className={`${styles.widgetBox} ${styles.requisitosCard}`}>
+                <div className={styles.widgetHeader}>
+                  <CheckCircle2 size={20} /> Requisitos para Acessar o Serviço
                 </div>
-              )}
+                <ul className={styles.docList} style={{ paddingLeft: '18px', margin: 0 }}>
+                  {dados.requisitos.map((req, idx) => (
+                    <li key={idx} style={{ marginBottom: '6px', fontSize: '14px' }}>{req}</li>
+                  ))}
+                </ul>
+              </div>
 
-              {/* ONDE OCORRE O ATENDIMENTO */}
-              {servico.onde && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <MapPin size={20} /> Onde Encontrar
-                  </div>
-                  <p className={styles.widgetText}>{servico.onde}</p>
+              {/* ONDE ENCONTRAR */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <MapPin size={20} /> Onde Encontrar
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.onde}</p>
+              </div>
 
               {/* HORÁRIO DE FUNCIONAMENTO */}
-              {servico.horario && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <Clock size={20} /> Horário de Atendimento
-                  </div>
-                  <p className={styles.widgetText}>{servico.horario}</p>
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Clock size={20} /> Horário de Atendimento
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.horario}</p>
+              </div>
 
             </aside>
 

@@ -12,7 +12,6 @@ import {
   MapPin, 
   AlertTriangle 
 } from 'lucide-react';
-import { dbServicos, tiposVacinas } from '@/data/servicosData';
 import styles from './Vacina.module.css';
 
 export default function VacinaPage() {

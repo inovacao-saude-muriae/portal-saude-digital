@@ -11,15 +11,52 @@ import {
   FileText, 
   ListOrdered,
   ShieldCheck,
-  PackageCheck
+  PackageCheck,
+  Activity,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './FarmaciaMunicipal.module.css';
 
 export default function FarmaciaMunicipalPage() {
-  const servico = dbServicos['farmacia-municipal'];
+  const dados = {
+    title: "Farmácia Municipal",
+    subtituloHero: "Acesso Gratuito a Medicamentos pelo SUS",
+    desc: "A Assistência Farmacêutica garante à população o acesso gratuito a medicamentos por meio do Sistema Único de Saúde (SUS). Esses medicamentos são organizados em diferentes componentes, de acordo com o tipo de tratamento, a complexidade das doenças e as diretrizes do Ministério da Saúde.",
+    onde: "Farmácia Central / Unidades Básicas de Saúde (UBS) - Muriaé/MG",
+    horarioBasico: "Segunda a Sexta-feira, das 07h00 às 17h00",
+    horarioEspecializado: "Segunda a Sexta-feira, das 07h00 às 15h00 (Último dia operacional do mês: dia 23)",
+    
+    basica: {
+      titulo: "Medicamentos da Assistência Farmacêutica Básica",
+      texto: "São medicamentos essenciais disponibilizados gratuitamente pelo SUS para o tratamento das doenças mais comuns. Eles fazem parte da Relação Municipal de Medicamentos Essenciais (REMUME).",
+      quemPode: "Pacientes com receita médica válida e que atendem aos critérios de uso de medicamentos disponíveis na rede pública.",
+      passoAPasso: [
+        "Atendimento de segunda a sexta-feira, das 7h às 17h;",
+        "Apresentar receita médica atualizada;",
+        "Apresentar documento de identificação oficial com foto;",
+        "Apresentar CPF e Cartão do SUS atualizado;",
+        "Apresentar comprovante de residência recente no município."
+      ]
+    },
 
-  if (!servico) return null;
+    especializado: {
+      titulo: "Componente Especializado (CEAF) - Alto Custo",
+      texto: "Programa do SUS que garante acesso a medicamentos de alto custo usados em tratamentos ambulatoriais, seguindo critérios dos Protocolos Clínicos e Diretrizes Terapêuticas (PCDT).",
+      regras: [
+        "Dispensação programada mensal, realizada a cada 30 dias;",
+        "Horário de atendimento exclusivo: das 7h às 15h;",
+        "Atenção: o último dia de atendimento operacional do mês é o dia 23;",
+        "Retirada permitida apenas pelo paciente cadastrado ou representante legal documentado."
+      ],
+      alerta: "Atenção ao Cadastro: Para o Componente Especializado, é necessário que o paciente esteja rigorosamente enquadrado nos critérios dos PCDTs, apresentando diagnóstico laudado e documentação específica exigida pelo Estado."
+    },
+
+    estrategico: {
+      titulo: "Componente Estratégico (CESAF)",
+      texto: "Reúne medicamentos para prevenção, controle e tratamento de doenças de impacto epidemiológico. A dispensação é realizada diretamente no setor de Epidemiologia, mediante receita médica, preenchimento de formulários e exames de monitoramento exigidos."
+    }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -30,9 +67,9 @@ export default function FarmaciaMunicipalPage() {
           <div className={styles.badgeHeader}>
             <Hospital size={14} /> Rede Pública de Saúde de Muriaé
           </div>
-          <h1 className={styles.heroTitle}>{servico.title}</h1>
+          <h1 className={styles.heroTitle}>{dados.title}</h1>
           <p className={styles.heroDesc}>
-            Fornecimento gratuito de medicamentos essenciais da Atenção Básica e intermediação de medicamentos de Alto Custo (Componente Especializado) pelo Sistema Único de Saúde (SUS).
+            {dados.subtituloHero}
           </p>
         </div>
       </section>
@@ -55,92 +92,97 @@ export default function FarmaciaMunicipalPage() {
             
             {/* COLUNA PRINCIPAL */}
             <div>
-              {/* SOBRE A FARMÁCIA MUNICIPAL */}
+              {/* SOBRE A ASSISTÊNCIA FARMACÊUTICA */}
               <div className={styles.infoBlock}>
                 <h2>
                   <Pill size={22} color="#008a83" /> Sobre a Assistência Farmacêutica
                 </h2>
-                <p>{servico.desc}</p>
-                <p>
-                  A Relação Municipal de Medicamentos Essenciais (REMUME) inclui remédios para tratamento de hipertensão, diabetes, infecções, analgésicos, antitérmicos e saúde mental, garantindo continuidade ao tratamento prescrito nas UBSs e hospitais do SUS.
-                </p>
+                <p>{dados.desc}</p>
               </div>
 
-              {/* TIPO DE DISPENSAÇÃO / SEÇÕES */}
+              {/* FARMÁCIA BÁSICA */}
               <div className={styles.infoBlock}>
                 <h3>
-                  <PackageCheck size={22} color="#008a83" /> Modalidades de Atendimento
+                  <PackageCheck size={22} color="#008a83" /> {dados.basica.titulo}
                 </h3>
+                <p>{dados.basica.texto}</p>
+                
+                <p style={{ marginTop: '14px', fontWeight: 600, color: '#003b5c' }}>
+                  Quem pode retirar:
+                </p>
+                <p>{dados.basica.quemPode}</p>
+
+                <p style={{ marginTop: '14px', fontWeight: 600, color: '#003b5c' }}>
+                  Como funciona a retirada:
+                </p>
                 <ul className={styles.docList}>
-                  <li>
-                    <strong>Farmácia Básica / Unidades Básicas de Saúde (UBS):</strong> Dispensação de remédios de uso contínuo e agudo pertencentes à lista REMUME.
-                  </li>
-                  <li>
-                    <strong>Componente Especializado (Alto Custo):</strong> Medicamentos para doenças crônicas ou raras fornecidos em parceria com a Secretaria de Estado de Saúde de Minas Gerais (SES-MG).
-                  </li>
+                  {dados.basica.passoAPasso.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
                 </ul>
               </div>
 
-              {/* PASSO A PASSO PARA RETIRADA */}
-              {servico.passoAPasso && servico.passoAPasso.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <ListOrdered size={22} color="#008a83" /> Como Retirar seu Medicamento
-                  </h3>
-                  <ol className={styles.docList}>
-                    {servico.passoAPasso.map((passo, idx) => (
-                      <li key={idx}>{passo}</li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+              {/* COMPONENTE ESPECIALIZADO (CEAF) */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <ShieldCheck size={22} color="#008a83" /> {dados.especializado.titulo}
+                </h3>
+                <p>{dados.especializado.texto}</p>
 
-              {/* DOCUMENTOS EXIGIDOS */}
-              {servico.documentos && servico.documentos.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <FileText size={22} color="#008a83" /> Documentação Obrigatória
-                  </h3>
-                  <ul className={styles.docList}>
-                    {servico.documentos.map((doc, idx) => (
-                      <li key={idx}>{doc}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                <p style={{ marginTop: '14px', fontWeight: 600, color: '#003b5c' }}>
+                  Regras de Funcionamento:
+                </p>
+                <ul className={styles.docList}>
+                  {dados.especializado.regras.map((regra, idx) => (
+                    <li key={idx}>{regra}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* ALERTA DE CADASTRO DO CEAF */}
+              <div className={styles.infoBlock} style={{ backgroundColor: '#fffbe3', borderColor: '#f59e0b' }}>
+                <h3 style={{ color: '#b45309', borderBottomColor: '#fde68a' }}>
+                  <AlertTriangle size={22} color="#b45309" /> Atenção ao Cadastro
+                </h3>
+                <p style={{ margin: 0, fontWeight: 500, color: '#78350f' }}>
+                  {dados.especializado.alerta}
+                </p>
+              </div>
+
+              {/* COMPONENTE ESTRATÉGICO (CESAF) */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <Activity size={22} color="#008a83" /> {dados.estrategico.titulo}
+                </h3>
+                <p>{dados.estrategico.texto}</p>
+              </div>
             </div>
 
             {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              <div className={`${styles.widgetBox} ${styles.destaqueCard}`}>
+              {/* ONDE ENCONTRAR */}
+              <div className={styles.widgetBox}>
                 <div className={styles.widgetHeader}>
-                  <ShieldCheck size={20} /> Validade da Receita
+                  <MapPin size={20} /> Onde Encontrar
                 </div>
-                <p className={styles.widgetText}>
-                  Receitas de uso contínuo possuem validade de até 6 meses. Receitas de antibióticos e medicamentos controlados têm regras e prazos específicos.
-                </p>
+                <p className={styles.widgetText}>{dados.onde}</p>
               </div>
 
-              {/* ONDE ENCONTRAR */}
-              {servico.onde && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <MapPin size={20} /> Onde Encontrar
-                  </div>
-                  <p className={styles.widgetText}>{servico.onde}</p>
+              {/* HORÁRIOS DE ATENDIMENTO */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Clock size={20} /> Horários de Atendimento
                 </div>
-              )}
-
-              {/* HORÁRIO DE FUNCIONAMENTO */}
-              {servico.horario && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <Clock size={20} /> Horário de Atendimento
-                  </div>
-                  <p className={styles.widgetText}>{servico.horario}</p>
-                </div>
-              )}
+                <p className={styles.widgetText} style={{ marginBottom: '10px' }}>
+                  <strong>Atenção Básica:</strong><br />
+                  {dados.horarioBasico}
+                </p>
+                <p className={styles.widgetText}>
+                  <strong>Componente Especializado (CEAF):</strong><br />
+                  {dados.horarioEspecializado}
+                </p>
+              </div>
 
             </aside>
 

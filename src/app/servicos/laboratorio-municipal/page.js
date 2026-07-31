@@ -9,17 +9,37 @@ import {
   Clock, 
   MapPin, 
   FileText, 
-  ListOrdered,
-  TestTube,
-  Info
+  Phone,
+  Baby,
+  CalendarCheck
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './LaboratorioMunicipal.module.css';
 
 export default function LaboratorioMunicipalPage() {
-  const servico = dbServicos['laboratorio-municipal'];
+  const dados = {
+    title: "Laboratório Municipal",
+    subtituloHero: "Diagnóstico e Apoio à Saúde da População",
+    desc: "O Laboratório Municipal é responsável pela realização de exames laboratoriais oferecidos pelo Sistema Único de Saúde (SUS), desempenhando um papel essencial no diagnóstico, prevenção e acompanhamento de doenças. Por meio desse serviço, a população tem acesso gratuito a exames que auxiliam os profissionais de saúde na identificação precoce de alterações e na condução adequada dos tratamentos.",
+    
+    agendamento: {
+      forma: "O agendamento é realizado exclusivamente de forma presencial no balcão de atendimento do laboratório.",
+      documentos: [
+        "Pedido médico oficial emitido pelo SUS;",
+        "Documento de identidade oficial com foto e CPF;",
+        "Comprovante de residência atualizado no município;",
+        "Cartão Nacional de Saúde (Cartão SUS) atualizado;",
+        "Número de telefone ativo para contato com o paciente;",
+        "No caso de menores de idade: certidão de nascimento da criança acompanhada do documento de identidade do responsável legal."
+      ],
+      alertaGestantes: "Além dos documentos citados, as gestantes deverão apresentar a Caderneta de Pré-Natal do SUS para garantir o atendimento prioritário e o encaminhamento para exames específicos do período gestacional."
+    },
 
-  if (!servico) return null;
+    contato: {
+      horario: "Segunda a sexta-feira, das 12h às 17h",
+      telefone: "(32) 2020-8074",
+      endereco: "Rua Coronel Izalino, s/n - Muriaé/MG"
+    }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -30,9 +50,9 @@ export default function LaboratorioMunicipalPage() {
           <div className={styles.badgeHeader}>
             <Hospital size={14} /> Rede Pública de Saúde de Muriaé
           </div>
-          <h1 className={styles.heroTitle}>{servico.title}</h1>
+          <h1 className={styles.heroTitle}>{dados.title}</h1>
           <p className={styles.heroDesc}>
-            Realização de exames de análises clínicas com precisão, agilidade e gratuidade para apoio diagnóstico aos pacientes do SUS.
+            {dados.subtituloHero}
           </p>
         </div>
       </section>
@@ -60,73 +80,69 @@ export default function LaboratorioMunicipalPage() {
                 <h2>
                   <FlaskConical size={22} color="#008a83" /> Sobre o Laboratório Municipal
                 </h2>
-                <p>{servico.desc}</p>
-                <p>
-                  A unidade realiza exames de sangue, urina, fezes, bioquímica, parasitologia, imunologia e hormônios, atendendo a solicitações da Atenção Básica, Especialidades e Urgências do município.
-                </p>
+                <p>{dados.desc}</p>
               </div>
 
-              {/* ALERTA SOBRE JEJUM E PREPARO */}
-              <div className={styles.alertaPreparo}>
+              {/* COMO REALIZAR O AGENDAMENTO */}
+              <div className={styles.infoBlock}>
                 <h3>
-                  <Info size={20} /> Orientação Importante sobre o Preparo
+                  <CalendarCheck size={22} color="#008a83" /> Como Realizar o Agendamento
                 </h3>
-                <p>
-                  Alguns exames de sangue necessitam de jejum prévio de 8 a 12 horas (conforme instrução médica). Para exames de urina e fezes, solicite o frasco estéril apropriado com antecedência na recepção do laboratório ou em sua UBS.
-                </p>
+                <p>{dados.agendamento.forma}</p>
               </div>
 
-              {/* PASSO A PASSO PARA REALIZAÇÃO */}
-              {servico.passoAPasso && servico.passoAPasso.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <ListOrdered size={22} color="#008a83" /> Etapas do Atendimento
-                  </h3>
-                  <ol className={styles.docList}>
-                    {servico.passoAPasso.map((passo, idx) => (
-                      <li key={idx}>{passo}</li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+              {/* DOCUMENTAÇÃO PARA AGENDAMENTO */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <FileText size={22} color="#008a83" /> Documentação para Agendamento de Exames
+                </h3>
+                <p style={{ marginBottom: '12px' }}>
+                  Para realizar o agendamento é necessário apresentar a seguinte documentação:
+                </p>
+                <ul className={styles.docList}>
+                  {dados.agendamento.documentos.map((doc, idx) => (
+                    <li key={idx}>{doc}</li>
+                  ))}
+                </ul>
+              </div>
 
-              {/* DOCUMENTOS EXIGIDOS */}
-              {servico.documentos && servico.documentos.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <FileText size={22} color="#008a83" /> Documentação Exigida
-                  </h3>
-                  <ul className={styles.docList}>
-                    {servico.documentos.map((doc, idx) => (
-                      <li key={idx}>{doc}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* ALERTA DEDICADO ÀS GESTANTES */}
+              <div className={styles.infoBlock} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
+                <h3 style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
+                  <Baby size={22} color="#008a83" /> Atenção Gestantes
+                </h3>
+                <p style={{ margin: 0, fontWeight: 500, color: '#0f766e' }}>
+                  {dados.agendamento.alertaGestantes}
+                </p>
+              </div>
             </div>
 
             {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              {/* ONDE ENCONTRAR */}
-              {servico.onde && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <MapPin size={20} /> Localização
-                  </div>
-                  <p className={styles.widgetText}>{servico.onde}</p>
+              {/* ENDEREÇO INSTITUCIONAL */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <MapPin size={20} /> Endereço Institucional
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.contato.endereco}</p>
+              </div>
 
-              {/* HORÁRIO DE FUNCIONAMENTO */}
-              {servico.horario && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <Clock size={20} /> Horários de Atendimento
-                  </div>
-                  <p className={styles.widgetText}>{servico.horario}</p>
+              {/* HORÁRIO DE ATENDIMENTO */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Clock size={20} /> Horário de Funcionamento
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.contato.horario}</p>
+              </div>
+
+              {/* TELEFONE DE CONTATO */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Phone size={20} /> Telefone de Contato
+                </div>
+                <p className={styles.widgetText}>{dados.contato.telefone}</p>
+              </div>
 
             </aside>
 

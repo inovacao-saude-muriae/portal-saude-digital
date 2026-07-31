@@ -8,17 +8,43 @@ import {
   ShieldCheck, 
   Clock, 
   MapPin, 
-  FileText, 
-  FileCheck, 
-  AlertTriangle 
+  Phone,
+  UserCheck,
+  AlertTriangle,
+  Mail,
+  Building
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './VigilanciaSanitaria.module.css';
 
 export default function VigilanciaSanitariaPage() {
-  const servico = dbServicos['vigilancia-sanitaria'];
+  const dados = {
+    title: "Vigilância Sanitária (VISA)",
+    subtituloHero: "Fiscalização, Orientação e Segurança para a População",
+    desc: "A Vigilância Sanitária é responsável por orientar e fiscalizar estabelecimentos e serviços de saúde ou de interesse à saúde, garantindo segurança, conformidade com as normas vigentes e qualidade para toda a população de Muriaé. Aqui você encontra informações institucionais sobre licenciamento, renovação de alvará e outros serviços regulados.",
+    
+    mudancaRT: {
+      titulo: "Solicitar Mudança de Responsável Técnico",
+      texto: "Os estabelecimentos regulados que necessitam alterar o profissional responsável técnico (RT) devem formalizar a solicitação presencialmente no setor da Vigilância. A equipe técnica do município irá fornecer o checklist de documentos e orientar todo o procedimento cabível no próprio local."
+    },
 
-  if (!servico) return null;
+    denuncias: {
+      titulo: "Denúncias Sanitárias",
+      alertaCanal: "Canais Oficiais: As denúncias sanitárias não são processadas diretamente no balcão técnico. Elas devem ser protocoladas e recebidas exclusivamente pela Ouvidoria do SUS e pela Ouvidoria Municipal para triagem legal.",
+      subtitulo: "Caso presencie irregularidades em estabelecimentos comerciais ou de saúde, utilize os contatos oficiais de ouvidoria listados abaixo:",
+      canais: [
+        "Ouvidoria do SUS Regional: (32) 3696-3318;",
+        "Ouvidoria Municipal Geral: Telefone 136, dígito 9;",
+        "Atendimento presencial da Ouvidoria: Secretaria Municipal de Saúde. Avenida Maestro Sansão, 236 - Centro. Segunda a sexta-feira, das 7h30 às 11h e das 13h às 16h30;",
+        "Canal digital via E-mail: ouvidoriasaudemuriae@hotmail.com"
+      ]
+    },
+
+    atendimento: {
+      endereco: "Rua Sinval Florêncio da Silva, nº 02, 2º andar – Centro (Prédio do SENAI, próximo ao Mercado Municipal);",
+      telefone: "(32) 2020-8105;",
+      horario: "Segunda a sexta-feira, das 7h às 11h e das 13h às 16h."
+    }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -29,9 +55,9 @@ export default function VigilanciaSanitariaPage() {
           <div className={styles.badgeHeader}>
             <Hospital size={14} /> Rede Pública de Saúde de Muriaé
           </div>
-          <h1 className={styles.heroTitle}>{servico.title}</h1>
+          <h1 className={styles.heroTitle}>{dados.title}</h1>
           <p className={styles.heroDesc}>
-            Fiscalização, orientação e regulamentação sanitária em comércios, indústrias e serviços de saúde para eliminação de riscos à população.
+            {dados.subtituloHero}
           </p>
         </div>
       </section>
@@ -59,68 +85,65 @@ export default function VigilanciaSanitariaPage() {
                 <h2>
                   <ShieldCheck size={22} color="#008a83" /> Sobre a Vigilância Sanitária
                 </h2>
-                <p>{servico.desc}</p>
-                <p>
-                  A VISA atua na proteção da saúde coletiva inspecionando estabelecimentos alimentícios, farmácias, clínicas, consultórios, saneantes, além de monitorar a qualidade da água e produtos consumidos no município.
-                </p>
+                <p>{dados.desc}</p>
               </div>
 
-              {/* SEÇÕES DE SERVIÇOS OFERECIDOS */}
-              {servico.secoesTexto && servico.secoesTexto.map((secao, idx) => (
-                <div key={idx} className={styles.infoBlock}>
-                  <h3>
-                    <FileCheck size={22} color="#008a83" /> {secao.titulo}
-                  </h3>
-                  {secao.paragrafo && <p>{secao.paragrafo}</p>}
-                </div>
-              ))}
+              {/* MUDANÇA DE RESPONSÁVEL TÉCNICO */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <UserCheck size={22} color="#008a83" /> {dados.mudancaRT.titulo}
+                </h3>
+                <p>{dados.mudancaRT.texto}</p>
+              </div>
 
-              {/* DOCUMENTAÇÃO NECESSÁRIA */}
-              {servico.documentos && servico.documentos.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <FileText size={22} color="#008a83" /> Documentação para Licenciamento
-                  </h3>
-                  <ul className={styles.docList}>
-                    {servico.documentos.map((doc, idx) => (
-                      <li key={idx}>{doc}</li>
-                    ))}
-                  </ul>
+              {/* DENÚNCIAS SANITÁRIAS & OUVIDORIA */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <AlertTriangle size={22} color="#008a83" /> {dados.denuncias.titulo}
+                </h3>
+                <p style={{ marginBottom: '16px' }}>{dados.denuncias.subtitulo}</p>
+
+                {/* ALERTA DOS CANAIS OFICIAIS DE OUVIDORIA */}
+                <div style={{ backgroundColor: '#fffbe3', borderLeft: '4px solid #f59e0b', padding: '16px', borderRadius: '8px', marginBottom: '20px' }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: '#78350f', fontSize: '14.5px' }}>
+                    {dados.denuncias.alertaCanal}
+                  </p>
                 </div>
-              )}
+
+                <ul className={styles.docList}>
+                  {dados.denuncias.canais.map((canal, idx) => (
+                    <li key={idx}>{canal}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              <div className={`${styles.widgetBox} ${styles.destaqueCard}`}>
+              {/* ENDEREÇO FÍSICO */}
+              <div className={styles.widgetBox}>
                 <div className={styles.widgetHeader}>
-                  <AlertTriangle size={20} /> Denúncias Sanitárias
+                  <MapPin size={20} /> Endereço Físico
                 </div>
-                <p className={styles.widgetText}>
-                  Suspeitas de irregularidades sanitárias em comércios de alimentos, medicamentos ou serviços podem ser informadas presencialmente na sede da VISA.
-                </p>
+                <p className={styles.widgetText}>{dados.atendimento.endereco}</p>
               </div>
 
-              {/* ONDE ENCONTRAR */}
-              {servico.onde && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <MapPin size={20} /> Onde Encontrar
-                  </div>
-                  <p className={styles.widgetText}>{servico.onde}</p>
+              {/* HORÁRIO DE EXPEDIENTE */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Clock size={20} /> Horário de Expediente
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.atendimento.horario}</p>
+              </div>
 
-              {/* HORÁRIO DE FUNCIONAMENTO */}
-              {servico.horario && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <Clock size={20} /> Horário de Atendimento
-                  </div>
-                  <p className={styles.widgetText}>{servico.horario}</p>
+              {/* TELEFONE DE CONTATO */}
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Phone size={20} /> Telefone de Contato
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.atendimento.telefone}</p>
+              </div>
 
             </aside>
 

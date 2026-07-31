@@ -10,14 +10,47 @@ import {
   Zap, 
   Info 
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './Aplicativos.module.css';
 
 export default function AplicativosPage() {
-  const servico = dbServicos['aplicativos'];
   const [appAtivo, setAppAtivo] = useState('saude-digital');
 
-  if (!servico) return null;
+  // Dados do serviço declarados localmente dentro da página
+  const servico = {
+    title: "Aplicativos Digitais de Saúde",
+    desc: "Acesse os serviços digitais de saúde na palma da sua mão para acompanhar atendimentos, histórico de saúde e agendamentos.",
+    apps: {
+      "saude-digital": {
+        nome: "Saúde Digital Muriaé",
+        subtitulo: "A plataforma oficial de saúde do município de Muriaé",
+        desc: "Permite consultar agendamentos de consultas, posição na fila de exames e históricos de atendimento.",
+        funcionalidades: [
+          "Acompanhamento de consultas agendadas;",
+          "Confirmação digital de presença;",
+          "Consulta da posição na fila de espera;"
+        ],
+        comoAcessar: "Cadastre-se na sua UBS de referência munido de CPF e documento com foto.",
+        linksDownload: {
+          appStore: "https://apps.apple.com/br/app/vivver-sa%C3%BAde-cidad%C3%A3o/id6466105436",
+          googlePlay: "https://play.google.com/store/apps/details?id=io.vivver.cidadao.app"
+        }
+      },
+      "meu-sus-digital": {
+        nome: "Meu SUS Digital",
+        subtitulo: "A plataforma oficial do Ministério da Saúde",
+        desc: "Acesse a Carteira de Vacinação, Cartão SUS digital e histórico nacional de atendimentos.",
+        funcionalidades: [
+          "Carteira Nacional de Vacinação Digital;",
+          "Emissão do Cartão SUS digital;"
+        ],
+        comoAcessar: "Acesse utilizando sua conta oficial do GOV.BR.",
+        linksDownload: {
+          appStore: "https://apps.apple.com/br/app/meu-sus-digital/id1527885233",
+          googlePlay: "https://play.google.com/store/apps/details?id=br.gov.datasus.conectesus"
+        }
+      }
+    }
+  };
 
   const appSelecionado = servico.apps ? servico.apps[appAtivo] : null;
 

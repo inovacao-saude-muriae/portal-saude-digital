@@ -16,20 +16,19 @@ export default function Hero() {
                     </div>
                     
                     <h1 className={styles.title}>
-                        Cuidando da saúde<br />da nossa cidade
+                        Você conhece o Saúde Digital Muriaé? <br />
                     </h1>
                     
                     <p className={styles.description}>
-                        Acesse serviços, acompanhe campanhas e 
-                        mantenha-se informado sobre a saúde do seu município.
+                        O aplicativo da Secretaria de Saúde de Muriaé, feito para você!
                     </p>
                     
                     <div className={styles.buttonGroup}>
-                        <Link href="/servicos" className={styles.btnPrimary}>
-                            Nossos serviços <span>→</span>
+                        <Link href="servicos/aplicativos" className={styles.btnPrimary}>
+                            Conheça <span>→</span>
                         </Link>
-                        <Link href="/contatos" className={styles.btnSecondary}>
-                            Fale conosco
+                        <Link href="/servicos" className={styles.btnSecondary}>
+                            Nossos Serviços
                         </Link>
                     </div>
                 </div>

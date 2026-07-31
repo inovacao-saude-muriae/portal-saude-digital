@@ -8,17 +8,29 @@ import {
   ClipboardList, 
   Clock, 
   MapPin, 
-  FileText, 
   ShieldCheck, 
-  ListOrdered
+  Building2,
+  Info
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './CamaraTecnica.module.css';
 
 export default function CamaraTecnicaPage() {
-  const servico = dbServicos['camara-tecnica'];
-
-  if (!servico) return null;
+  const dados = {
+    title: "Câmara Técnica de Saúde",
+    subtituloHero: "Gestão e Assessoria Especializada",
+    desc: "A Câmara Técnica é um grupo de especialistas que trabalha para garantir que o cidadão receba o tratamento correto, unindo as necessidades dos pacientes às regras e recursos do SUS.",
+    onde: "Secretaria Municipal de Saúde / Setor de Regulação - Muriaé/MG",
+    horario: "Segunda a Sexta-feira, das 07h30 às 11h30 e das 13h00 às 17h00",
+    atribuicoes: [
+      "Prestar assessoria à Gestão Municipal de Saúde no processo de oferta de medicamentos, exames, tratamentos e materiais médicos que estejam fora das listas padrão e das diretrizes do SUS (PCDT), sempre que houver prescrição feita por profissionais habilitados.",
+      "Estabelecer roteiros padronizados de atendimento para organizar as rotinas e os cuidados prestados na assistência à saúde.",
+      "Analisar as justificativas dos profissionais para o uso de itens fora da rede, emitindo um parecer que recomende a continuidade do tratamento, a sua substituição por alternativas previstas no SUS ou, se necessário, o indeferimento por falta de eficácia.",
+      "Promover encontros de trabalho entre os especialistas das áreas assistenciais para discutir e integrar as ações de saúde.",
+      "Submeter anualmente à revisão pericial os pacientes com sentenças judiciais definitivas. A perícia deve atestar se a manutenção do tratamento ainda se justifica ou se houve mudança na situação real do paciente que permita a troca por outras terapias ou até a suspensão do fornecimento."
+    ],
+    apoioInstitucional: "Prestar auxílio técnico ao Poder Judiciário, Ministério Público, Defensoria Pública, OAB e à Procuradoria Geral do Município por meio de Acordos de Cooperação. O objetivo é fornecer laudos e perícias que garantam o cumprimento dos protocolos do SUS e a adoção de terapias alternativas, evitando gastos desnecessários para o município.",
+    avisoPericia: "Todas as pessoas que recebem remédios, materiais ou tratamentos pelo SUS poderão passar por perícias periódicas, seguindo as regras e critérios definidos pela Câmara Técnica de Saúde."
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -29,9 +41,9 @@ export default function CamaraTecnicaPage() {
           <div className={styles.badgeHeader}>
             <Hospital size={14} /> Rede Pública de Saúde de Muriaé
           </div>
-          <h1 className={styles.heroTitle}>{servico.title}</h1>
+          <h1 className={styles.heroTitle}>{dados.title}</h1>
           <p className={styles.heroDesc}>
-            Avaliação e consultoria especializada de profissionais de saúde para análise técnica de solicitações de medicamentos, procedimentos e tratamentos de alta complexidade no SUS.
+            {dados.subtituloHero}
           </p>
         </div>
       </section>
@@ -59,53 +71,38 @@ export default function CamaraTecnicaPage() {
                 <h2>
                   <ClipboardList size={22} color="#008a83" /> Sobre a Câmara Técnica
                 </h2>
-                <p>{servico.desc}</p>
+                <p>{dados.desc}</p>
               </div>
 
-              {/* SEÇÕES ADICIONAIS / ATRIBUÍÇÕES */}
-              {servico.secoesTexto && servico.secoesTexto.map((secao, idx) => (
-                <div key={idx} className={styles.infoBlock}>
-                  <h3>
-                    <ShieldCheck size={22} color="#008a83" /> {secao.titulo}
-                  </h3>
-                  {secao.paragrafo && <p>{secao.paragrafo}</p>}
-                  {secao.itens && secao.itens.length > 0 && (
-                    <ul className={styles.docList}>
-                      {secao.itens.map((item, itemIdx) => (
-                        <li key={itemIdx}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
+              {/* ATRIBUIÇÕES */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <ShieldCheck size={22} color="#008a83" /> Atribuições da Câmara Técnica de Saúde
+                </h3>
+                <ul className={styles.docList}>
+                  {dados.atribuicoes.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              </div>
 
-              {/* PASSO A PASSO PARA SOLICITAÇÃO */}
-              {servico.passoAPasso && servico.passoAPasso.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <ListOrdered size={22} color="#008a83" /> Etapas do Processo
-                  </h3>
-                  <ol className={styles.docList}>
-                    {servico.passoAPasso.map((passo, idx) => (
-                      <li key={idx}>{passo}</li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+              {/* APOIO INSTITUCIONAL */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <Building2 size={22} color="#008a83" /> Apoio Institucional
+                </h3>
+                <p>{dados.apoioInstitucional}</p>
+              </div>
 
-              {/* DOCUMENTAÇÃO NECESSÁRIA */}
-              {servico.documentos && servico.documentos.length > 0 && (
-                <div className={styles.infoBlock}>
-                  <h3>
-                    <FileText size={22} color="#008a83" /> Documentação Exigida
-                  </h3>
-                  <ul className={styles.docList}>
-                    {servico.documentos.map((doc, idx) => (
-                      <li key={idx}>{doc}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* INFORMAÇÃO IMPORTANTE / AVISO DE PERÍCIA */}
+              <div className={styles.infoBlock} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
+                <h3 style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
+                  <Info size={22} color="#008a83" /> Perícias Periódicas
+                </h3>
+                <p style={{ margin: 0, fontWeight: 500, color: '#0f766e' }}>
+                  {dados.avisoPericia}
+                </p>
+              </div>
             </div>
 
             {/* BARRA LATERAL (SIDEBAR) */}
@@ -116,29 +113,25 @@ export default function CamaraTecnicaPage() {
                   <ShieldCheck size={20} /> Transparência e Rigor
                 </div>
                 <p className={styles.widgetText}>
-                  A análise garante que todos os pedidos atendam aos critérios clínicos nacionais e às normas vigentes do Ministério da Saúde.
+                  A análise garante que todos os pedidos atendam aos critérios clínicos e às diretrizes dos protocolos oficiais do SUS.
                 </p>
               </div>
 
               {/* ONDE ENCONTRAR */}
-              {servico.onde && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <MapPin size={20} /> Onde Encontrar
-                  </div>
-                  <p className={styles.widgetText}>{servico.onde}</p>
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <MapPin size={20} /> Onde Encontrar
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.onde}</p>
+              </div>
 
               {/* HORÁRIO DE FUNCIONAMENTO */}
-              {servico.horario && (
-                <div className={styles.widgetBox}>
-                  <div className={styles.widgetHeader}>
-                    <Clock size={20} /> Horário de Atendimento
-                  </div>
-                  <p className={styles.widgetText}>{servico.horario}</p>
+              <div className={styles.widgetBox}>
+                <div className={styles.widgetHeader}>
+                  <Clock size={20} /> Horário de Atendimento
                 </div>
-              )}
+                <p className={styles.widgetText}>{dados.horario}</p>
+              </div>
 
             </aside>
 

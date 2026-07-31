@@ -1,23 +1,29 @@
 .heroSection {
     width: 100%;
-    min-height: 550px;
-    position: relative; /* Mantido para ancorar o overlay e os textos */
+    /* Altura reduzida para não esticar demais e sumir com a pessoa */
+    height: 480px; 
+    position: relative;
     
-    /* CORRIGIDO: Deixamos apenas a imagem pura aqui para o Next.js mapear a partir da pasta public */
-    background-image: url('/img/banner-home.png');
+    background-image: url('/img/13.png');
     background-size: cover;
-    background-position: center;
+    
+    /* 
+       SEGREDO CONTRA CORTE: 
+       Tranca a imagem no lado DIREITO. Quando a tela encolher,
+       o CSS vai cortar o fundo azul da esquerda e PRESERVAR a moça e o celular!
+    */
+    background-position: right center; 
     background-repeat: no-repeat;
     
     display: flex;
     align-items: center;
-    padding: 60px 0;
+    padding: 40px 0;
     color: #ffffff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
 }
 
-/* CAMADA DE GRADIENTE AZUL PROFISSIONAL (IGUAL AO SEU PRINT) */
+/* GRADIENTE AJUSTADO */
 .heroSection::before {
     content: '';
     position: absolute;
@@ -25,10 +31,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    /* Gradiente idêntico ao que você criou, cobrindo perfeitamente a foto */
-    background: linear-gradient(to right, rgba(0, 64, 102, 0.95) 30%, rgba(0, 64, 102, 0.5) 100%);
-    z-index: 1; /* Fica acima da foto, mas abaixo do texto */
+    /* Escurece a esquerda para o texto e fica transparente na direita para ver a moça */
+    
+    z-index: 1;
 }
+
 
 .container {
     max-width: 1200px;
@@ -59,7 +66,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 24px;
-    backdrop-filter: blur(5px);
+
 }
 
 .dot {
@@ -162,6 +169,43 @@
     margin: 0;
 }
 
+
+/* RESPONSIVIDADE PARA CELULARES E TABLETS */
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .heroLeft {
+        max-width: 100%;
+    }
+
+    .buttonGroup {
+        justify-content: center;
+    }
+
+    .heroRight {
+        width: 100%;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .glassGrid {
+        position: relative;
+        bottom: 0;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+/* REGRA PARA TELAS MUITO LARGAS / MONITORES DE DESKTOP GRANDES */
+@media (min-width: 1400px) {
+    .heroSection {
+        /* Em monitores grandes, força a imagem a alinhar mais à direita */
+        background-position: 70% 12%; 
+    }
+}
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) {
     .container {
@@ -183,18 +227,55 @@
         width: 100%;
     }
 }
-
 @media (max-width: 576px) {
+    .heroSection {
+        min-height: 680px; /* Mais espaço vertical no mobile */
+        background-position: top center; /* Garante a placa sempre visível */
+    }
+
+    .heroSection::before {
+        /* No mobile, o azul fica um pouco mais escuro por inteiro para garantir a leitura do texto empilhado */
+        background: rgba(0, 59, 92, 0.88);
+    }
+
     .title {
         font-size: 32px;
     }
     
     .glassGrid {
-        grid-template-columns: 1fr; /* 1 card por linha no mobile */
+        grid-template-columns: 1fr;
         width: 100%;
     }
 
     .buttonGroup {
         flex-direction: column;
+    }
+}
+/* ==========================================================
+   AJUSTE ESPECÍFICO PARA NOTEBOOKS (TELAS DE 1024px A 1400px)
+   ========================================================== */
+@media (max-width: 1366px) {
+    .heroSection {
+        height: 420px; /* Reduz a altura para a imagem encaixar perfeitamente */
+        background-position: 100% center; /* Garante que a moça fique 100% visível na ponta direita */
+    }
+
+    .title {
+        font-size: 38px; /* Título menor para não ocupar espaço demais */
+    }
+
+    .description {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .glassGrid {
+        max-width: 360px;
+        gap: 10px;
+        padding: 16px;
+    }
+
+    .glassCard h2 {
+        font-size: 24px;
     }
 }

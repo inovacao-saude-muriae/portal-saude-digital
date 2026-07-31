@@ -14,7 +14,6 @@ import {
   Hospital, 
   FileText 
 } from 'lucide-react';
-import { dbServicos } from '@/data/servicosData';
 import styles from './FluxosAssistenciais.module.css';
 
 export default function FluxosAssistenciaisPage() {
