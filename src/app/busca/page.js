@@ -19,7 +19,8 @@ import { dbEventos } from '@/data/eventosData';
 import { dbNoticias } from '@/data/noticiasData';
 import { animaisDisponiveis } from '@/data/animaisData';
 import { listaContatos } from '@/data/contatosData';
-import { dbServicos } from '@/data/servicosData';
+import { servicos as dbServicos } from '@/data/servicosData';
+
 
 import styles from './Busca.module.css';
 
