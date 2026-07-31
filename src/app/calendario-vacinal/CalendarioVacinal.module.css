@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   background-color: #d1eae5;
-  color: #0f6251;
+  color: #2b943d;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -150,7 +150,7 @@
 
 .tagCriancasAtiva {
   background-color: #d1eae5; /* Azul esmaecido do print */
-  color: #0f6251;
+  color: #2b943d;
 }
 
 .tagAdolescentesAtiva {
@@ -195,11 +195,11 @@
 }
 
 .actionLink:hover {
-  color: #0f6251;
+  color: #2b943d;
 }
 
 .actionLinkActive {
-  color: #0f6251;
+  color: #2b943d;
 }
 
 /* ==========================================================================
@@ -310,7 +310,7 @@
 /* Badges em formato de Pílula Arredondada */
 .idadeBadge {
   background-color: #d1eae5;
-  color: #0f6251;
+  color: #2b943d;
   padding: 4px 14px;
   border-radius: 50px; /* Pílula perfeita */
   font-size: 13px;
@@ -363,7 +363,7 @@
   display: inline-block;
   font-size: 11.5px;
   background-color: #e6f2f0;
-  color: #0f6251;
+  color: #2b943d;
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 500;
@@ -392,7 +392,7 @@
 }
 
 .btnToggleInfo:hover {
-  color: #0f6251;
+  color: #2b943d;
 }
 
 .painelDetalhesExtra {

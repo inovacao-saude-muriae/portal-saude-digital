@@ -122,15 +122,15 @@
 }
 
 .tabBtn:hover {
-  border-color: #008a83;
-  color: #008a83;
+  border-color: #2b943d;
+  color: #2b943d;
   background-color: #f0fdfa;
 }
 
 .tabBtnActive {
-  background-color: #008a83 !important;
+  background-color: #2b943d !important;
   color: #ffffff !important;
-  border-color: #008a83 !important;
+  border-color: #2b943d !important;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
 }
 
@@ -193,9 +193,9 @@
 }
 
 .openExternalBtn:hover {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
-  border-color: #008a83;
+  border-color: #2b943d;
 }
 
 /* ==========================================================================
@@ -283,15 +283,15 @@
 }
 
 .categoryBtn:hover {
-  border-color: #008a83;
-  color: #008a83;
+  border-color: #2b943d;
+  color: #2b943d;
   background-color: #f0fdfa;
 }
 
 .categoryBtnActive {
-  background-color: #008a83 !important;
+  background-color: #2b943d !important;
   color: #ffffff !important;
-  border-color: #008a83 !important;
+  border-color: #2b943d !important;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
 }
 
@@ -326,12 +326,12 @@
 }
 
 .subTabBtn:hover {
-  color: #008a83;
+  color: #2b943d;
 }
 
 .subTabBtnActive {
   background-color: #ffffff !important;
-  color: #008a83 !important;
+  color: #2b943d !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 

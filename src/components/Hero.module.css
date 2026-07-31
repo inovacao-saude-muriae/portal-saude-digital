@@ -6,12 +6,6 @@
     
     background-image: url('/img/13.png');
     background-size: cover;
-    
-    /* 
-       SEGREDO CONTRA CORTE: 
-       Tranca a imagem no lado DIREITO. Quando a tela encolher,
-       o CSS vai cortar o fundo azul da esquerda e PRESERVAR a moça e o celular!
-    */
     background-position: right center; 
     background-repeat: no-repeat;
     
@@ -30,9 +24,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    /* Escurece a esquerda para o texto e fica transparente na direita para ver a moça */
-    
+    height: 100%;    
     z-index: 1;
 }
 
@@ -96,8 +88,8 @@
 }
 
 .btnPrimary {
-    background-color: #f3cc16; /* Azul do botão */
-    color: #ffffff;
+    background-color: #fee100; /* Azul do botão */
+    color: #000;
     text-decoration: none;
     padding: 14px 28px;
     border-radius: 6px;

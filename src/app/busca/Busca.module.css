@@ -71,7 +71,7 @@
 }
 
 .searchBox:focus-within {
-  border-color: #008a83;
+  border-color: #2b943d;
   background-color: #ffffff !important;
   box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.12);
 }
@@ -109,7 +109,7 @@
 }
 
 .searchBtn {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
   border: none;
   padding: 8px 20px;
@@ -164,10 +164,10 @@
 
 .cardTitle { font-size: 18px; color: #0f172a; margin: 0 0 8px 0; font-weight: 700; }
 .cardResumo { font-size: 14px; color: #475569; margin: 0 0 14px 0; line-height: 1.5; }
-.cardLink { display: inline-flex; align-items: center; gap: 6px; color: #008a83; font-weight: 700; font-size: 14px; text-decoration: none; }
+.cardLink { display: inline-flex; align-items: center; gap: 6px; color: #2b943d; font-weight: 700; font-size: 14px; text-decoration: none; }
 .cardLink:hover { text-decoration: underline; }
 
 /* ESTADO VAZIO */
 .emptyState { text-align: center; padding: 50px 20px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; }
 .emptyIcon { color: #94a3b8; margin-bottom: 12px; }
-.backHomeBtn { display: inline-block; margin-top: 16px; background-color: #008a83; color: #ffffff; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 14px; }
+.backHomeBtn { display: inline-block; margin-top: 16px; background-color: #2b943d; color: #ffffff; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 14px; }

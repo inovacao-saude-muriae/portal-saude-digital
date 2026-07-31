@@ -146,9 +146,9 @@
 }
 
 .tabButtonActive {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
-  border-color: #008a83;
+  border-color: #2b943d;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
 }
 

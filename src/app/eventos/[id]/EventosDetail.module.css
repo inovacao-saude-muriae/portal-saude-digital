@@ -164,7 +164,7 @@
 
 .cronoHora {
   font-weight: 800;
-  color: #008a83;
+  color: #2b943d;
   font-size: 14px;
   min-width: 65px;
 }
@@ -224,11 +224,11 @@
 }
 
 .formInput:focus {
-  border-color: #008a83;
+  border-color: #2b943d;
 }
 
 .submitBtn {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
   padding: 14px;
   border: none;
@@ -372,8 +372,8 @@
 }
 
 .navBtn:hover {
-  background-color: #008a83;
-  border-color: #008a83;
+  background-color: #2b943d;
+  border-color: #2b943d;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -405,7 +405,7 @@
 .btnVoltar {
   display: inline-block;
   margin-top: 16px;
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
   padding: 10px 20px;
   border-radius: 20px;

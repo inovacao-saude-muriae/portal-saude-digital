@@ -127,7 +127,7 @@
 }
 
 .searchBox:focus-within {
-  border-color: #008a83;
+  border-color: #2b943d;
   box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.12);
 }
 
@@ -166,7 +166,7 @@
 }
 
 .searchBtn {
-  background-color: #008a83;
+  background-color: #003181;
   color: #ffffff;
   border: none;
   padding: 8px 20px;
@@ -274,7 +274,7 @@
 }
 
 .resetBtn {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
   border: none;
   padding: 8px 18px;

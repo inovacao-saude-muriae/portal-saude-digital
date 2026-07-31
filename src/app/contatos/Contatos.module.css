@@ -22,7 +22,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1920 / 355; 
-  background-image: url('/img/banner-paginas.png');
+  background-image: url('/img/banner-header.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -112,7 +112,7 @@
 }
 
 .searchBox:focus-within {
-  border-color: #008a83;
+  border-color: #2b943d;
   box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.12);
 }
 
@@ -147,7 +147,7 @@
 }
 
 .searchBtn {
-  background-color: #008a83;
+  background-color: #003181;
   color: #ffffff;
   border: none;
   padding: 8px 20px;
@@ -187,15 +187,15 @@
 }
 
 .filterBtn:hover {
-  border-color: #008a83;
-  color: #008a83;
+  border-color: #2b943d;
+  color: #2b943d;
   background-color: #f0fdfa;
 }
 
 .filterBtnActive {
-  background-color: #008a83 !important;
+  background-color: #2b943d !important;
   color: #ffffff !important;
-  border-color: #008a83 !important;
+  border-color: #2b943d !important;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
 }
 
@@ -308,7 +308,7 @@
 }
 
 .mapsBtn:hover {
-  background-color: #008a83;
+  background-color: #2b943d;
 }
 
 /* ==========================================================================
@@ -344,7 +344,7 @@
 }
 
 .resetSearchBtn {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
   border: none;
   padding: 8px 18px;

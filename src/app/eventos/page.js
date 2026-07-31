@@ -62,7 +62,7 @@ export default function EventosPage() {
       {/* 1. HERO BANNER (PADRÃO DAS DEMAIS PÁGINAS INSTITUCIONAIS) */}
       <section 
         className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-paginas.png')" }}
+        style={{ backgroundImage: "url('/img/banner-header.png')" }}
       >
         <div className={styles.overlay}>
           <div className={styles.container}>

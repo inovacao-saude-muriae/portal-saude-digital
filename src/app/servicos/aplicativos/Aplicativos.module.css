@@ -123,7 +123,7 @@
 
 .subtituloApp {
   font-weight: 700;
-  color: #008a83;
+  color: #2b943d;
   margin-bottom: 12px;
   font-size: 15px;
 }
@@ -153,9 +153,9 @@
 }
 
 .tabButtonActive {
-  background-color: #008a83;
+  background-color: #2b943d;
   color: #ffffff;
-  border-color: #008a83;
+  border-color: #2b943d;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
 }
 
@@ -175,7 +175,7 @@
    ========================================================================== */
 .downloadBox {
   background-color: #f8fafc;
-  border-left: 4px solid #008a83;
+  border-left: 4px solid #2b943d;
   border-radius: 16px;
   padding: 28px;
   margin-top: 24px;

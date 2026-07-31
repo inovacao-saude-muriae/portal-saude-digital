@@ -134,14 +134,14 @@
 }
 
 .categoryButton:hover {
-  border-color: #008a83;
-  color: #008a83;
+  border-color: #2b943d;
+  color: #2b943d;
 }
 
 .categoryButtonActive {
-  background-color: #008a83 !important;
+  background-color: #2b943d !important;
   color: #ffffff !important;
-  border-color: #008a83 !important;
+  border-color: #2b943d !important;
   box-shadow: 0 4px 12px rgba(0, 138, 131, 0.25);
 }
 
@@ -220,13 +220,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #008a83;
+  color: #2b943d;
 }
 
 .headerTag {
   font-size: 12px;
   font-weight: 700;
-  color: #008a83;
+  color: #2b943d;
   text-transform: uppercase;
 }
 
@@ -291,7 +291,7 @@
 
 .diagramCard:hover {
   transform: translateY(-3px);
-  border-color: #008a83;
+  border-color: #2b943d;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -315,7 +315,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #008a83;
+  color: #2b943d;
   font-size: 13.5px;
   font-weight: 700;
 }
@@ -372,7 +372,7 @@
   align-items: center;
   gap: 4px;
   background-color: #e6f4f2;
-  color: #008a83;
+  color: #2b943d;
   font-size: 12px;
   font-weight: 700;
   padding: 4px 10px;

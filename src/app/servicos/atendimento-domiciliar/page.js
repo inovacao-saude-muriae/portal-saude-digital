@@ -8,7 +8,6 @@ import {
   Home, 
   Clock, 
   MapPin, 
-  FileText, 
   CheckCircle2, 
   ListOrdered,
   Info
@@ -92,30 +91,30 @@ export default function AtendimentoDomiciliarPage() {
                 </ol>
               </div>
 
-              {/* INFORMAÇÃO / COMUNICAÇÃO COM O USUÁRIO */}
-              <div className={styles.infoBlock} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
-                <h3 style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
-                  <Info size={22} color="#008a83" /> Informações Importantes
+              {/* REQUISITOS PARA ACESSAR O SERVIÇO (AGORA NA COLUNA PRINCIPAL) */}
+              <div className={styles.infoBlock}>
+                <h3>
+                  <CheckCircle2 size={22} color="#008a83" /> Requisitos para Acessar o Serviço
                 </h3>
-                <p style={{ margin: 0, fontWeight: 500, color: '#0f766e' }}>
-                  {dados.comunicacao}
-                </p>
+                <ul className={styles.docList}>
+                  {dados.requisitos.map((req, idx) => (
+                    <li key={idx}>{req}</li>
+                  ))}
+                </ul>
               </div>
             </div>
 
             {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              {/* REQUISITOS PARA ACESSAR O SERVIÇO */}
-              <div className={`${styles.widgetBox} ${styles.requisitosCard}`}>
-                <div className={styles.widgetHeader}>
-                  <CheckCircle2 size={20} /> Requisitos para Acessar o Serviço
+              {/* INFORMAÇÕES IMPORTANTES (AGORA NA BARRA LATERAL) */}
+              <div className={styles.widgetBox} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
+                <div className={styles.widgetHeader} style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
+                  <Info size={20} color="#008a83" /> Informações Importantes
                 </div>
-                <ul className={styles.docList} style={{ paddingLeft: '18px', margin: 0 }}>
-                  {dados.requisitos.map((req, idx) => (
-                    <li key={idx} style={{ marginBottom: '6px', fontSize: '14px' }}>{req}</li>
-                  ))}
-                </ul>
+                <p className={styles.widgetText} style={{ fontWeight: 500, color: '#0f766e' }}>
+                  {dados.comunicacao}
+                </p>
               </div>
 
               {/* ONDE ENCONTRAR */}

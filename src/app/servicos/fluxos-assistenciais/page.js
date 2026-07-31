@@ -16,8 +16,11 @@ import {
 } from 'lucide-react';
 import styles from './FluxosAssistenciais.module.css';
 
-export default function FluxosAssistenciaisPage() {
-  const servico = dbServicos['fluxos-assistenciais'];
+// IMPORTAÇÃO DOS DADOS DO SEU ARQUIVO
+import { fluxosAssistenciaisData } from '@/data/fluxosAssistenciaisData';
+
+export default function Page() {
+  const servico = fluxosAssistenciaisData;
 
   const [categoriaAtivaId, setCategoriaAtivaId] = useState('cardiologia');
   const [submoduloAtivoId, setSubmoduloAtivoId] = useState('angioplastia');
@@ -70,7 +73,7 @@ export default function FluxosAssistenciaisPage() {
     setPosition({ x: 0, y: 0 });
   };
 
-  // Controles do Mouse
+  // Controles do Mouse (Drag)
   const handleMouseDown = (e) => {
     if (zoomLevel <= 1) return;
     e.preventDefault();
@@ -89,7 +92,7 @@ export default function FluxosAssistenciaisPage() {
 
   const handleMouseUp = () => setIsDragging(false);
 
-  // Controles de Touch (Telas sensíveis ao toque)
+  // Controles de Touch (Mobile)
   const handleTouchStart = (e) => {
     if (zoomLevel <= 1 || e.touches.length !== 1) return;
     setIsDragging(true);
@@ -195,7 +198,7 @@ export default function FluxosAssistenciaisPage() {
                     <FileText size={22} />
                   </div>
                   <div>
-                    <span className={styles.headerTag}>{categoriaAtual.titulo}</span>
+                    <span className={styles.headerTag}>{categoriaAtual?.titulo}</span>
                     <h2 className={styles.headerTitle}>{submoduloAtual.titulo}</h2>
                   </div>
                 </div>
