@@ -15,32 +15,32 @@ import {
   Calendar,
   Trash2,
   List,
-  PlusCircle
+  PlusCircle,
+  Pencil,
+  XCircle
 } from 'lucide-react';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData';
 import styles from './Noticia.module.css';
 
-// URL do seu Web App no Google Apps Script
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsi09GSHFIZSj_y77dxpz7pRBJAKwk0DE_fi_-O8yddeVtU5S6Ue8VFc1uRiGIRbKKMQ/exec';
 
 export default function AdminDashboardPage() {
-  // Controle de Abas Principais: 'noticias' ou 'eventos'
   const [abaModulo, setAbaModulo] = useState('noticias'); 
-
-  // Controle de Sub-abas de Notícias: 'cadastrar' ou 'gerenciar'
   const [abaNoticia, setAbaNoticia] = useState('cadastrar');
 
-  // Estados do Formulário de Notícia
+  // Estados do Formulário
   const [loadingForm, setLoadingForm] = useState(false);
   const [mensagem, setMensagem] = useState(null);
   const [nomeArquivo, setNomeArquivo] = useState('');
+  
+  // Estado para armazenar dados em modo de Edição (se null, está criando nova)
+  const [noticiaEmEdicao, setNoticiaEmEdicao] = useState(null);
 
   // Estados do Gerenciador de Notícias
   const [listaNoticias, setListaNoticias] = useState([]);
   const [loadingLista, setLoadingLista] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
-  // Dispara a busca de notícias quando a aba "gerenciar" for selecionada
   useEffect(() => {
     async function carregarNoticias() {
       setLoadingLista(true);
@@ -71,7 +71,22 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // SUBMIT DO FORMULÁRIO DE NOTÍCIA
+  // PREPARAR PARA EDITAR
+  const handleIniciarEdicao = (noticia) => {
+    setNoticiaEmEdicao(noticia);
+    setAbaNoticia('cadastrar');
+    setNomeArquivo('');
+    setMensagem(null);
+  };
+
+  // CANCELAR EDIÇÃO
+  const handleCancelarEdicao = () => {
+    setNoticiaEmEdicao(null);
+    setNomeArquivo('');
+    setMensagem(null);
+  };
+
+  // SUBMIT DO FORMULÁRIO (CRIAR OU ATUALIZAR)
   const handleSubmitNoticia = async (e) => {
     e.preventDefault();
     setLoadingForm(true);
@@ -79,11 +94,12 @@ export default function AdminDashboardPage() {
 
     const formData = new FormData(e.target);
     const imagemArquivo = formData.get('imagem');
+    const isEditing = !!noticiaEmEdicao;
 
     const processarEnvio = async (base64Image = '', name = '', type = '') => {
       const payload = {
-        action: 'CREATE',
-        id: formData.get('titulo')
+        action: isEditing ? 'UPDATE' : 'CREATE',
+        id: isEditing ? noticiaEmEdicao.id : formData.get('titulo')
           .toLowerCase()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
@@ -93,7 +109,7 @@ export default function AdminDashboardPage() {
         resumo: formData.get('resumo'),
         categoria: formData.get('categoria'),
         tipoCategoria: formData.get('tipoCategoria'),
-        data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', ''),
+        data: isEditing ? noticiaEmEdicao.data : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', ''),
         conteudo: formData.get('conteudo'),
         imagemBase64: base64Image,
         imagemNome: name,
@@ -110,11 +126,19 @@ export default function AdminDashboardPage() {
         const resData = await response.json();
 
         if (resData.status === 'success') {
-          setMensagem({ tipo: 'sucesso', texto: 'Notícia publicada com sucesso no portal!' });
-          e.target.reset();
-          setNomeArquivo('');
+          setMensagem({ 
+            tipo: 'sucesso', 
+            texto: isEditing ? 'Notícia atualizada com sucesso!' : 'Notícia publicada com sucesso no portal!' 
+          });
+          
+          if (!isEditing) {
+            e.target.reset();
+            setNomeArquivo('');
+          } else {
+            setNoticiaEmEdicao(null);
+          }
         } else {
-          setMensagem({ tipo: 'erro', texto: 'Erro ao cadastrar: ' + resData.message });
+          setMensagem({ tipo: 'erro', texto: 'Erro ao salvar: ' + resData.message });
         }
       } catch (err) {
         console.error(err);
@@ -188,7 +212,7 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
 
-        {/* 1. SELETOR DE MÓDULOS (NOTÍCIAS vs EVENTOS) */}
+        {/* SELETOR DE MÓDULOS */}
         <div className={styles.moduleSelector}>
           <button
             onClick={() => setAbaModulo('noticias')}
@@ -205,7 +229,7 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        {/* ALERTA DE SUCESSO / ERRO DA NOTÍCIA */}
+        {/* ALERTA DE SUCESSO / ERRO */}
         {mensagem && abaModulo === 'noticias' && (
           <div className={`${styles.alertMessage} ${mensagem.tipo === 'sucesso' ? styles.alertSucesso : styles.alertErro}`}>
             {mensagem.tipo === 'sucesso' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
@@ -213,16 +237,17 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* CONTEÚDO DO MÓDULO DE NOTÍCIAS */}
-        {/* ========================================== */}
+        {/* MÓDULO DE NOTÍCIAS */}
         {abaModulo === 'noticias' && (
           <div>
-            {/* SUB-ABAS: CADASTRAR vs GERENCIAR */}
+            {/* SUB-ABAS */}
             <div className={styles.subTabContainer}>
               <button
-                onClick={() => setAbaNoticia('cadastrar')}
-                className={`${styles.subTabBtn} ${abaNoticia === 'cadastrar' ? styles.subTabCadastrarActive : ''}`}
+                onClick={() => {
+                  setNoticiaEmEdicao(null);
+                  setAbaNoticia('cadastrar');
+                }}
+                className={`${styles.subTabBtn} ${abaNoticia === 'cadastrar' && !noticiaEmEdicao ? styles.subTabCadastrarActive : ''}`}
               >
                 <PlusCircle size={16} /> Cadastrar Nova Notícia
               </button>
@@ -235,15 +260,29 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            {/* ABAS 1A: FORMULÁRIO DE CADASTRO DE NOTÍCIA */}
+            {/* FORMULÁRIO DE CADASTRO OU EDIÇÃO */}
             {abaNoticia === 'cadastrar' && (
               <form onSubmit={handleSubmitNoticia}>
+                
+                {/* AVISO SE ESTIVER EM MODO DE EDIÇÃO */}
+                    {noticiaEmEdicao && (
+                    <div className={styles.editModeBanner}>
+                        <div>
+                        <strong>Editando matéria:</strong> {`"${noticiaEmEdicao.titulo}"`}
+                        </div>
+                        <button type="button" onClick={handleCancelarEdicao} className={styles.cancelEditBtn}>
+                        <XCircle size={16} /> Cancelar Edição
+                        </button>
+                    </div>
+                    )}
+
                 <div className={styles.formGrid}>
                   
-                  {/* COLUNA ESQUERDA: CONTEÚDO PRINCIPAL */}
+                  {/* COLUNA ESQUERDA: CONTEÚDO */}
                   <div className={styles.cardSection}>
                     <h2 className={styles.sectionTitle}>
-                      <FileText size={20} color="#0065a4" /> Conteúdo da Publicação
+                      <FileText size={20} color="#0065a4" /> 
+                      {noticiaEmEdicao ? 'Editar Conteúdo' : 'Conteúdo da Publicação'}
                     </h2>
 
                     <div className={styles.formGroup}>
@@ -252,6 +291,7 @@ export default function AdminDashboardPage() {
                         type="text" 
                         name="titulo" 
                         required 
+                        defaultValue={noticiaEmEdicao?.titulo || ''}
                         placeholder="Ex: Secretaria lança novo sistema de agendamento online" 
                         className={styles.input}
                       />
@@ -263,6 +303,7 @@ export default function AdminDashboardPage() {
                         type="text" 
                         name="resumo" 
                         required 
+                        defaultValue={noticiaEmEdicao?.resumo || ''}
                         placeholder="Resumo de 1 ou 2 frases que ficará visível nos cards da homepage" 
                         className={styles.input}
                       />
@@ -274,13 +315,14 @@ export default function AdminDashboardPage() {
                         name="conteudo" 
                         rows={10} 
                         required 
+                        defaultValue={Array.isArray(noticiaEmEdicao?.conteudo) ? noticiaEmEdicao.conteudo.join('\n\n') : noticiaEmEdicao?.conteudo || ''}
                         placeholder="Digite aqui a matéria completa, detalhes da ação ou comunicado oficial..." 
                         className={styles.textarea}
                       />
                     </div>
                   </div>
 
-                  {/* COLUNA DIREITA: IMAGEM, CATEGORIAS E AÇÃO */}
+                  {/* COLUNA DIREITA: IMAGEM, CATEGORIA E BOTÃO */}
                   <div className={styles.rightColumn}>
                     
                     {/* CARD DE IMAGEM */}
@@ -291,18 +333,22 @@ export default function AdminDashboardPage() {
 
                       <div className={styles.dropZone}>
                         <UploadCloud size={36} className={styles.uploadIcon} />
-                        <div className={styles.uploadText}>Clique para selecionar</div>
+                        <div className={styles.uploadText}>
+                          {noticiaEmEdicao ? 'Clique para trocar a imagem' : 'Clique para selecionar'}
+                        </div>
                         <div className={styles.uploadSubtext}>Formatos JPG, PNG ou WEBP</div>
                         
-                        {nomeArquivo && (
+                        {nomeArquivo ? (
                           <span className={styles.fileNameBadge}>📷 {nomeArquivo}</span>
-                        )}
+                        ) : noticiaEmEdicao?.imagem ? (
+                          <span className={styles.fileNameBadge}>📷 Imagem atual mantida</span>
+                        ) : null}
 
                         <input 
                           type="file" 
                           name="imagem" 
                           accept="image/*" 
-                          required 
+                          required={!noticiaEmEdicao} // Se for edição, a imagem é opcional
                           onChange={handleFileChange}
                           className={styles.fileInputHidden}
                         />
@@ -317,7 +363,11 @@ export default function AdminDashboardPage() {
 
                       <div className={styles.formGroup}>
                         <label className={styles.label}>Categoria*</label>
-                        <select name="categoria" className={styles.select}>
+                        <select 
+                          name="categoria" 
+                          className={styles.select}
+                          defaultValue={noticiaEmEdicao?.categoria || 'Inovação'}
+                        >
                           <option value="Inovação">Inovação</option>
                           <option value="Campanha">Campanha</option>
                           <option value="Novidades">Novidades</option>
@@ -327,7 +377,11 @@ export default function AdminDashboardPage() {
 
                       <div className={styles.formGroup}>
                         <label className={styles.label}>Estilo do Badge*</label>
-                        <select name="tipoCategoria" className={styles.select}>
+                        <select 
+                          name="tipoCategoria" 
+                          className={styles.select}
+                          defaultValue={noticiaEmEdicao?.tipoCategoria || 'infra'}
+                        >
                           <option value="infra">Infraestrutura / Inovação (Azul)</option>
                           <option value="vacinacao">Vacinação / Campanha (Verde)</option>
                         </select>
@@ -338,7 +392,12 @@ export default function AdminDashboardPage() {
                         disabled={loadingForm}
                         className={styles.submitBtn}
                       >
-                        {loadingForm ? 'Publicando...' : <><Send size={18} /> Publicar Notícia</>}
+                        {loadingForm 
+                          ? 'Salvando...' 
+                          : noticiaEmEdicao 
+                            ? <><Pencil size={18} /> Salvar Alterações</> 
+                            : <><Send size={18} /> Publicar Notícia</>
+                        }
                       </button>
                     </div>
 
@@ -348,7 +407,7 @@ export default function AdminDashboardPage() {
               </form>
             )}
 
-            {/* ABAS 1B: LISTAGEM E REMOÇÃO DE NOTÍCIAS */}
+            {/* LISTAGEM DE NOTÍCIAS */}
             {abaNoticia === 'gerenciar' && (
               <div className={styles.cardSection}>
                 <h2 className={styles.sectionTitle}>
@@ -377,14 +436,27 @@ export default function AdminDashboardPage() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => handleDeletarNoticia(item.id, item.titulo)}
-                          disabled={deletandoId === item.id}
-                          className={styles.deleteBtn}
-                        >
-                          <Trash2 size={15} />
-                          {deletandoId === item.id ? 'Excluindo...' : 'Remover'}
-                        </button>
+                        {/* BOTÕES DE AÇÃO: EDITAR E EXCLUIR */}
+                        <div className={styles.actionButtonsGroup}>
+                          <button
+                            onClick={() => handleIniciarEdicao(item)}
+                            className={styles.editBtn}
+                            title="Editar notícia"
+                          >
+                            <Pencil size={15} /> Editar
+                          </button>
+
+                          <button
+                            onClick={() => handleDeletarNoticia(item.id, item.titulo)}
+                            disabled={deletandoId === item.id}
+                            className={styles.deleteBtn}
+                            title="Excluir notícia"
+                          >
+                            <Trash2 size={15} />
+                            {deletandoId === item.id ? 'Excluindo...' : 'Remover'}
+                          </button>
+                        </div>
+
                       </div>
                     ))}
                   </div>
@@ -396,9 +468,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* CONTEÚDO DO MÓDULO DE EVENTOS */}
-        {/* ========================================== */}
+        {/* MÓDULO DE EVENTOS */}
         {abaModulo === 'eventos' && (
           <div className={`${styles.cardSection} ${styles.eventsPlaceholder}`}>
             <Calendar size={48} color="#0065a4" className={styles.eventsIcon} />
