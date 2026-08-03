@@ -6,7 +6,6 @@ import { Search } from 'lucide-react';
 import { listaContatos, categoriasContatos } from '@/data/contatosData';
 import styles from './Contatos.module.css';
 
-// FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
