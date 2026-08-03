@@ -1,19 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
-import { dbNoticias, converterParaDate } from '@/data/noticiasData';
+import { getDbNoticias, converterParaDate } from '@/data/noticiasData';
 import styles from './Noticias.module.css';
 
-// Mapeamento local dos tipos de categoria para os estilos do CSS Module
 const categoriaClassMap = {
   infra: styles.catInfra,
   vacinacao: styles.catVacinacao
 };
 
-// FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
@@ -25,26 +23,35 @@ function normalizarTexto(texto) {
 export default function NoticiasPage() {
   const [busca, setBusca] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [listaNoticias, setListaNoticias] = useState([]);
+  const [loading, setLoading] = useState(true);
   const ITENS_POR_PAGINA = 9;
+
+  // BUSCA AS NOTÍCIAS DO GOOGLE SHEETS AO CARREGAR A PÁGINA
+  useEffect(() => {
+    async function carregarDados() {
+      setLoading(true);
+      const db = await getDbNoticias();
+      
+      const lista = Object.keys(db)
+        .map((chave) => ({
+          id: chave,
+          ...db[chave]
+        }))
+        .sort((a, b) => converterParaDate(b.data).getTime() - converterParaDate(a.data).getTime());
+
+      setListaNoticias(lista);
+      setLoading(false);
+    }
+
+    carregarDados();
+  }, []);
 
   const handleBusca = (valor) => {
     setBusca(valor);
     setPaginaAtual(1);
   };
 
-  const handleSubmeterBusca = (e) => {
-    e.preventDefault();
-  };
-
-  // Transforma o objeto em Array e o ordena da notícia mais recente para a mais antiga
-  const listaNoticias = Object.keys(dbNoticias)
-    .map((chave) => ({
-      id: chave,
-      ...dbNoticias[chave]
-    }))
-    .sort((a, b) => converterParaDate(b.data).getTime() - converterParaDate(a.data).getTime());
-
-  // Filtragem que ignora acentos e diferença de maiúsculas/minúsculas
   const termo = normalizarTexto(busca.trim());
 
   const noticiasFiltradas = listaNoticias.filter((noticia) => {
@@ -55,7 +62,6 @@ export default function NoticiasPage() {
     return bateTitulo || bateResumo || bateCategoria;
   });
 
-  // Lógica de Paginação
   const totalPaginas = Math.ceil(noticiasFiltradas.length / ITENS_POR_PAGINA);
   const inicioIndice = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const noticiasPagina = noticiasFiltradas.slice(inicioIndice, inicioIndice + ITENS_POR_PAGINA);
@@ -69,8 +75,6 @@ export default function NoticiasPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      
-      {/* 1. BANNER DE TOPO */}
       <section 
         className={styles.heroBanner}
         style={{ backgroundImage: "url('/img/banner-header.png')" }}
@@ -80,13 +84,12 @@ export default function NoticiasPage() {
             <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
             <h1 className={styles.heroTitle}>Notícias da Saúde</h1>
             <p className={styles.heroDesc}>
-              Aqui você encontra as atualizações mais recentes sobre serviços, campanhas de vacinação, programas de prevenção, ações educativas e demais iniciativas conduzidas pela Secretaria Municipal de Saúde.
+              Aqui você encontra as atualizações mais recentes sobre serviços, campanhas de vacinação e ações da Secretaria de Saúde.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2. BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/" className={styles.backLink}>
@@ -95,16 +98,14 @@ export default function NoticiasPage() {
         </div>
       </div>
 
-      {/* 3. CONTEÚDO CENTRAL */}
       <section className={styles.contentSection}>
         <div className={styles.container}> 
           
-          {/* BARRA DE PESQUISA COMPACTA E CENTRALIZADA */}
-          <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
+          <form onSubmit={(e) => e.preventDefault()} className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
             <input 
               type="text" 
-              placeholder="Buscar notícias " 
+              placeholder="Buscar notícias..." 
               value={busca}
               onChange={(e) => handleBusca(e.target.value)}
               className={styles.searchInput}
@@ -114,7 +115,6 @@ export default function NoticiasPage() {
                 type="button" 
                 className={styles.clearBtn} 
                 onClick={() => handleBusca('')}
-                title="Limpar busca"
               >
                 ✕
               </button>
@@ -122,7 +122,11 @@ export default function NoticiasPage() {
             <button type="submit" className={styles.searchBtn}>Buscar</button>
           </form>
 
-          {noticiasPagina.length > 0 ? (
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: '#0065a4' }}>
+              <h3>Carregando notícias atualizadas...</h3>
+            </div>
+          ) : noticiasPagina.length > 0 ? (
             <>
               <div className={styles.gridNoticias}>
                 {noticiasPagina.map((noticia) => {
@@ -135,7 +139,7 @@ export default function NoticiasPage() {
                           alt={noticia.titulo} 
                           className={styles.imagemNoticiaSrc} 
                           height={200} 
-                          src={noticia.imagem} 
+                          src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
                           unoptimized 
                           width={360}
                         />
@@ -157,7 +161,6 @@ export default function NoticiasPage() {
                 })}
               </div>
 
-              {/* CONTROLES DA PAGINAÇÃO */}
               {totalPaginas > 1 && (
                 <div className={styles.paginationContainer}>
                   <button 
@@ -183,7 +186,7 @@ export default function NoticiasPage() {
                   <button 
                     className={styles.paginationNavBtn} 
                     disabled={paginaAtual === totalPaginas}
-                    onClick={() => handleMudarPagina(paginaAtual + 1)}
+                    onClick={() => handleMudarPagina(paginaAtual + totalPaginas)}
                   >
                     Próximo →
                   </button>
