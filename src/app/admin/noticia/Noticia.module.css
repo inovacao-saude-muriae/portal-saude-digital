@@ -1,48 +1,21 @@
-/* ==========================================================
-   ESTILOS MODERNOS - PAINEL DA COMUNICAÇÃO
-   ========================================================== */
-
 .pageWrapper {
   min-height: 100vh;
   background-color: #f8fafc;
-  padding: 40px 20px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1e293b;
+  padding: 40px 20px 80px 20px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .container {
-  max-width: 1080px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-/* --- HEADER --- */
+/* HEADER BAR */
 .headerBar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #0065a4;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.backLink:hover {
-  background-color: #0065a4;
-  color: #ffffff;
-  border-color: #0065a4;
+  align-items: flex-start;
+  margin-bottom: 28px;
 }
 
 .badgeHeader {
@@ -52,40 +25,90 @@
   background-color: #e0f2fe;
   color: #0369a1;
   font-size: 12px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
 }
 
 .mainTitle {
-  color: #0f172a;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
   letter-spacing: -0.5px;
-  margin: 12px 0 6px 0;
 }
 
 .subTitle {
-  color: #64748b;
   font-size: 15px;
-  margin: 0 0 28px 0;
+  color: #64748b;
+  margin: 0;
 }
 
-/* --- ALERTAS --- */
-.alertMessage {
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 28px;
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0065a4;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.backLink:hover {
+  background-color: #f1f5f9;
+  color: #004066;
+}
+
+/* NAVEGAÇÃO DE MÓDULOS PRINCIPAIS */
+.moduleSelector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.moduleBtn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-weight: bold;
+  cursor: pointer;
   font-size: 15px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.moduleBtnActive {
+  background-color: #0065a4;
+  color: #ffffff;
+}
+
+/* ALERTAS DE MENSAGEM */
+.alertMessage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 24px;
 }
 
 .alertSucesso {
-  background-color: #f0fdf4;
+  background-color: #dc26260f;
+  background-color: #dcfce7;
   color: #15803d;
   border: 1px solid #bbf7d0;
 }
@@ -96,96 +119,156 @@
   border: 1px solid #fecaca;
 }
 
-/* --- LAYOUT GRID EM DUPAS COLUNAS --- */
-.formGrid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 28px;
-  align-items: start;
+/* SUB-ABAS (CADASTRAR vs GERENCIAR) */
+.subTabContainer {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.cardSection {
+.subTabBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
   background-color: #ffffff;
-  padding: 28px;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subTabCadastrarActive {
+  background-color: #2b943d;
+  color: #ffffff;
+  border-color: #2b943d;
+}
+
+.subTabGerenciarActive {
+  background-color: #0065a4;
+  color: #ffffff;
+  border-color: #0065a4;
+}
+
+/* FORMULÁRIO E CARDS */
+.formGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.rightColumn {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+.cardSection {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
 .sectionTitle {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 16px 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-/* --- CAMPOS --- */
 .formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.formGroup:last-child {
+  margin-bottom: 0;
 }
 
 .label {
-  font-weight: 600;
+  display: block;
   font-size: 13px;
-  color: #334155;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
 }
 
 .input,
 .select,
 .textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px;
+  border-radius: 8px;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 15px;
+  font-size: 14px;
   color: #0f172a;
+  outline: none;
   background-color: #f8fafc;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .input:focus,
 .select:focus,
 .textarea:focus {
-  outline: none;
   border-color: #0065a4;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(0, 101, 164, 0.12);
 }
 
 .textarea {
   resize: vertical;
-  min-height: 220px;
   line-height: 1.6;
 }
 
-/* --- DROPZONE CUSTOMIZADA PARA IMAGEM --- */
+/* DROPZONE DE UPLOAD */
 .dropZone {
   position: relative;
   border: 2px dashed #cbd5e1;
   border-radius: 12px;
-  padding: 24px 16px;
+  padding: 30px 16px;
   text-align: center;
   background-color: #f8fafc;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .dropZone:hover {
-  border-color: #0065a4;
-  background-color: #f0f7fc;
+  background-color: #f1f5f9;
+}
+
+.uploadIcon {
+  color: #0065a4;
+  margin-bottom: 8px;
+}
+
+.uploadText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.uploadSubtext {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.fileNameBadge {
+  display: inline-block;
+  margin-top: 10px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 .fileInputHidden {
@@ -198,72 +281,144 @@
   cursor: pointer;
 }
 
-.uploadIcon {
-  color: #0065a4;
-  margin-bottom: 8px;
-}
-
-.uploadText {
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.uploadSubtext {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 4px;
-}
-
-.fileNameBadge {
-  margin-top: 10px;
-  font-size: 12px;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  padding: 4px 10px;
-  border-radius: 6px;
-  word-break: break-all;
-  display: inline-block;
-}
-
-/* --- BOTÃO PRINCIPAL --- */
+/* BOTÃO DE SUBMIT */
 .submitBtn {
-  background: linear-gradient(135deg, #0065a4 0%, #004b7a 100%);
-  color: #ffffff;
-  border: none;
-  padding: 16px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 101, 164, 0.25);
+  gap: 8px;
+  background-color: #2b943d;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
   margin-top: 10px;
+  transition: background-color 0.2s ease;
 }
 
-.submitBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 101, 164, 0.35);
+.submitBtn:hover {
+  background-color: #237a32;
 }
 
 .submitBtn:disabled {
-  background: #cbd5e1;
-  box-shadow: none;
+  background-color: #cbd5e1;
   cursor: not-allowed;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* GERENCIADOR / LISTA DE NOTÍCIAS */
+.newsListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.newsItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.newsItemContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.imageThumbnailWrapper {
+  width: 70px;
+  height: 50px;
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.thumbnailImg {
+  object-fit: cover;
+}
+
+.newsMetaText {
+  font-size: 12px;
+  color: #0065a4;
+  font-weight: bold;
+}
+
+.newsItemTitle {
+  margin: 2px 0 0 0;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #b91c1c;
+}
+
+.deleteBtn:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.loadingText,
+.emptyText {
+  text-align: center;
+  padding: 30px;
+  color: #64748b;
+}
+
+/* PLACEHOLDER MÓDULO EVENTOS */
+.eventsPlaceholder {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.eventsIcon {
+  margin-bottom: 16px;
+}
+
+.eventsTitle {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+
+.eventsSubtext {
+  color: #64748b;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 /* RESPONSIVIDADE */
 @media (max-width: 900px) {
   .formGrid {
     grid-template-columns: 1fr;
+  }
+  
+  .headerBar {
+    flex-direction: column;
+    gap: 16px;
   }
 }
