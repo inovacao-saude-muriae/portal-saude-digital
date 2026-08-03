@@ -26,8 +26,8 @@ export default function NoticiaDetalhePage({ params }) {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '100px 0', color: '#0065a4' }}>
-        <h2>Carregando matéria...</h2>
+      <div className={styles.pageWrapper} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <p style={{ color: '#0065a4', fontSize: '18px', fontWeight: 'bold' }}>Carregando notícia...</p>
       </div>
     );
   }
@@ -44,8 +44,22 @@ export default function NoticiaDetalhePage({ params }) {
     );
   }
 
+  // TRATAMENTO DE PARÁGRAFOS DO CONTEÚDO (seja do Sheets ou estático)
+  let paragrafos = [];
+  if (Array.isArray(noticia.conteudo)) {
+    paragrafos = noticia.conteudo;
+  } else if (typeof noticia.conteudo === 'string') {
+    // Separa por quebra de linha (\n) se vier uma string longa do Google Sheets
+    paragrafos = noticia.conteudo
+      .split('\n')
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+  }
+
   return (
     <div className={styles.pageWrapper}>
+      
+      {/* BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/noticias" className={styles.backLink}>
@@ -56,22 +70,31 @@ export default function NoticiaDetalhePage({ params }) {
 
       <main className={styles.mainContent}>
         <div className={styles.container}>
+          
+          {/* CARD BRANCO PRINCIPAL */}
           <article className={styles.articleCard}>
-            <span className={styles.dataPublicacao}>
-              Publicado em: {noticia.data}
-            </span>
+            
+            {/* DATA DE PUBLICAÇÃO */}
+            {noticia.data && (
+              <span className={styles.dataPublicacao}>
+                Publicado em: {noticia.data}
+              </span>
+            )}
 
+            {/* TÍTULO PRINCIPAL */}
             <h1 className={styles.titulo}>{noticia.titulo}</h1>
 
+            {/* RESUMO / SUBTÍTULO */}
             {noticia.resumo && (
               <p className={styles.resumo}>{noticia.resumo}</p>
             )}
 
+            {/* IMAGEM DE CAPA */}
             {noticia.imagem && (
               <div className={styles.imageWrapper}>
                 <Image 
                   src={noticia.imagem} 
-                  alt={noticia.titulo}
+                  alt={noticia.titulo || 'Imagem da notícia'}
                   width={900}
                   height={500}
                   className={styles.imagemCapa}
@@ -81,9 +104,10 @@ export default function NoticiaDetalhePage({ params }) {
               </div>
             )}
 
+            {/* CORPO DO TEXTO DA NOTÍCIA */}
             <div className={styles.corpoNoticia}>
-              {Array.isArray(noticia.conteudo) ? (
-                noticia.conteudo.map((paragrafo, index) => (
+              {paragrafos.length > 0 ? (
+                paragrafos.map((paragrafo, index) => (
                   <p key={index}>{paragrafo}</p>
                 ))
               ) : (
@@ -92,6 +116,7 @@ export default function NoticiaDetalhePage({ params }) {
             </div>
 
           </article>
+
         </div>
       </main>
     </div>

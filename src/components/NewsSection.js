@@ -6,11 +6,6 @@ import Link from 'next/link';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData'; 
 import styles from './NewsSection.module.css';
 
-const categoriaClassMap = {
-  infra: styles.catInfra,
-  vacinacao: styles.catVacinacao
-};
-
 export default function NewsSection() {
   const [noticias, setNoticias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,15 +15,15 @@ export default function NewsSection() {
       setLoading(true);
       const db = await getDbNoticias();
       
-      // Converte o objeto do banco/sheets em array e ordena por data
       const lista = Object.keys(db)
         .map((chave) => ({
           id: chave,
           ...db[chave]
         }))
+        // Ordena da mais recente para a mais antiga
         .sort((a, b) => converterParaDate(b.data).getTime() - converterParaDate(a.data).getTime());
 
-      // Pega as 3 notícias mais recentes para o carrossel/grid da Home
+      // Pega as 3 mais recentes
       setNoticias(lista.slice(0, 3));
       setLoading(false);
     }
@@ -40,7 +35,9 @@ export default function NewsSection() {
     return (
       <section className={styles.newsSection}>
         <div className={styles.container}>
-          <p style={{ textAlign: 'center', color: '#0065a4' }}>Carregando notícias...</p>
+          <p style={{ textAlign: 'center', color: '#004066', fontWeight: 'bold' }}>
+            Carregando notícias da saúde...
+          </p>
         </div>
       </section>
     );
@@ -50,47 +47,49 @@ export default function NewsSection() {
     <section className={styles.newsSection}>
       <div className={styles.container}>
         
-        <div className={styles.headerRow}>
+        {/* CABEÇALHO DA SEÇÃO */}
+        <div className={styles.headerArea}>
           <div>
-            <span className={styles.badgeHeader}>INFORMAÇÃO E TRANSPARÊNCIA</span>
-            <h2 className={styles.sectionTitle}>Últimas Notícias da Saúde</h2>
+            <span className={styles.subtitle}>INFORMAÇÃO E TRANSPARÊNCIA</span>
+            <h2 className={styles.title}>Últimas Notícias da Saúde</h2>
           </div>
-          <Link href="/noticias" className={styles.verTodasBtn}>
+          <Link href="/noticias" className={styles.seeAllLink}>
             Ver todas as notícias →
           </Link>
         </div>
 
-        <div className={styles.gridNoticias}>
-          {noticias.map((noticia) => {
-            const classCategoriaCss = categoriaClassMap[noticia.tipoCategoria] || styles.catInfra;
+        {/* GRELHA DE NOTÍCIAS */}
+        <div className={styles.newsGrid}>
+          {noticias.map((noticia) => (
+            <Link className={styles.newsCard} href={`/noticias/${noticia.id}`} key={noticia.id}>
+              
+              {/* IMAGEM DO CARD */}
+              <div className={styles.imageWrapper}>
+                <Image 
+                  alt={noticia.titulo || 'Notícia'} 
+                  className={styles.cardImage} 
+                  src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  unoptimized 
+                />
+              </div>
+              
+              {/* ÁREA DE TEXTO */}
+              <div className={styles.cardContent}>
+                <div className={styles.metaArea}>
+                  <span className={styles.categoryTag}>
+                    {noticia.categoria}
+                  </span>
+                  <span className={styles.dateText}>{noticia.data}</span>
+                </div>                                        
+                <h3 className={styles.cardTitle}>{noticia.titulo}</h3>
+                <p className={styles.cardDescription}>{noticia.resumo}</p>                                        
+                <span className={styles.readMore}>Ler mais →</span>
+              </div>
 
-            return (
-              <Link className={styles.cardNoticia} href={`/noticias/${noticia.id}`} key={noticia.id}>
-                <div className={styles.capsulaImagem}>
-                  <Image 
-                    alt={noticia.titulo} 
-                    className={styles.imagemNoticiaSrc} 
-                    height={200} 
-                    src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
-                    unoptimized 
-                    width={360}
-                  />
-                </div>
-                
-                <div className={styles.infoCard}>
-                  <div className={styles.metaRow}>
-                    <span className={`${styles.badgeCategoria} ${classCategoriaCss}`}>
-                      {noticia.categoria}
-                    </span>
-                    <span className={styles.dataText}>{noticia.data}</span>
-                  </div>                                        
-                  <h3 className={styles.tituloCard}>{noticia.titulo}</h3>
-                  <p className={styles.resumoCard}>{noticia.resumo}</p>                                        
-                  <span className={styles.leiaMaisBtn}>Ler mais →</span>
-                </div>
-              </Link>
-            );
-          })}
+            </Link>
+          ))}
         </div>
 
       </div>

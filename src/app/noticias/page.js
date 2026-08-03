@@ -27,7 +27,7 @@ export default function NoticiasPage() {
   const [loading, setLoading] = useState(true);
   const ITENS_POR_PAGINA = 9;
 
-  // BUSCA AS NOTÍCIAS DO GOOGLE SHEETS AO CARREGAR A PÁGINA
+  // Carrega as notícias do Google Sheets de forma assíncrona
   useEffect(() => {
     async function carregarDados() {
       setLoading(true);
@@ -38,6 +38,7 @@ export default function NoticiasPage() {
           id: chave,
           ...db[chave]
         }))
+        // Ordena da notícia mais recente para a mais antiga usando o conversor resiliente
         .sort((a, b) => converterParaDate(b.data).getTime() - converterParaDate(a.data).getTime());
 
       setListaNoticias(lista);
@@ -50,6 +51,10 @@ export default function NoticiasPage() {
   const handleBusca = (valor) => {
     setBusca(valor);
     setPaginaAtual(1);
+  };
+
+  const handleSubmeterBusca = (e) => {
+    e.preventDefault();
   };
 
   const termo = normalizarTexto(busca.trim());
@@ -75,6 +80,8 @@ export default function NoticiasPage() {
 
   return (
     <div className={styles.pageWrapper}>
+      
+      {/* 1. BANNER DE TOPO */}
       <section 
         className={styles.heroBanner}
         style={{ backgroundImage: "url('/img/banner-header.png')" }}
@@ -84,12 +91,13 @@ export default function NoticiasPage() {
             <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
             <h1 className={styles.heroTitle}>Notícias da Saúde</h1>
             <p className={styles.heroDesc}>
-              Aqui você encontra as atualizações mais recentes sobre serviços, campanhas de vacinação e ações da Secretaria de Saúde.
+              Aqui você encontra as atualizações mais recentes sobre serviços, campanhas de vacinação, programas de prevenção, ações educativas e demais iniciativas conduzidas pela Secretaria Municipal de Saúde.
             </p>
           </div>
         </div>
       </section>
 
+      {/* 2. BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/" className={styles.backLink}>
@@ -98,14 +106,16 @@ export default function NoticiasPage() {
         </div>
       </div>
 
+      {/* 3. CONTEÚDO CENTRAL */}
       <section className={styles.contentSection}>
         <div className={styles.container}> 
           
-          <form onSubmit={(e) => e.preventDefault()} className={styles.searchBox}>
+          {/* BARRA DE PESQUISA COMPACTA E CENTRALIZADA */}
+          <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
             <input 
               type="text" 
-              placeholder="Buscar notícias..." 
+              placeholder="Buscar notícias" 
               value={busca}
               onChange={(e) => handleBusca(e.target.value)}
               className={styles.searchInput}
@@ -115,6 +125,7 @@ export default function NoticiasPage() {
                 type="button" 
                 className={styles.clearBtn} 
                 onClick={() => handleBusca('')}
+                title="Limpar busca"
               >
                 ✕
               </button>
@@ -124,7 +135,7 @@ export default function NoticiasPage() {
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#0065a4' }}>
-              <h3>Carregando notícias atualizadas...</h3>
+              <p>Carregando notícias da saúde...</p>
             </div>
           ) : noticiasPagina.length > 0 ? (
             <>
@@ -136,7 +147,7 @@ export default function NoticiasPage() {
                     <Link className={styles.cardNoticia} href={`/noticias/${noticia.id}`} key={noticia.id}>
                       <div className={styles.capsulaImagem}>
                         <Image 
-                          alt={noticia.titulo} 
+                          alt={noticia.titulo || 'Notícia'} 
                           className={styles.imagemNoticiaSrc} 
                           height={200} 
                           src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
@@ -161,6 +172,7 @@ export default function NoticiasPage() {
                 })}
               </div>
 
+              {/* CONTROLES DA PAGINAÇÃO */}
               {totalPaginas > 1 && (
                 <div className={styles.paginationContainer}>
                   <button 
@@ -186,7 +198,7 @@ export default function NoticiasPage() {
                   <button 
                     className={styles.paginationNavBtn} 
                     disabled={paginaAtual === totalPaginas}
-                    onClick={() => handleMudarPagina(paginaAtual + totalPaginas)}
+                    onClick={() => handleMudarPagina(paginaAtual + 1)} // Correção: avança 1 página por vez
                   >
                     Próximo →
                   </button>
