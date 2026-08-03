@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -16,16 +16,14 @@ import {
 
 // IMPORTAÇÃO DAS BASES DE DADOS DO SITE
 import { dbEventos } from '@/data/eventosData';
-import { dbNoticias } from '@/data/noticiasData';
+import { getDbNoticias } from '@/data/noticiasData'; // Atualizado para a função assíncrona
 import { animaisDisponiveis } from '@/data/animaisData';
 import { listaContatos } from '@/data/contatosData';
 import { servicos } from '@/data/servicosData';
 
-
 import styles from './Busca.module.css';
 
 // FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
-// Exemplo: "Farmácia" vira "farmacia"
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
@@ -59,8 +57,20 @@ function SearchResultsContent() {
   const router = useRouter();
   const query = searchParams.get('q') || '';
   
-  // Estado do campo de busca (sem necessidade de useEffect)
   const [inputBusca, setInputBusca] = useState(query);
+  const [noticiasState, setNoticiasState] = useState({});
+  const [loadingNoticias, setLoadingNoticias] = useState(true);
+
+  // Busca as notícias atualizadas do Google Sheets ao carregar
+  useEffect(() => {
+    async function carregarNoticias() {
+      setLoadingNoticias(true);
+      const dbNoticiasAtualizado = await getDbNoticias();
+      setNoticiasState(dbNoticiasAtualizado);
+      setLoadingNoticias(false);
+    }
+    carregarNoticias();
+  }, []);
 
   const handleRefazerBusca = (e) => {
     e.preventDefault();
@@ -69,21 +79,20 @@ function SearchResultsContent() {
     }
   };
 
-  // Normaliza o termo de busca pesquisado pelo usuário
   const termo = normalizarTexto(query.trim());
 
-  // --- VARREDURA EM TODAS AS BASES DE DADOS COM NORMALIZAÇÃO ---
+  // --- VARREDURA NAS BASES DE DADOS ---
 
-  // 1. CARTA DE SERVIÇOS
-  const servicosEncontrados = termo ? Object.keys(dbServicos).map(key => ({
+  // 1. CARTA DE SERVIÇOS (Corrigido para usar a variável 'servicos')
+  const baseServicos = servicos || {};
+  const servicosEncontrados = termo ? Object.keys(baseServicos).map(key => ({
     id: key,
-    ...dbServicos[key]
+    ...baseServicos[key]
   })).filter(s => {
     const bateId = normalizarTexto(s.id).includes(termo);
-    const bateTitulo = normalizarTexto(s.title).includes(termo);
-    const bateDesc = normalizarTexto(s.desc).includes(termo);
+    const bateTitulo = normalizarTexto(s.title || s.titulo).includes(termo);
+    const bateDesc = normalizarTexto(s.desc || s.descricao).includes(termo);
     
-    // Verifica se o termo está dentro das seções de texto secundárias
     const bateSecoes = s.secoesTexto && s.secoesTexto.some(secao => 
       normalizarTexto(secao.titulo).includes(termo) ||
       normalizarTexto(secao.paragrafo).includes(termo)
@@ -93,13 +102,13 @@ function SearchResultsContent() {
   }).map(s => ({
     id: `srv-${s.id}`,
     categoria: 'Serviço',
-    titulo: s.title,
-    resumo: s.desc.length > 180 ? `${s.desc.substring(0, 180)}...` : s.desc,
+    titulo: s.title || s.titulo,
+    resumo: (s.desc || s.descricao || '').length > 180 ? `${(s.desc || s.descricao).substring(0, 180)}...` : (s.desc || s.descricao),
     url: `/servicos/${s.id}`
   })) : [];
 
   // 2. GUIA DE CONTATOS / UNIDADES DE SAÚDE
-  const contatosEncontrados = termo ? listaContatos.filter(c =>
+  const contatosEncontrados = termo ? (listaContatos || []).filter(c =>
     normalizarTexto(c.nome).includes(termo) ||
     normalizarTexto(c.endereco).includes(termo) ||
     normalizarTexto(c.categoria).includes(termo)
@@ -111,10 +120,10 @@ function SearchResultsContent() {
     url: '/contatos'
   })) : [];
 
-  // 3. NOTÍCIAS
-  const noticiasEncontradas = termo ? Object.keys(dbNoticias).map(id => ({
+  // 3. NOTÍCIAS (Buscando dinamicamente do Sheets)
+  const noticiasEncontradas = termo ? Object.keys(noticiasState).map(id => ({
     id,
-    ...dbNoticias[id]
+    ...noticiasState[id]
   })).filter(n =>
     normalizarTexto(n.titulo).includes(termo) ||
     normalizarTexto(n.resumo).includes(termo) ||
@@ -128,7 +137,7 @@ function SearchResultsContent() {
   })) : [];
 
   // 4. EVENTOS
-  const eventosEncontrados = termo ? dbEventos.filter(e =>
+  const eventosEncontrados = termo ? (dbEventos || []).filter(e =>
     normalizarTexto(e.titulo).includes(termo) ||
     normalizarTexto(e.resumo).includes(termo) ||
     normalizarTexto(e.descricao).includes(termo)
@@ -141,7 +150,7 @@ function SearchResultsContent() {
   })) : [];
 
   // 5. ANIMAIS PARA ADOÇÃO (CCZ)
-  const animaisEncontrados = termo ? animaisDisponiveis.filter(a =>
+  const animaisEncontrados = termo ? (animaisDisponiveis || []).filter(a =>
     normalizarTexto(a.nome).includes(termo) ||
     normalizarTexto(a.especie).includes(termo) ||
     normalizarTexto(a.descricao).includes(termo)
@@ -200,7 +209,9 @@ function SearchResultsContent() {
 
           {/* MENSAGEM COM RESULTADOS */}
           <div className={styles.headerInfo}>
-            {query ? (
+            {loadingNoticias ? (
+              <p>Carregando informações do portal...</p>
+            ) : query ? (
               <p>Encontramos <strong>{todosResultados.length}</strong> resultado(s) para: <strong>{`"${query}"`}</strong></p>
             ) : (
               <p>Digite algo no campo acima para realizar a busca no portal.</p>
@@ -224,7 +235,7 @@ function SearchResultsContent() {
               ))}
             </div>
           ) : (
-            query && (
+            query && !loadingNoticias && (
               <div className={styles.emptyState}>
                 <Search size={48} className={styles.emptyIcon} />
                 <h2>Nenhum resultado encontrado</h2>
@@ -240,7 +251,6 @@ function SearchResultsContent() {
   );
 }
 
-// Wrapper que gerencia o estado por Query utilizando a prop 'key'
 function BuscaWrapper() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
