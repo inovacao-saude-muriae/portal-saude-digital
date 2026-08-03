@@ -8,17 +8,58 @@ import {
   Syringe, 
   Calendar, 
   Megaphone, 
-  Clock, 
   MapPin, 
   AlertTriangle 
 } from 'lucide-react';
 import styles from './Vacina.module.css';
 
-export default function VacinaPage() {
-  const servico = dbServicos['vacina'];
-  const [activeTab, setActiveTab] = useState('campanhas');
+/* ==========================================================================
+   DADOS ESPECÍFICOS DA PÁGINA DE VACINAS
+   ========================================================================== */
+const servico = {
+  id: 'vacina',
+  title: 'Vacina',
+  desc: 'Imunização para todas as faixas etárias segundo o calendário oficial.'
+};
 
-  if (!servico) return null;
+const tiposVacinas = [
+  {
+    id: 1,
+    titulo: "Vacinação de Rotina (Caderneta)",
+    desc: "Atualização sistemática do esquema vacinal conforme o Calendário Nacional para crianças, adolescentes, adultos e idosos.",
+    proceder: "Comparecer a uma UBS portando a caderneta para avaliação do profissional.",
+    locais: "Todas as Unidades Básicas de Saúde (UBS) do município.",
+    docs: "Documento oficial de identificação, Cartão SUS e Caderneta de Vacinação."
+  },
+  {
+    id: 2,
+    titulo: "Vacina Antirrábica Humana",
+    desc: "Imunização pós-exposição preventiva para pessoas mordidas, arranhadas ou arranhadas por animais suspeitos.",
+    proceder: "Lavar o ferimento com água e sabão e procurar atendimento imediatamente.",
+    locais: "UBS Safira, UBS São Francisco, Hospital Municipal e UPA.",
+    docs: "Documento oficial, Cartão SUS e Guia de Atendimento de Acidente Animal."
+  },
+  {
+    id: 3,
+    titulo: "Vacinação contra Covid-19",
+    desc: "Doses de imunização e reforço contra o coronavírus para os grupos prioritários convocados.",
+    proceder: "Acompanhar os comunicados semanais da Secretaria de Saúde.",
+    locais: "UBS Polos divulgadas nos canais oficiais.",
+    docs: "Documento com foto, CPF e Cartão do SUS."
+  },
+  {
+    id: 4,
+    titulo: "Vacina contra a Dengue",
+    desc: "Imunização para redução de complicações e internações por dengue.",
+    proceder: "Faixa etária convocada (10 a 14 anos) deve comparecer acompanhada dos pais.",
+    locais: "Salas de vacinação polos do município.",
+    docs: "Documento da criança, CPF e comprovante de residência.",
+    alerta: "Contraindicada para gestantes, lactantes e imunossuprimidos."
+  }
+];
+
+export default function VacinaPage() {
+  const [activeTab, setActiveTab] = useState('campanhas');
 
   return (
     <div className={styles.pageWrapper}>
@@ -50,7 +91,7 @@ export default function VacinaPage() {
       <main className={styles.mainContent}>
         <div className={styles.container}>
           
-          {/* BLOCOR INFORMATIVO PRINCIPAL */}
+          {/* BLOCO INFORMATIVO PRINCIPAL */}
           <div className={styles.infoBlock}>
             <h2>
               <Syringe size={22} color="#008a83" /> Programa Nacional de Imunizações (PNI)
