@@ -6,18 +6,16 @@ import { MapPin, Clock } from 'lucide-react';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './EventSection.module.css';
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
-// FUNÇÃO SEGURA PARA EXTRAIR DIA E MÊS SEM DAR INVALID DATE
 function extrairDiaEMes(dataBruta) {
   if (!dataBruta) return { dia: '01', mes: 'JAN' };
 
   try {
     const dataString = String(dataBruta).split('T')[0].trim();
 
-    // Caso 1: Formato YYYY-MM-DD (ex: 2026-08-15)
     if (dataString.includes('-')) {
       const partes = dataString.split('-');
       if (partes.length === 3) {
@@ -30,7 +28,6 @@ function extrairDiaEMes(dataBruta) {
       }
     }
 
-    // Caso 2: Formato DD/MM/YYYY (ex: 15/08/2026)
     if (dataString.includes('/')) {
       const partes = dataString.split('/');
       if (partes.length === 3) {
@@ -43,7 +40,6 @@ function extrairDiaEMes(dataBruta) {
       }
     }
 
-    // Caso 3: Fallback usando new Date()
     const d = new Date(dataBruta);
     if (!isNaN(d.getTime())) {
       return {
@@ -63,20 +59,46 @@ export default function EventSection() {
 
   useEffect(() => {
     async function carregarEventos() {
+      // 1. Tenta carregar do Cache Local para renderização instantânea
       try {
-        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
+        const cache = localStorage.getItem('cache_portal_eventos');
+        if (cache) {
+          const eventosCache = JSON.parse(cache);
+          if (Array.isArray(eventosCache) && eventosCache.length > 0) {
+            setEventos(eventosCache);
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao ler cache local de eventos:', err);
+      }
+
+      // 2. Busca atualizações do Google Apps Script em segundo plano
+      try {
+        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`, {
+          method: 'GET',
+          redirect: 'follow',
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Servidor retornou HTML em vez de JSON.');
+        }
+
         const resData = await response.json();
 
         if (resData.status === 'success' && Array.isArray(resData.eventos) && resData.eventos.length > 0) {
           const idsOnline = new Set(resData.eventos.map(e => String(e.id)));
           const locaisFiltrados = dbEventosLocal.filter(e => !idsOnline.has(String(e.id)));
-          setEventos([...resData.eventos, ...locaisFiltrados]);
+          const listaFinal = [...resData.eventos, ...locaisFiltrados];
+
+          setEventos(listaFinal);
+          localStorage.setItem('cache_portal_eventos', JSON.stringify(listaFinal));
         } else {
-          setEventos(dbEventosLocal);
+          setEventos((prev) => (prev.length > 0 ? prev : dbEventosLocal));
         }
       } catch (err) {
-        console.error('Erro ao buscar eventos para a home, usando locais:', err);
-        setEventos(dbEventosLocal);
+        console.warn('Erro ao carregar eventos online. Usando versão offline/local:', err);
+        setEventos((prev) => (prev.length > 0 ? prev : dbEventosLocal));
       }
     }
 
@@ -113,11 +135,14 @@ export default function EventSection() {
           {ultimosEventos.map((evento) => {
             const { dia, mes } = extrairDiaEMes(evento.data);
             const status = getStatusEvento(evento, styles);
+            
+            // GARANTE QUE O ID DO LINK ESTEJA SEMPRE EM FORMATO STRING VÁLIDO
+            const eventoIdFinal = String(evento.id || '').trim();
 
             return (
               <Link 
-                key={evento.id} 
-                href={`/eventos/${evento.id}`}
+                key={eventoIdFinal || evento.titulo} 
+                href={`/eventos/${eventoIdFinal}`}
                 className={styles.eventCard}
               >
                 

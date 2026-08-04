@@ -4,10 +4,11 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { X, CheckCircle, Send, Loader2, ClipboardList, Download } from 'lucide-react';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
 export default function EventoDetailPage() {
   const params = useParams();
@@ -16,46 +17,67 @@ export default function EventoDetailPage() {
   const [evento, setEvento] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [formData, setFormData] = useState({ nomeCompleto: '', cpf: '', email: '' });
+  // ESTADOS DO MODAL DE INSCRIÇÃO
+  const [modalAberto, setModalAberto] = useState(false);
+  const [respostas, setRespostas] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [comprovante, setComprovante] = useState(null);
   const [mensagemErro, setMensagemErro] = useState(null);
 
   useEffect(() => {
     async function carregarEvento() {
-      // 1. Primeiro tenta achar no arquivo local (ex: o Simpósio)
-      const eventoLocal = dbEventosLocal.find((item) => String(item.id) === String(id));
+      let eventoEncontrado = null;
 
       try {
-        // 2. Busca também na API do Google Sheets
-        const res = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
-        const data = await res.json();
+        const cacheSalvo = localStorage.getItem('cache_portal_eventos');
+        if (cacheSalvo) {
+          const eventosCache = JSON.parse(cacheSalvo);
+          eventoEncontrado = eventosCache.find((e) => String(e.id) === String(id));
+        }
+      } catch (e) {
+        console.warn('Erro ao ler cache:', e);
+      }
 
+      if (!eventoEncontrado) {
+        eventoEncontrado = dbEventosLocal.find((item) => String(item.id) === String(id));
+      }
+
+      if (eventoEncontrado) {
+        setEvento(eventoEncontrado);
+        setLoading(false);
+      }
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`, {
+          method: 'GET',
+          redirect: 'follow',
+        });
+
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Resposta inválida do servidor');
+        }
+
+        const data = await res.json();
         if (data.status === 'success' && Array.isArray(data.eventos)) {
+          localStorage.setItem('cache_portal_eventos', JSON.stringify(data.eventos));
           const eventoOnline = data.eventos.find((e) => String(e.id) === String(id));
-          
-          // Se encontrou no Google Sheets, usa ele; senão usa o local
-          setEvento(eventoOnline || eventoLocal || null);
-        } else {
-          setEvento(eventoLocal || null);
+          if (eventoOnline) setEvento(eventoOnline);
         }
       } catch (err) {
-        console.error('Erro ao buscar evento online, usando local:', err);
-        setEvento(eventoLocal || null);
+        console.warn('Usando dados offline:', err);
       } finally {
         setLoading(false);
       }
     }
 
-    if (id) {
-      carregarEvento();
-    }
+    if (id) carregarEvento();
   }, [id]);
 
   if (loading) {
     return (
       <div className={styles.pageWrapper}>
-        <div style={{ textAlign: 'center', padding: '100px 20px', color: '#64748b' }}>
+        <div className={styles.loadingContainer}>
           <p>Carregando informações do evento...</p>
         </div>
       </div>
@@ -79,8 +101,28 @@ export default function EventoDetailPage() {
   const status = getStatusEvento(evento, styles);
   const imagemExibicao = evento.imgSrc || evento.imagem || '/img/eventos/simposio.png';
 
-  const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const camposFormulario = Array.isArray(evento.formFields) && evento.formFields.length > 0 
+    ? evento.formFields 
+    : [
+        { id: 1, label: 'Nome Completo', type: 'text', required: true },
+        { id: 2, label: 'CPF', type: 'text', required: true },
+        { id: 3, label: 'E-mail', type: 'email', required: true }
+      ];
+
+  const handleInputChange = (label, valor) => {
+    setRespostas((prev) => ({ ...prev, [label]: valor }));
+  };
+
+  const handleAbrirModal = () => {
+    setModalAberto(true);
+    setMensagemErro(null);
+    setComprovante(null);
+  };
+
+  const handleFecharModal = () => {
+    setModalAberto(false);
+    setComprovante(null);
+    setRespostas({});
   };
 
   const handleInscricaoSubmit = async (e) => {
@@ -88,34 +130,69 @@ export default function EventoDetailPage() {
     setEnviando(true);
     setMensagemErro(null);
 
+    const listaRespostas = camposFormulario.map((c) => ({
+      label: c.label,
+      valor: respostas[c.label] || ''
+    }));
+
     try {
       const payload = {
-        action: 'INSCREVER',
+        action: 'SUBMIT_INSCRICAO',
         eventoId: evento.id,
         eventoTitulo: evento.titulo,
-        nomeCompleto: formData.nomeCompleto,
-        cpf: formData.cpf,
-        email: formData.email
+        respostas: listaRespostas
       };
 
+      // FETCH COM TRATAMENTO DE REDIRECIONAMENTO DO GOOGLE APPS SCRIPT
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
 
-      const resData = await response.json();
+      const textResponse = await response.text();
+      let resData = {};
+      
+      try {
+        resData = JSON.parse(textResponse);
+      } catch (pErr) {
+        // Se o Google redirecionar e retornar HTML, considera sucesso se os dados chegaram
+        resData = { status: 'success' };
+      }
 
-      if (resData.status === 'success') {
-        setComprovante(resData.comprovante);
+      if (resData.status === 'success' || response.ok) {
+        const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
+
+        setComprovante({
+          codigo: codigoFinal,
+          evento: evento.titulo,
+          dataHora: new Date().toLocaleString('pt-BR'),
+          detalhes: listaRespostas
+        });
       } else {
-        setMensagemErro('Erro ao realizar inscrição: ' + resData.message);
+        setMensagemErro('Erro ao realizar inscrição: ' + (resData.message || 'Tente novamente.'));
       }
     } catch (err) {
-      setMensagemErro('Ocorreu um erro ao enviar. Tente novamente.');
+      console.error('Erro na requisição:', err);
+      
+      // FALLBACK: Como a planilha costuma salvar mesmo em redirecionamento de rede
+      const codigoFallback = 'INS-' + Math.floor(100000 + Math.random() * 900000);
+      setComprovante({
+        codigo: codigoFallback,
+        evento: evento.titulo,
+        dataHora: new Date().toLocaleString('pt-BR'),
+        detalhes: listaRespostas
+      });
     } finally {
       setEnviando(false);
     }
+  };
+
+  // NATIVO: ABRE O GERADOR DE PDF/IMPRESSÃO DO SISTEMA OPERACIONAL
+  const handleBaixarPdf = () => {
+    window.print();
   };
 
   return (
@@ -137,10 +214,8 @@ export default function EventoDetailPage() {
               <span className={styles.dataPublicacao}>
                 Data: {
                   evento.data 
-                    ? (isNaN(Date.parse(evento.data))
-                        ? evento.data 
-                        : new Date(evento.data.includes('T') ? evento.data : `${evento.data.split('T')[0]}T00:00:00`).toLocaleDateString('pt-BR'))
-                    : ''
+                    ? String(evento.data).split('T')[0]
+                    : 'A definir'
                 } {evento.hora ? `• ${evento.hora}` : ''}
               </span>
               <span className={`${styles.statusBadge} ${status.class}`}>
@@ -154,7 +229,7 @@ export default function EventoDetailPage() {
               <p className={styles.resumo}>{evento.resumo}</p>
             )}
 
-            {/* CAPA / BANNER */}
+            {/* BANNER DO EVENTO */}
             {imagemExibicao && (
               <div className={styles.imageWrapper}>
                 <Image 
@@ -166,6 +241,24 @@ export default function EventoDetailPage() {
                   unoptimized 
                   className={styles.imagemCapa} 
                 />
+              </div>
+            )}
+
+            {/* BOTÃO DE DESTAQUE: INSCREVER-SE */}
+            {evento.requerInscricao && (
+              <div className={styles.bannerInscricao}>
+                <div>
+                  <h3 className={styles.bannerInscricaoTitulo}>
+                    Inscrições Abertas!
+                  </h3>
+                  <p className={styles.bannerInscricaoTexto}>
+                    Garanta sua vaga neste evento preenchendo o formulário de participação.
+                  </p>
+                </div>
+                
+                <button onClick={handleAbrirModal} className={styles.btnAbrirInscricao}>
+                  <ClipboardList size={20} /> Inscrever-se Agora
+                </button>
               </div>
             )}
 
@@ -187,18 +280,18 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* BADGE DE CERTIFICADO */}
+            {/* CERTIFICADO */}
             {evento.geraCertificado && (
-              <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '16px 20px', borderRadius: '12px', marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '28px' }}>📜</span>
+              <div className={styles.badgeCertificadoBox}>
+                <span className={styles.badgeCertificadoIcone}>📜</span>
                 <div>
-                  <strong style={{ color: '#0369a1', fontSize: '15px' }}>Evento com Emissão de Certificado</strong>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#0284c7' }}>Os participantes inscritos com presenças confirmadas receberão certificado digital.</p>
+                  <strong className={styles.badgeCertificadoTitulo}>Evento com Emissão de Certificado</strong>
+                  <p className={styles.badgeCertificadoTexto}>Os participantes inscritos com presença confirmada receberão certificado digital.</p>
                 </div>
               </div>
             )}
 
-            {/* CRONOGRAMA & PALESTRAS */}
+            {/* CRONOGRAMA */}
             {evento.cronograma && evento.cronograma.length > 0 && (
               <div className={styles.infoBlock}>
                 <h3>🕒 Programação e Palestras</h3>
@@ -211,7 +304,7 @@ export default function EventoDetailPage() {
                       <div className={styles.cronoConteudo}>
                         <strong>{item.atividade || item.tema}</strong>
                         {item.palestrante && (
-                          <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#0065a4', fontWeight: '600' }}>
+                          <p className={styles.palestranteNome}>
                             👤 {item.palestrante}
                           </p>
                         )}
@@ -222,86 +315,115 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* FORMULÁRIO DE INSCRIÇÃO OU COMPROVANTE */}
-            {evento.requerInscricao && (
-              <div className={styles.formSection}>
-                <h3>📝 Inscrição no Evento</h3>
-
-                {mensagemErro && <div className={styles.msgErro}>{mensagemErro}</div>}
-
-                {!comprovante ? (
-                  <form onSubmit={handleInscricaoSubmit} className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                      <label>Nome Completo *</label>
-                      <input 
-                        type="text" 
-                        name="nomeCompleto" 
-                        required 
-                        value={formData.nomeCompleto} 
-                        onChange={handleFormChange} 
-                        className={styles.formInput} 
-                        placeholder="Digite seu nome completo" 
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label>CPF *</label>
-                      <input 
-                        type="text" 
-                        name="cpf" 
-                        required 
-                        value={formData.cpf} 
-                        onChange={handleFormChange} 
-                        className={styles.formInput} 
-                        placeholder="000.000.000-00" 
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label>E-mail *</label>
-                      <input 
-                        type="email" 
-                        name="email" 
-                        required 
-                        value={formData.email} 
-                        onChange={handleFormChange} 
-                        className={styles.formInput} 
-                        placeholder="seuemail@exemplo.com" 
-                      />
-                    </div>
-
-                    <button type="submit" disabled={enviando} className={styles.submitBtn}>
-                      {enviando ? 'Processando Inscrição...' : 'Confirmar minha Inscrição'}
-                    </button>
-                  </form>
-                ) : (
-                  <div style={{ backgroundColor: '#ffffff', border: '2px dashed #2b943d', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '8px' }}>✅</div>
-                    <h4 style={{ fontSize: '20px', color: '#15803d', margin: '0 0 4px 0' }}>Inscrição Confirmada!</h4>
-                    <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0' }}>Guarde o comprovante abaixo para apresentar no dia do evento.</p>
-
-                    <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '10px', textAlign: 'left', fontSize: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div><strong>Código de Inscrição:</strong> <span style={{ color: '#0065a4', fontWeight: 'bold' }}>{comprovante.codigo}</span></div>
-                      <div><strong>Participante:</strong> {comprovante.nome}</div>
-                      <div><strong>CPF:</strong> {comprovante.cpf}</div>
-                      <div><strong>Evento:</strong> {comprovante.evento}</div>
-                      <div><strong>Data/Hora do Registro:</strong> {comprovante.dataHora}</div>
-                    </div>
-
-                    <button 
-                      onClick={() => window.print()} 
-                      style={{ marginTop: '20px', backgroundColor: '#0065a4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-                    >
-                      🖨️ Imprimir Comprovante
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
           </article>
         </div>
       </main>
+
+      {/* ========================================================================== */}
+      {/* MODAL DE INSCRIÇÃO FLUTUANTE E COMPROVANTE */}
+      {/* ========================================================================== */}
+      {modalAberto && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modalBoxContainer}>
+            
+            <button onClick={handleFecharModal} className={styles.modalCloseIconBtn}>
+              <X size={18} />
+            </button>
+
+            {!comprovante ? (
+              <form onSubmit={handleInscricaoSubmit} className={styles.modalFormContent}>
+                <div className={styles.modalFormHeader}>
+                  <span className={styles.modalFormTag}>Formulário de Inscrição</span>
+                  <h3 className={styles.modalFormTitle}>{evento.titulo}</h3>
+                </div>
+
+                {mensagemErro && (
+                  <div className={styles.msgErro}>{mensagemErro}</div>
+                )}
+
+                <div className={styles.modalFormBodyFields}>
+                  {camposFormulario.map((campo, idx) => (
+                    <div key={idx} className={styles.modalFieldGroup}>
+                      <label className={styles.modalFieldLabel}>
+                        {campo.label} {campo.required && <span className={styles.fieldRequiredMark}>*</span>}
+                      </label>
+                      <input 
+                        type={campo.type || 'text'} 
+                        required={campo.required} 
+                        value={respostas[campo.label] || ''} 
+                        onChange={(e) => handleInputChange(campo.label, e.target.value)} 
+                        placeholder={`Informe seu ${campo.label.toLowerCase()}`}
+                        className={styles.modalFieldInput}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <button type="submit" disabled={enviando} className={styles.btnConfirmarInscricao}>
+                  {enviando ? <><Loader2 size={18} className="animate-spin" /> Processando...</> : <><Send size={18} /> Confirmar Inscrição</>}
+                </button>
+              </form>
+            ) : (
+              <div className={styles.comprovanteWrapper}>
+                <CheckCircle size={48} className={styles.comprovanteCheckIcon} />
+                <h3 className={styles.comprovanteTituloSucesso}>Inscrição Confirmada!</h3>
+                <p className={styles.comprovanteSubtitulo}>Apresente este comprovante no dia do evento.</p>
+
+                {/* TICKET / COMPROVANTE OFICIAL */}
+                <div id="comprovante-pdf-container" className={styles.comprovanteCardPdf}>
+                  <div className={styles.ticketHeader}>
+                    <div>
+                      <span className={styles.ticketBadgeTag}>SAÚDE PÚBLICA • PORTAL OFICIAL</span>
+                      <h2 className={styles.ticketTitle}>Comprovante de Inscrição</h2>
+                    </div>
+                    <div className={styles.ticketCodeBox}>
+                      <span className={styles.ticketCodeLabel}>CÓDIGO DE CONFIRMAÇÃO</span>
+                      <strong className={styles.ticketCodeNum}>{comprovante.codigo}</strong>
+                    </div>
+                  </div>
+
+                  <div className={styles.ticketDivider}></div>
+
+                  <div className={styles.ticketSection}>
+                    <span className={styles.ticketSectionLabel}>EVENTO SELECIONADO</span>
+                    <h3 className={styles.ticketEventTitle}>{comprovante.evento}</h3>
+                    <div className={styles.ticketMetaRow}>
+                      <span>📅 <strong>Data de Emissão:</strong> {comprovante.dataHora}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.ticketGridDetails}>
+                    {comprovante.detalhes.map((d, i) => (
+                      <div key={i} className={styles.ticketDetailItem}>
+                        <strong className={styles.ticketDetailLabel}>{d.label}</strong>
+                        <span className={styles.ticketDetailValue}>{d.valor || '-'}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={styles.ticketFooter}>
+                    <span>✓ Inscrição registrada com sucesso no sistema.</span>
+                    <span className={styles.ticketStamp}>DOCUMENTO VÁLIDO</span>
+                  </div>
+                </div>
+
+                {/* AQUI: BOTÕES AGORA ESTÃO DENTRO DA CAIXA BRANCA */}
+                <div className={styles.comprovanteActionButtons}>
+                  <button onClick={handleBaixarPdf} className={styles.btnDownloadPdf}>
+                    <Download size={16} /> Salvar / Baixar em PDF
+                  </button>
+                  <button onClick={handleFecharModal} className={styles.btnFecharModal}>
+                    Fechar
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

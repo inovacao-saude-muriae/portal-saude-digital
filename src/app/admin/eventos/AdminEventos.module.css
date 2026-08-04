@@ -1,3 +1,5 @@
+/* src/app/admin/eventos/Eventos.module.css */
+
 .pageWrapper {
   min-height: 100vh;
   background-color: #f8fafc;
@@ -10,7 +12,7 @@
   margin: 0 auto;
 }
 
-/* HEADER BAR */
+/* BARRA DE CABEÇALHO */
 .headerBar {
   display: flex;
   justify-content: space-between;
@@ -65,7 +67,7 @@
   color: #004066;
 }
 
-/* SUB-ABAS DE NAVEGAÇÃO */
+/* NAVEGAÇÃO POR SUB-ABAS */
 .subTabContainer {
   display: flex;
   gap: 10px;
@@ -98,7 +100,7 @@
   border-color: #0065a4;
 }
 
-/* BANNER MODO DE EDIÇÃO */
+/* BANNER DE EDIÇÃO */
 .editModeBanner {
   display: flex;
   align-items: center;
@@ -131,7 +133,7 @@
   background-color: #b91c1c;
 }
 
-/* FORMULÁRIO */
+/* ESTRUTURA DO FORMULÁRIO */
 .formGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -208,7 +210,7 @@
   line-height: 1.6;
 }
 
-/* DROPZONE UPLOAD */
+/* ÁREA DE UPLOAD (DROPZONE) */
 .dropZone {
   position: relative;
   border: 2px dashed #cbd5e1;
@@ -289,7 +291,7 @@
   cursor: not-allowed;
 }
 
-/* LISTA DE EVENTOS */
+/* LISTAGEM DE EVENTOS NO PAINEL */
 .newsListContainer {
   display: flex;
   flex-direction: column;
@@ -401,6 +403,7 @@
   cursor: not-allowed;
 }
 
+/* ALERTAS DE SUCESSO / ERRO */
 .alertMessage {
   display: flex;
   align-items: center;
@@ -431,9 +434,93 @@
   color: #64748b;
 }
 
+/* RESPONSIVIDADE PARA DISPOSITIVOS MÓVEIS */
 @media (max-width: 900px) {
   .formGrid,
   .rowTwoCols {
     grid-template-columns: 1fr;
+  }
+
+  .headerBar {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .newsItemRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .actionButtonsGroup {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+/* ==========================================================================
+   --- REGRA DE IMPRESSÃO A4 PAISAGEM (CORRIGIDO PROBLEMA DE QUEBRA DE LINHAS) ---
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 landscape !important;
+    margin: 0 !important;
+  }
+
+  /* 1. Força a exibição de cores e fundo no navegador */
+  :global(html),
+  :global(body) {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 2. Oculta toda a interface do painel */
+  :global(body) * {
+    visibility: hidden !important;
+  }
+
+  /* 3. Exibe apenas a área dos certificados */
+  :global(#certificados-em-lote-print),
+  :global(#certificados-em-lote-print) * {
+    visibility: visible !important;
+  }
+
+  :global(#certificados-em-lote-print) {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 999999 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* 4. Força tags inline como <strong> a não quebrarem linha */
+  :global(#certificados-em-lote-print) strong,
+  :global(#certificados-em-lote-print) span {
+    display: inline !important;
+  }
+
+  :global(#certificados-em-lote-print) p {
+    display: block !important;
+    text-align: justify !important;
+  }
+
+  .certificadoPageSingle {
+    width: 297mm !important;
+    height: 210mm !important;
+    position: relative !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
   }
 }

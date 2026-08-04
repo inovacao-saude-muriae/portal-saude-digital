@@ -241,11 +241,27 @@
   margin: 0 0 10px 0;
 }
 
+/* FORMATAÇÃO E TRUNCAMENTO DO RESUMO (ALINHADO COM O SIMPÓSIO) */
 .cardResumo {
   font-size: 14px;
   color: #627d98;
   line-height: 1.5;
   margin: 0 0 20px 0;
+  
+  /* IMPEDE QUE PALAVRAS LONGAS OU SEM ESPAÇO VAZEM O CARD */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+
+  /* CORTA EM ATÉ 3 LINHAS E INSERE ... */
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  
+  /* RESERVA A ALTURA PARA MANTER O BOTÃO INFERIOR ALINHADO */
+  min-height: 63px;
 }
 
 .cardBtn {
