@@ -135,7 +135,13 @@ export default function EventoDetailPage() {
             {/* CABEÇALHO */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
-                Data: {evento.data} {evento.hora ? `• ${evento.hora}` : ''}
+                Data: {
+                  evento.data 
+                    ? (isNaN(Date.parse(evento.data))
+                        ? evento.data 
+                        : new Date(evento.data.includes('T') ? evento.data : `${evento.data.split('T')[0]}T00:00:00`).toLocaleDateString('pt-BR'))
+                    : ''
+                } {evento.hora ? `• ${evento.hora}` : ''}
               </span>
               <span className={`${styles.statusBadge} ${status.class}`}>
                 {status.label}
