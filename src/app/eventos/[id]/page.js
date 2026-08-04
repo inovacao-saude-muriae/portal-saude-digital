@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { dbEventos, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
@@ -13,12 +12,42 @@ export default function EventoDetailPage() {
   const params = useParams();
   const id = params?.id;
 
-  const evento = dbEventos.find(item => String(item.id) === String(id));
-  
+  const [evento, setEvento] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({ nomeCompleto: '', cpf: '', email: '' });
   const [enviando, setEnviando] = useState(false);
   const [comprovante, setComprovante] = useState(null);
   const [mensagemErro, setMensagemErro] = useState(null);
+
+  useEffect(() => {
+    async function carregarEvento() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
+        const data = await res.json();
+        if (data.status === 'success' && data.eventos) {
+          const encontrado = data.eventos.find((e) => String(e.id) === String(id));
+          setEvento(encontrado || null);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar evento:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (id) carregarEvento();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className={styles.pageWrapper}>
+        <div style={{ textAlign: 'center', padding: '100px 20px', color: '#64748b' }}>
+          <p>Carregando dados do evento...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!evento) {
     return (
@@ -31,9 +60,6 @@ export default function EventoDetailPage() {
       </div>
     );
   }
-
-  const status = getStatusEvento(evento, styles);
-  const dataFormatada = new Date(`${evento.data}T00:00:00`).toLocaleDateString('pt-BR');
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -68,7 +94,7 @@ export default function EventoDetailPage() {
         setMensagemErro('Erro ao realizar inscrição: ' + resData.message);
       }
     } catch (err) {
-      setMensagemErro('Ocorreu um erro na comunicação. Tente novamente.');
+      setMensagemErro('Ocorreu um erro ao enviar. Tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -87,21 +113,21 @@ export default function EventoDetailPage() {
           <article className={styles.articleCard}>
             
             <div className={styles.headerMeta}>
-              <span className={styles.dataPublicacao}>Publicado em: {dataFormatada}</span>
-              <span className={`${styles.statusBadge} ${status.class}`}>{status.label}</span>
+              <span className={styles.dataPublicacao}>{evento.dataEvento} • {evento.hora}</span>
+              <span className={styles.statusBadge} style={{ backgroundColor: '#0065a4' }}>{evento.categoria}</span>
             </div>
 
             <h1 className={styles.titulo}>{evento.titulo}</h1>
 
-            {evento.imgSrc && (
+            {evento.imagem && (
               <div className={styles.imageWrapper}>
-                <Image src={evento.imgSrc} alt={evento.titulo} width={900} height={450} priority unoptimized className={styles.imagemCapa} />
+                <Image src={evento.imagem} alt={evento.titulo} width={900} height={450} priority unoptimized className={styles.imagemCapa} />
               </div>
             )}
 
             <div className={styles.corpoConteudo}>
               <h3>Sobre o Evento</h3>
-              {Array.isArray(evento.descricao) ? evento.descricao.map((p, idx) => <p key={idx}>{p}</p>) : <p>{evento.descricao}</p>}
+              <p>{evento.descricao}</p>
             </div>
 
             {evento.local && (
@@ -111,13 +137,13 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* AVISO DE CERTIFICADO */}
+            {/* CERTIFICADO */}
             {evento.geraCertificado && (
               <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '16px 20px', borderRadius: '12px', marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '24px' }}>📜</span>
+                <span style={{ fontSize: '28px' }}>📜</span>
                 <div>
                   <strong style={{ color: '#0369a1', fontSize: '15px' }}>Evento com Emissão de Certificado</strong>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#0284c7' }}>Os participantes inscritos com presenças confirmadas receberão certificado digital.</p>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#0284c7' }}>Os participantes inscritos com presença confirmada receberão certificado digital.</p>
                 </div>
               </div>
             )}
@@ -140,7 +166,7 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* SEÇÃO DE INSCRIÇÃO OU COMPROVANTE */}
+            {/* INSCRIÇÃO OU COMPROVANTE */}
             {evento.requerInscricao && (
               <div className={styles.formSection}>
                 <h3>📝 Inscrição no Evento</h3>
@@ -169,7 +195,6 @@ export default function EventoDetailPage() {
                     </button>
                   </form>
                 ) : (
-                  /* CARD DE COMPROVANTE DE INSCRIÇÃO GERADO */
                   <div style={{ backgroundColor: '#ffffff', border: '2px dashed #2b943d', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
                     <div style={{ fontSize: '40px', marginBottom: '8px' }}>✅</div>
                     <h4 style={{ fontSize: '20px', color: '#15803d', margin: '0 0 4px 0' }}>Inscrição Confirmada!</h4>

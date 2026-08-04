@@ -36,11 +36,8 @@ export default function AdminEventosPage() {
   const [nomeArquivo, setNomeArquivo] = useState('');
   const [eventoEmEdicao, setEventoEmEdicao] = useState(null);
 
-  // Estados de Inscrição e Certificado
   const [requerInscricao, setRequerInscricao] = useState(false);
   const [geraCertificado, setGeraCertificado] = useState(false);
-
-  // Estado do Cronograma Dinâmico
   const [cronograma, setCronograma] = useState([]);
 
   const [listaEventos, setListaEventos] = useState([]);
@@ -131,7 +128,7 @@ export default function AdminEventosPage() {
         descricao: formData.get('descricao'),
         requerInscricao: requerInscricao,
         geraCertificado: requerInscricao ? geraCertificado : false,
-        cronograma: cronograma.filter((item) => item.horario.trim() !== '' || item.atividade.trim() !== ''),
+        cronograma: cronograma.filter((item) => (item.horario && item.horario.trim() !== '') || (item.atividade && item.atividade.trim() !== '')),
         imagemBase64: base64Image,
         imagemNome: name,
         imagemType: type
@@ -171,7 +168,7 @@ export default function AdminEventosPage() {
       }
     };
 
-    if (imagemArquivo && imagemArquivo.size > 0) {
+    if (imagemArquivo && imagemArquivo instanceof File && imagemArquivo.size > 0) {
       const reader = new FileReader();
       reader.readAsDataURL(imagemArquivo);
       reader.onloadend = () => {
@@ -302,7 +299,7 @@ export default function AdminEventosPage() {
                   <textarea name="descricao" rows={5} required defaultValue={eventoEmEdicao?.descricao || ''} placeholder="Informe detalhes, documentos necessários, público-alvo..." className={styles.textarea} />
                 </div>
 
-                {/* OPÇÕES DE INSCRIÇÃO E CERTIFICADO */}
+                {/* CONFIGURAÇÃO DE INSCRIÇÃO E CERTIFICADO */}
                 <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ClipboardList size={18} color="#0065a4" /> Configuração de Inscrição
@@ -405,7 +402,7 @@ export default function AdminEventosPage() {
                     <div className={styles.uploadText}>{eventoEmEdicao ? 'Clique para trocar imagem' : 'Clique para selecionar'}</div>
                     <div className={styles.uploadSubtext}>Formatos JPG, PNG ou WEBP</div>
                     {nomeArquivo ? <span className={styles.fileNameBadge}>📷 {nomeArquivo}</span> : eventoEmEdicao?.imagem ? <span className={styles.fileNameBadge}>📷 Imagem mantida</span> : null}
-                    <input type="file" name="imagem" accept="image/*" required={!eventoEmEdicao} onChange={handleFileChange} className={styles.fileInputHidden} />
+                    <input type="file" name="imagem" accept="image/*" onChange={handleFileChange} className={styles.fileInputHidden} />
                   </div>
                 </div>
 
