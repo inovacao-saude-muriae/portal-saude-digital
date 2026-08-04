@@ -9,6 +9,41 @@ import { Search } from 'lucide-react';
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
+// PARSER SEGURO PARA ORDENAÇÃO DE DATAS
+function timestampSeguro(dataBruta) {
+  if (!dataBruta) return 0;
+  const str = String(dataBruta).trim();
+
+  // Se for no formato DD/MM/AAAA
+  if (str.includes('/')) {
+    const partes = str.split('/');
+    if (partes.length === 3) {
+      return new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`).getTime() || 0;
+    }
+  }
+
+  // Se for YYYY-MM-DD
+  const t = new Date(str.includes('T') ? str : `${str}T00:00:00`).getTime();
+  return isNaN(t) ? 0 : t;
+}
+
+// FORMATAÇÃO VISUAL DA DATA NO CARD
+function formatarDataCard(dataBruta) {
+  if (!dataBruta) return '';
+  const strData = String(dataBruta).trim();
+
+  if (strData.includes('/')) return strData;
+
+  if (strData.includes('-')) {
+    const partes = strData.split('T')[0].split('-');
+    if (partes.length === 3) {
+      return `${partes[2].padStart(2, '0')}/${partes[1].padStart(2, '0')}/${partes[0]}`;
+    }
+  }
+
+  return strData;
+}
+
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
@@ -20,29 +55,39 @@ function normalizarTexto(texto) {
 export default function EventosPage() {
   const [busca, setBusca] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [eventos, setEventos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
+  const [eventos, setEventos] = useState(dbEventosLocal || []);
   const ITENS_POR_PAGINA = 9;
 
   useEffect(() => {
     async function carregarEventosOnline() {
+      // 1. Lê cache se existir
+      const cachedData = localStorage.getItem('cache_portal_eventos');
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setEventos(parsed);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // 2. Atualiza via Apps Script em segundo plano
       try {
         const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
         const resData = await response.json();
         
         if (resData.status === 'success' && Array.isArray(resData.eventos) && resData.eventos.length > 0) {
-          // Unifica eventos do banco online com os locais
           const idsOnline = new Set(resData.eventos.map(e => String(e.id)));
           const locaisFiltrados = dbEventosLocal.filter(e => !idsOnline.has(String(e.id)));
-          setEventos([...resData.eventos, ...locaisFiltrados]);
-        } else {
-          setEventos(dbEventosLocal);
+          const listaFinal = [...resData.eventos, ...locaisFiltrados];
+
+          setEventos(listaFinal);
+          localStorage.setItem('cache_portal_eventos', JSON.stringify(listaFinal));
         }
       } catch (err) {
-        console.error('Erro ao buscar eventos online, usando locais:', err);
-        setEventos(dbEventosLocal);
-      } finally {
-        setCarregando(false);
+        console.error('Erro ao buscar eventos online:', err);
       }
     }
 
@@ -58,11 +103,16 @@ export default function EventosPage() {
     e.preventDefault();
   };
 
-  const eventosOrdenados = [...eventos].sort((a, b) => new Date(b.data || '2026-01-01') - new Date(a.data || '2026-01-01'));
+  // ORDENAÇÃO SEGURA SEM INVALID DATE
+  const eventosOrdenados = [...eventos].sort((a, b) => {
+    return timestampSeguro(b.data) - timestampSeguro(a.data);
+  });
 
   const termo = normalizarTexto(busca.trim());
 
+  // FILTRAGEM
   const eventosFiltrados = eventosOrdenados.filter(e => {
+    if (!termo) return true; // Se a busca está vazia, exibe todos os eventos!
     const bateTitulo = normalizarTexto(e.titulo).includes(termo);
     const bateResumo = normalizarTexto(e.resumo || e.descricao).includes(termo);
     const bateDescricao = normalizarTexto(e.descricao).includes(termo);
@@ -132,22 +182,18 @@ export default function EventosPage() {
             <button type="submit" className={styles.searchBtn}>Buscar</button>
           </form>
 
-          {carregando ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-              <p>Buscando agenda atualizada...</p>
-            </div>
-          ) : eventosPagina.length > 0 ? (
+          {eventosPagina.length > 0 ? (
             <>
               <div className={styles.eventosGrid}>
                 {eventosPagina.map((evento) => {
                   const status = getStatusEvento(evento, styles);
-                  const dataFormatada = evento.data ? new Date(`${evento.data}T00:00:00`).toLocaleDateString('pt-BR') : '';
+                  const dataFormatada = formatarDataCard(evento.data);
                   
                   return (
                     <Link key={evento.id} href={`/eventos/${evento.id}`} className={styles.eventoCard}>
                       <div className={styles.cardImageWrapper}>
                         <Image 
-                          src={evento.imgSrc || '/img/eventos/evento1.png'} 
+                          src={evento.imgSrc || evento.imagem || '/img/eventos/simposio.png'} 
                           alt={evento.titulo} 
                           width={400} 
                           height={240} 
@@ -160,9 +206,13 @@ export default function EventosPage() {
                       </div>
 
                       <div className={styles.cardBody}>
-                        <span className={styles.eventoData}>📅 {dataFormatada}</span>
+                        {dataFormatada && (
+                          <span className={styles.eventoData}>📅 {dataFormatada}</span>
+                        )}
                         <h3 className={styles.cardTitle}>{evento.titulo}</h3>
-                        <p className={styles.cardResumo}>{evento.resumo || evento.descricao?.substring(0, 100) + '...'}</p>
+                        <p className={styles.cardResumo}>
+                          {evento.resumo || (evento.descricao ? evento.descricao.substring(0, 100) + '...' : '')}
+                        </p>
                         
                         <span className={styles.cardBtn}>
                           Ver detalhes do evento →
@@ -209,10 +259,12 @@ export default function EventosPage() {
             <div className={styles.emptyState}>
               <Search size={40} className={styles.emptyIcon} />
               <h3>Nenhum evento encontrado</h3>
-              <p>Não encontramos nenhum evento correspondente a {`"${busca}"`}.</p>
-              <button className={styles.resetBtn} onClick={() => handleBusca('')}>
-                Limpar busca
-              </button>
+              <p>{termo ? `Não encontramos nenhum evento correspondente a "${busca}".` : 'Nenhum evento cadastrado no momento.'}</p>
+              {termo && (
+                <button className={styles.resetBtn} onClick={() => handleBusca('')}>
+                  Limpar busca
+                </button>
+              )}
             </div>
           )}
         </div>
