@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { dbEventos, getStatusEvento } from '@/data/eventosData';
+import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './Eventos.module.css';
 import { Search } from 'lucide-react';
 
-// FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+
 function normalizarTexto(texto) {
   if (!texto) return '';
   return texto
@@ -19,7 +20,34 @@ function normalizarTexto(texto) {
 export default function EventosPage() {
   const [busca, setBusca] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [eventos, setEventos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
   const ITENS_POR_PAGINA = 9;
+
+  useEffect(() => {
+    async function carregarEventosOnline() {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
+        const resData = await response.json();
+        
+        if (resData.status === 'success' && Array.isArray(resData.eventos) && resData.eventos.length > 0) {
+          // Unifica eventos do banco online com os locais
+          const idsOnline = new Set(resData.eventos.map(e => String(e.id)));
+          const locaisFiltrados = dbEventosLocal.filter(e => !idsOnline.has(String(e.id)));
+          setEventos([...resData.eventos, ...locaisFiltrados]);
+        } else {
+          setEventos(dbEventosLocal);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar eventos online, usando locais:', err);
+        setEventos(dbEventosLocal);
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarEventosOnline();
+  }, []);
 
   const handleBusca = (valor) => {
     setBusca(valor);
@@ -30,21 +58,18 @@ export default function EventosPage() {
     e.preventDefault();
   };
 
-  // Ordena por data mais recente
-  const eventosOrdenados = [...dbEventos].sort((a, b) => new Date(b.data) - new Date(a.data));
+  const eventosOrdenados = [...eventos].sort((a, b) => new Date(b.data || '2026-01-01') - new Date(a.data || '2026-01-01'));
 
-  // Filtragem que ignora acentos e diferença de maiúsculas/minúsculas
   const termo = normalizarTexto(busca.trim());
 
   const eventosFiltrados = eventosOrdenados.filter(e => {
     const bateTitulo = normalizarTexto(e.titulo).includes(termo);
-    const bateResumo = normalizarTexto(e.resumo).includes(termo);
+    const bateResumo = normalizarTexto(e.resumo || e.descricao).includes(termo);
     const bateDescricao = normalizarTexto(e.descricao).includes(termo);
 
     return bateTitulo || bateResumo || bateDescricao;
   });
 
-  // Lógica de Paginação
   const totalPaginas = Math.ceil(eventosFiltrados.length / ITENS_POR_PAGINA);
   const inicioIndice = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const eventosPagina = eventosFiltrados.slice(inicioIndice, inicioIndice + ITENS_POR_PAGINA);
@@ -59,7 +84,6 @@ export default function EventosPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER (PADRÃO DAS DEMAIS PÁGINAS INSTITUCIONAIS) */}
       <section 
         className={styles.heroBanner}
         style={{ backgroundImage: "url('/img/banner-header.png')" }}
@@ -75,7 +99,6 @@ export default function EventosPage() {
         </div>
       </section>
 
-      {/* 2. BARRA DE NAVEGAÇÃO DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/" className={styles.backLink}>
@@ -84,11 +107,9 @@ export default function EventosPage() {
         </div>
       </div>
 
-      {/* 3. CONTEÚDO PRINCIPAL */}
       <main className={styles.mainContent}>
         <div className={styles.container}> 
           
-          {/* BARRA DE PESQUISA COMPACTA */}
           <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
             <input 
@@ -111,19 +132,22 @@ export default function EventosPage() {
             <button type="submit" className={styles.searchBtn}>Buscar</button>
           </form>
 
-          {eventosPagina.length > 0 ? (
+          {carregando ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
+              <p>Buscando agenda atualizada...</p>
+            </div>
+          ) : eventosPagina.length > 0 ? (
             <>
               <div className={styles.eventosGrid}>
                 {eventosPagina.map((evento) => {
                   const status = getStatusEvento(evento, styles);
-                  const dataFormatada = new Date(`${evento.data}T00:00:00`).toLocaleDateString('pt-BR');
+                  const dataFormatada = evento.data ? new Date(`${evento.data}T00:00:00`).toLocaleDateString('pt-BR') : '';
                   
                   return (
-                    /* CARD INTEIRO TRANSFORMADO EM LINK */
                     <Link key={evento.id} href={`/eventos/${evento.id}`} className={styles.eventoCard}>
                       <div className={styles.cardImageWrapper}>
                         <Image 
-                          src={evento.imgSrc} 
+                          src={evento.imgSrc || '/img/eventos/evento1.png'} 
                           alt={evento.titulo} 
                           width={400} 
                           height={240} 
@@ -138,7 +162,7 @@ export default function EventosPage() {
                       <div className={styles.cardBody}>
                         <span className={styles.eventoData}>📅 {dataFormatada}</span>
                         <h3 className={styles.cardTitle}>{evento.titulo}</h3>
-                        <p className={styles.cardResumo}>{evento.resumo}</p>
+                        <p className={styles.cardResumo}>{evento.resumo || evento.descricao?.substring(0, 100) + '...'}</p>
                         
                         <span className={styles.cardBtn}>
                           Ver detalhes do evento →

@@ -44,6 +44,7 @@ export default function AdminEventosPage() {
   const [loadingEventos, setLoadingEventos] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
+  // BUSCA EVENTOS QUANDO A ABA "GERENCIAR" FOR SELECIONADA
   useEffect(() => {
     async function carregarEventos() {
       setLoadingEventos(true);
@@ -112,7 +113,8 @@ export default function AdminEventosPage() {
     setMensagem(null);
 
     const formData = new FormData(e.target);
-    const imagemArquivo = formData.get('imagem');
+    const imagemInput = e.target.querySelector('input[name="imagem"]');
+    const imagemArquivo = imagemInput && imagemInput.files ? imagemInput.files[0] : null;
     const isEditing = !!eventoEmEdicao;
 
     const processarEnvio = async (base64Image = '', name = '', type = '') => {
@@ -122,7 +124,7 @@ export default function AdminEventosPage() {
         id: isEditing ? eventoEmEdicao.id : 'evt-' + Date.now(),
         titulo: formData.get('titulo'),
         local: formData.get('local'),
-        dataEvento: formData.get('dataEvento'),
+        data: formData.get('dataEvento'),
         hora: formData.get('hora'),
         categoria: formData.get('categoria'),
         descricao: formData.get('descricao'),
@@ -146,7 +148,7 @@ export default function AdminEventosPage() {
         if (resData.status === 'success') {
           setMensagem({ 
             tipo: 'sucesso', 
-            texto: isEditing ? 'Evento atualizado com sucesso!' : 'Evento publicado com sucesso no portal!' 
+            texto: isEditing ? 'Evento atualizado com sucesso!' : 'Evento publicado com sucesso na planilha e no portal!' 
           });
           if (!isEditing) {
             e.target.reset();
@@ -168,7 +170,7 @@ export default function AdminEventosPage() {
       }
     };
 
-    if (imagemArquivo && imagemArquivo instanceof File && imagemArquivo.size > 0) {
+    if (imagemArquivo) {
       const reader = new FileReader();
       reader.readAsDataURL(imagemArquivo);
       reader.onloadend = () => {
@@ -285,7 +287,7 @@ export default function AdminEventosPage() {
                 <div className={styles.rowTwoCols}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Data do Evento*</label>
-                    <input type="text" name="dataEvento" required defaultValue={eventoEmEdicao?.dataEvento || ''} placeholder="Ex: 15/08/2026" className={styles.input} />
+                    <input type="text" name="dataEvento" required defaultValue={eventoEmEdicao?.data || ''} placeholder="Ex: 2026-08-15" className={styles.input} />
                   </div>
 
                   <div className={styles.formGroup}>
@@ -334,7 +336,7 @@ export default function AdminEventosPage() {
                   </div>
                 </div>
 
-                {/* CRONOGRAMA DINÂMICO */}
+                {/* CRONOGRAMA */}
                 <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div>
@@ -401,7 +403,7 @@ export default function AdminEventosPage() {
                     <UploadCloud size={36} className={styles.uploadIcon} />
                     <div className={styles.uploadText}>{eventoEmEdicao ? 'Clique para trocar imagem' : 'Clique para selecionar'}</div>
                     <div className={styles.uploadSubtext}>Formatos JPG, PNG ou WEBP</div>
-                    {nomeArquivo ? <span className={styles.fileNameBadge}>📷 {nomeArquivo}</span> : eventoEmEdicao?.imagem ? <span className={styles.fileNameBadge}>📷 Imagem mantida</span> : null}
+                    {nomeArquivo ? <span className={styles.fileNameBadge}>📷 {nomeArquivo}</span> : eventoEmEdicao?.imgSrc ? <span className={styles.fileNameBadge}>📷 Imagem mantida</span> : null}
                     <input type="file" name="imagem" accept="image/*" onChange={handleFileChange} className={styles.fileInputHidden} />
                   </div>
                 </div>
@@ -419,7 +421,7 @@ export default function AdminEventosPage() {
                   </div>
 
                   <button type="submit" disabled={loadingForm} className={styles.submitBtn}>
-                    {loadingForm ? 'Salvando...' : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar Evento</>}
+                    {loadingForm ? 'Salvando na planilha...' : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar Evento</>}
                   </button>
                 </div>
               </div>
@@ -438,16 +440,16 @@ export default function AdminEventosPage() {
                   <div key={item.id} className={styles.newsItemRow}>
                     <div className={styles.newsItemContent}>
                       <div className={styles.imageThumbnailWrapper}>
-                        <Image src={item.imagem || '/img/noticias/noticia1.jpeg'} alt={item.titulo} fill className={styles.thumbnailImg} unoptimized />
+                        <Image src={item.imgSrc || item.imagem || '/img/noticias/noticia1.jpeg'} alt={item.titulo} fill className={styles.thumbnailImg} unoptimized />
                       </div>
                       <div>
                         <span className={styles.newsMetaText}>
-                          {item.categoria} {item.requerInscricao && ' • Inscrição Obrigatória'} {item.geraCertificado && ' • 📜 Certificado'}
+                          {item.categoria} {item.requerInscricao && ' • Inscrição'} {item.geraCertificado && ' • 📜 Certificado'}
                         </span>
                         <h3 className={styles.newsItemTitle}>{item.titulo}</h3>
                         <div className={styles.eventDetailsRow}>
                           <span><MapPin size={12} /> {item.local}</span>
-                          <span><Clock size={12} /> {item.dataEvento} - {item.hora}</span>
+                          <span><Clock size={12} /> {item.data} - {item.hora}</span>
                         </div>
                       </div>
                     </div>
