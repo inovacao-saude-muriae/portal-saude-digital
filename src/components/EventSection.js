@@ -1,22 +1,96 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, Clock } from 'lucide-react';
-// Importa o array de eventos e a função de status do arquivo centralizado
-import { dbEventos, getStatusEvento } from '@/data/eventosData';
+import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './EventSection.module.css';
 
-// Nomes dos meses resumidos para exibição no bloco do card
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
+// FUNÇÃO SEGURA PARA EXTRAIR DIA E MÊS SEM DAR INVALID DATE
+function extrairDiaEMes(dataBruta) {
+  if (!dataBruta) return { dia: '01', mes: 'JAN' };
+
+  try {
+    const dataString = String(dataBruta).split('T')[0].trim();
+
+    // Caso 1: Formato YYYY-MM-DD (ex: 2026-08-15)
+    if (dataString.includes('-')) {
+      const partes = dataString.split('-');
+      if (partes.length === 3) {
+        const [ano, mes, dia] = partes;
+        const mesIndex = parseInt(mes, 10) - 1;
+        return {
+          dia: dia.padStart(2, '0'),
+          mes: MESES[mesIndex] || 'JAN'
+        };
+      }
+    }
+
+    // Caso 2: Formato DD/MM/YYYY (ex: 15/08/2026)
+    if (dataString.includes('/')) {
+      const partes = dataString.split('/');
+      if (partes.length === 3) {
+        const [dia, mes] = partes;
+        const mesIndex = parseInt(mes, 10) - 1;
+        return {
+          dia: dia.padStart(2, '0'),
+          mes: MESES[mesIndex] || 'JAN'
+        };
+      }
+    }
+
+    // Caso 3: Fallback usando new Date()
+    const d = new Date(dataBruta);
+    if (!isNaN(d.getTime())) {
+      return {
+        dia: String(d.getUTCDate()).padStart(2, '0'),
+        mes: MESES[d.getUTCMonth()] || 'JAN'
+      };
+    }
+  } catch (err) {
+    console.error('Erro ao extrair dia/mês:', err);
+  }
+
+  return { dia: '01', mes: 'JAN' };
+}
+
 export default function EventSection() {
-  // 1. Ordena os eventos da data mais recente (mais nova) para a mais antiga
-  const eventosOrdenados = [...dbEventos].sort((a, b) => {
-    return new Date(b.data) - new Date(a.data);
+  const [eventos, setEventos] = useState([]);
+
+  useEffect(() => {
+    async function carregarEventos() {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
+        const resData = await response.json();
+
+        if (resData.status === 'success' && Array.isArray(resData.eventos) && resData.eventos.length > 0) {
+          const idsOnline = new Set(resData.eventos.map(e => String(e.id)));
+          const locaisFiltrados = dbEventosLocal.filter(e => !idsOnline.has(String(e.id)));
+          setEventos([...resData.eventos, ...locaisFiltrados]);
+        } else {
+          setEventos(dbEventosLocal);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar eventos para a home, usando locais:', err);
+        setEventos(dbEventosLocal);
+      }
+    }
+
+    carregarEventos();
+  }, []);
+
+  // Ordena os eventos do mais recente para o mais antigo
+  const eventosOrdenados = [...eventos].sort((a, b) => {
+    const dataA = new Date(a.data || '2026-01-01').getTime();
+    const dataB = new Date(b.data || '2026-01-01').getTime();
+    return dataB - dataA;
   });
 
-  // 2. Pega os 3 eventos mais recentes para exibir na Home
+  // Pega os 3 mais recentes para exibir na Home
   const ultimosEventos = eventosOrdenados.slice(0, 3);
 
   return (
@@ -37,16 +111,10 @@ export default function EventSection() {
         {/* GRELHA DE EVENTOS */}
         <div className={styles.eventsGrid}>
           {ultimosEventos.map((evento) => {
-            // Extrai o dia e o mês diretamente da string YYYY-MM-DD para evitar problemas de fuso horário
-            const [ano, mesStr, diaStr] = evento.data.split('-');
-            const mesIndex = parseInt(mesStr, 10) - 1;
-            const mesNome = MESES[mesIndex] || "JAN";
-
-            // Calcula o status dinâmico do evento (Inscrições, Em Andamento ou Encerrado)
+            const { dia, mes } = extrairDiaEMes(evento.data);
             const status = getStatusEvento(evento, styles);
 
             return (
-              /* TRANSFORMAMOS O CARD INTEIRO EM UM LINK CLICÁVEL */
               <Link 
                 key={evento.id} 
                 href={`/eventos/${evento.id}`}
@@ -55,8 +123,8 @@ export default function EventSection() {
                 
                 {/* BLOCO DA DATA (AZUL) */}
                 <div className={styles.dateBox}>
-                  <span className={styles.dayNumber}>{diaStr}</span>
-                  <span className={styles.monthText}>{mesNome}</span>
+                  <span className={styles.dayNumber}>{dia}</span>
+                  <span className={styles.monthText}>{mes}</span>
                 </div>
 
                 {/* CONTEÚDO DE TEXTO */}
@@ -80,13 +148,12 @@ export default function EventSection() {
                   <div className={styles.metaRow}>
                     <Clock size={14} className={styles.icon} />
                     <span>
-                      {evento.horaInicio 
-                        ? `${evento.horaInicio}h${evento.horaFim ? ` às ${evento.horaFim}h` : ''}` 
-                        : 'Consulte a programação'}
+                      {evento.hora 
+                        ? evento.hora 
+                        : (evento.horaInicio ? `${evento.horaInicio}h${evento.horaFim ? ` às ${evento.horaFim}h` : ''}` : 'Consulte a programação')}
                     </span>
                   </div>
 
-                  {/* BOTÃO/TEXTO "VER MAIS" APENAS VISUAL */}
                   <span 
                     style={{ 
                       marginTop: '12px', 
