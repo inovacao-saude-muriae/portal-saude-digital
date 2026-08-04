@@ -7,47 +7,18 @@ import Image from 'next/image';
 import { dbEventos, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+
 export default function EventoDetailPage() {
   const params = useParams();
   const id = params?.id;
 
   const evento = dbEventos.find(item => String(item.id) === String(id));
   
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ nomeCompleto: '', cpf: '', email: '' });
   const [enviando, setEnviando] = useState(false);
-  const [mensagem, setMensagem] = useState(null);
-  const [fotoIndex, setFotoIndex] = useState(null);
-
-  const galeria = evento?.galeria || [];
-
-  // NAVEGAÇÃO PRÁTICA E SEM PROBLEMAS DE HOOKS
-  const proximaFoto = () => {
-    if (galeria.length === 0) return;
-    setFotoIndex((prev) => (prev === null ? 0 : (prev + 1) % galeria.length));
-  };
-
-  const fotoAnterior = () => {
-    if (galeria.length === 0) return;
-    setFotoIndex((prev) => (prev === null ? 0 : (prev - 1 + galeria.length) % galeria.length));
-  };
-
-  // TECLAS DE ATALHO DO TECLADO
-  useEffect(() => {
-    if (fotoIndex === null || galeria.length === 0) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        setFotoIndex((prev) => (prev === null ? 0 : (prev + 1) % galeria.length));
-      } else if (e.key === 'ArrowLeft') {
-        setFotoIndex((prev) => (prev === null ? 0 : (prev - 1 + galeria.length) % galeria.length));
-      } else if (e.key === 'Escape') {
-        setFotoIndex(null);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [fotoIndex, galeria.length]);
+  const [comprovante, setComprovante] = useState(null);
+  const [mensagemErro, setMensagemErro] = useState(null);
 
   if (!evento) {
     return (
@@ -55,9 +26,7 @@ export default function EventoDetailPage() {
         <div className={styles.containerNotFound}>
           <h2>Evento não encontrado</h2>
           <p>O evento solicitado não existe ou foi removido.</p>
-          <Link href="/eventos" className={styles.btnVoltar}>
-            ← Voltar para Eventos
-          </Link>
+          <Link href="/eventos" className={styles.btnVoltar}>← Voltar para Eventos</Link>
         </div>
       </div>
     );
@@ -70,25 +39,36 @@ export default function EventoDetailPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleInscricaoSubmit = async (e) => {
     e.preventDefault();
     setEnviando(true);
-    setMensagem(null);
+    setMensagemErro(null);
 
     try {
-      const dataToSend = new FormData();
-      Object.keys(formData).forEach(key => dataToSend.append(key, formData[key]));
+      const payload = {
+        action: 'INSCREVER',
+        eventoId: evento.id,
+        eventoTitulo: evento.titulo,
+        nomeCompleto: formData.nomeCompleto,
+        cpf: formData.cpf,
+        email: formData.email
+      };
 
-      await fetch(evento.scriptUrl, {
+      const response = await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: dataToSend,
-        mode: 'no-cors'
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
       });
 
-      setMensagem({ tipo: 'sucesso', texto: 'Inscrição realizada com sucesso!' });
-      setFormData({});
+      const resData = await response.json();
+
+      if (resData.status === 'success') {
+        setComprovante(resData.comprovante);
+      } else {
+        setMensagemErro('Erro ao realizar inscrição: ' + resData.message);
+      }
     } catch (err) {
-      setMensagem({ tipo: 'erro', texto: 'Ocorreu um erro ao enviar. Tente novamente.' });
+      setMensagemErro('Ocorreu um erro na comunicação. Tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -96,66 +76,34 @@ export default function EventoDetailPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      
-      {/* BARRA DE NAVEGAÇÃO SUPERIOR DE VOLTAR */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
-          <Link href="/eventos" className={styles.backLink}>
-            ← Voltar para Eventos
-          </Link>
+          <Link href="/eventos" className={styles.backLink}>← Voltar para Eventos</Link>
         </div>
       </div>
 
       <main className={styles.mainContent}>
         <div className={styles.container}>
-          
-          {/* CARD BRANCO PRINCIPAL */}
           <article className={styles.articleCard}>
             
-            {/* LINHA DE META E STATUS */}
             <div className={styles.headerMeta}>
-              <span className={styles.dataPublicacao}>
-                Publicado em: {dataFormatada}
-              </span>
-              <span className={`${styles.statusBadge} ${status.class}`}>
-                {status.label}
-              </span>
+              <span className={styles.dataPublicacao}>Publicado em: {dataFormatada}</span>
+              <span className={`${styles.statusBadge} ${status.class}`}>{status.label}</span>
             </div>
 
-            {/* TÍTULO PRINCIPAL */}
             <h1 className={styles.titulo}>{evento.titulo}</h1>
 
-            {/* RESUMO / SUBTÍTULO */}
-            {evento.resumo && (
-              <p className={styles.resumo}>{evento.resumo}</p>
-            )}
-
-            {/* IMAGEM DE CAPA */}
             {evento.imgSrc && (
               <div className={styles.imageWrapper}>
-                <Image 
-                  src={evento.imgSrc} 
-                  alt={evento.titulo} 
-                  width={900} 
-                  height={450} 
-                  priority 
-                  unoptimized 
-                  className={styles.imagemCapa}
-                />
+                <Image src={evento.imgSrc} alt={evento.titulo} width={900} height={450} priority unoptimized className={styles.imagemCapa} />
               </div>
             )}
 
-            {/* SOBRE O EVENTO */}
             <div className={styles.corpoConteudo}>
               <h3>Sobre o Evento</h3>
-              {Array.isArray(evento.descricao) ? (
-                evento.descricao.map((p, idx) => <p key={idx}>{p}</p>)
-              ) : (
-                <p>{evento.descricao}</p>
-              )}
+              {Array.isArray(evento.descricao) ? evento.descricao.map((p, idx) => <p key={idx}>{p}</p>) : <p>{evento.descricao}</p>}
             </div>
 
-            {/* LOCAL DE REALIZAÇÃO */}
             {evento.local && (
               <div className={styles.infoBlock}>
                 <h3>📍 Local de Realização</h3>
@@ -163,17 +111,28 @@ export default function EventoDetailPage() {
               </div>
             )}
 
+            {/* AVISO DE CERTIFICADO */}
+            {evento.geraCertificado && (
+              <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '16px 20px', borderRadius: '12px', marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '24px' }}>📜</span>
+                <div>
+                  <strong style={{ color: '#0369a1', fontSize: '15px' }}>Evento com Emissão de Certificado</strong>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#0284c7' }}>Os participantes inscritos com presenças confirmadas receberão certificado digital.</p>
+                </div>
+              </div>
+            )}
+
             {/* CRONOGRAMA */}
             {evento.cronograma && evento.cronograma.length > 0 && (
               <div className={styles.infoBlock}>
-                <h3>🕒 Programação / Cronograma</h3>
+                <h3>🕒 Programação e Palestras</h3>
                 <div className={styles.cronogramaList}>
                   {evento.cronograma.map((item, idx) => (
                     <div key={idx} className={styles.cronogramaItem}>
-                      <span className={styles.cronoHora}>{item.hora}</span>
+                      <span className={styles.cronoHora}>{item.horario || item.hora}</span>
                       <div className={styles.cronoConteudo}>
-                        <strong>{item.tema}</strong>
-                        {item.palestrante && <p>{item.palestrante}</p>}
+                        <strong>{item.atividade || item.tema}</strong>
+                        {item.palestrante && <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#0065a4', fontWeight: '600' }}>👤 {item.palestrante}</p>}
                       </div>
                     </div>
                   ))}
@@ -181,90 +140,63 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* FORMULÁRIO DE INSCRIÇÃO */}
-            {evento.formulario && status.label.includes('Aberto') && (
+            {/* SEÇÃO DE INSCRIÇÃO OU COMPROVANTE */}
+            {evento.requerInscricao && (
               <div className={styles.formSection}>
-                <h3>📝 Formulário de Inscrição</h3>
-                
-                {mensagem && (
-                  <div className={mensagem.tipo === 'sucesso' ? styles.msgSucesso : styles.msgErro}>
-                    {mensagem.texto}
+                <h3>📝 Inscrição no Evento</h3>
+
+                {mensagemErro && <div className={styles.msgErro}>{mensagemErro}</div>}
+
+                {!comprovante ? (
+                  <form onSubmit={handleInscricaoSubmit} className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label>Nome Completo *</label>
+                      <input type="text" name="nomeCompleto" required value={formData.nomeCompleto} onChange={handleFormChange} className={styles.formInput} placeholder="Digite seu nome completo" />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>CPF *</label>
+                      <input type="text" name="cpf" required value={formData.cpf} onChange={handleFormChange} className={styles.formInput} placeholder="000.000.000-00" />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>E-mail *</label>
+                      <input type="email" name="email" required value={formData.email} onChange={handleFormChange} className={styles.formInput} placeholder="seuemail@exemplo.com" />
+                    </div>
+
+                    <button type="submit" disabled={enviando} className={styles.submitBtn}>
+                      {enviando ? 'Processando Inscrição...' : 'Confirmar minha Inscrição'}
+                    </button>
+                  </form>
+                ) : (
+                  /* CARD DE COMPROVANTE DE INSCRIÇÃO GERADO */
+                  <div style={{ backgroundColor: '#ffffff', border: '2px dashed #2b943d', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '8px' }}>✅</div>
+                    <h4 style={{ fontSize: '20px', color: '#15803d', margin: '0 0 4px 0' }}>Inscrição Confirmada!</h4>
+                    <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0' }}>Guarde o comprovante abaixo para apresentar no dia do evento.</p>
+
+                    <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '10px', textAlign: 'left', fontSize: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div><strong>Código de Inscrição:</strong> <span style={{ color: '#0065a4', fontWeight: 'bold' }}>{comprovante.codigo}</span></div>
+                      <div><strong>Participante:</strong> {comprovante.nome}</div>
+                      <div><strong>CPF:</strong> {comprovante.cpf}</div>
+                      <div><strong>Evento:</strong> {comprovante.evento}</div>
+                      <div><strong>Data/Hora do Registro:</strong> {comprovante.dataHora}</div>
+                    </div>
+
+                    <button 
+                      onClick={() => window.print()} 
+                      style={{ marginTop: '20px', backgroundColor: '#0065a4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                    >
+                      🖨️ Imprimir Comprovante
+                    </button>
                   </div>
                 )}
-
-                <form onSubmit={handleFormSubmit} className={styles.formGrid}>
-                  {evento.formulario.map((field, idx) => (
-                    <div key={idx} className={styles.formGroup}>
-                      <label>{field.label} {field.required && '*'}</label>
-                      <input 
-                        type={field.type} 
-                        name={field.name}
-                        required={field.required}
-                        value={formData[field.name] || ''}
-                        onChange={handleFormChange}
-                        className={styles.formInput}
-                      />
-                    </div>
-                  ))}
-                  <button type="submit" disabled={enviando} className={styles.submitBtn}>
-                    {enviando ? 'Enviando...' : 'Confirmar Inscrição'}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* GALERIA DE FOTOS */}
-            {galeria.length > 0 && (
-              <div className={styles.infoBlock}>
-                <h3>📸 Galeria de Fotos</h3>
-                <div className={styles.galeriaGrid}>
-                  {galeria.map((img, idx) => (
-                    <div 
-                      key={idx} 
-                      className={styles.galeriaItem}
-                      onClick={() => setFotoIndex(idx)}
-                    >
-                      <Image 
-                        src={img} 
-                        alt={`Foto ${idx + 1}`} 
-                        width={300} 
-                        height={200} 
-                        unoptimized 
-                        className={styles.galeriaImg}
-                      />
-                      <div className={styles.zoomOverlay}>🔍 Expandir</div>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
           </article>
-
         </div>
       </main>
-
-      {/* MODAL LIGHTBOX */}
-      {fotoIndex !== null && galeria.length > 0 && (
-        <div className={styles.modalOverlay} onClick={() => setFotoIndex(null)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setFotoIndex(null)}>✕</button>
-            <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={fotoAnterior}>❮</button>
-
-            <Image 
-              src={galeria[fotoIndex]} 
-              alt={`Foto ${fotoIndex + 1}`} 
-              width={1200} 
-              height={800} 
-              unoptimized 
-              className={styles.modalImage}
-            />
-
-            <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={proximaFoto}>❯</button>
-            <div className={styles.counterBadge}>{fotoIndex + 1} / {galeria.length}</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

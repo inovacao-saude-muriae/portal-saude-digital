@@ -58,7 +58,6 @@ export default function Header() {
                                 width={45}  
                                 height={45} 
                                 className={styles.iconLogo} 
-                                quality={85}
                             />
                         </div>
                         <div className={styles.brandText}>
