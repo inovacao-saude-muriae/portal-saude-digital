@@ -325,6 +325,18 @@ export default function AdminEventosPage() {
     setLoadingForm(true);
     setMensagem(null);
 
+    // RECUPERA DADOS DO USUÁRIO LOGADO NO LOCALSTORAGE
+    let autorNome = 'Gestor / Sistema';
+    const savedUser = localStorage.getItem('user_info');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        autorNome = `${parsedUser.nome} (${parsedUser.usuario})`;
+      } catch (err) {
+        console.error('Erro ao ler informações do usuário:', err);
+      }
+    }
+
     const formData = new FormData(e.target);
     const imagemInput = e.target.querySelector('input[name="imagem"]');
     const imagemArquivo = imagemInput && imagemInput.files ? imagemInput.files[0] : null;
@@ -345,6 +357,7 @@ export default function AdminEventosPage() {
         hora: formData.get('hora'),
         categoria: formData.get('categoria'),
         descricao: formData.get('descricao'),
+        autor: autorNome, // ENVIANDO O USUÁRIO RESPONSÁVEL PARA A PLANILHA
         requerInscricao: requerInscricao,
         geraCertificado: requerInscricao ? geraCertificado : false,
         formFields: requerInscricao 

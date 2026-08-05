@@ -249,6 +249,18 @@ export default function AdminNoticiasPage() {
     setLoadingForm(true);
     setMensagem(null);
 
+    // CAPTURA AS INFORMAÇÕES DO USUÁRIO LOGADO NO LOCALSTORAGE
+    let autorNome = 'Gestor / Sistema';
+    const savedUser = localStorage.getItem('user_info');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        autorNome = `${parsedUser.nome} (${parsedUser.usuario})`;
+      } catch (err) {
+        console.error('Erro ao ler informações do usuário:', err);
+      }
+    }
+
     const formData = new FormData(e.target);
     const imagemInput = e.target.querySelector('input[name="imagem"]');
     const imagemArquivo = imagemInput && imagemInput.files ? imagemInput.files[0] : null;
@@ -267,6 +279,7 @@ export default function AdminNoticiasPage() {
         data: dataFormatadaEnvio,
         categoria: formData.get('categoria'),
         conteudo: formData.get('conteudo'),
+        autor: autorNome, // ENVIANDO O USUÁRIO RESPONSÁVEL PARA A PLANILHA
         imagemBase64: base64Image,
         imagemNome: name,
         imagemType: type
@@ -452,7 +465,6 @@ export default function AdminNoticiasPage() {
                     />
                   </div>
 
-                  {/* MENU SUSPENSO PADRÃO (SEM CORES INTERNAS) */}
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Categoria da Notícia*</label>
                     <select 
@@ -542,7 +554,6 @@ export default function AdminNoticiasPage() {
                           </div>
                         </div>
                         <div>
-                          {/* BADGE DA CATEGORIA EXIBIDO EXCLUSIVAMENTE NO CARD */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                             <span className={`${styles.badgeCategoria} ${getClasseCategoria(item.categoria)}`}>
                               {item.categoria}

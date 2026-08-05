@@ -1,10 +1,12 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import styles from './Header.module.css'; 
 import Image from 'next/image';
 import Link from 'next/link'; 
 import { usePathname } from 'next/navigation';
+import { Lock } from 'lucide-react';
+
 const logoSecretaria = '/img/logo-Prefeitura.png'; 
 
 export default function Header() {
@@ -20,7 +22,7 @@ export default function Header() {
         return pathname === path ? styles.activeLink : "";
     };
 
-    // Ativo exclusivo para a barra superior (Ouvidoria / Transparência)
+    // Ativo exclusivo para a barra superior
     const isTopBarActive = (path) => {
         return pathname === path ? styles.topBarActiveLink : "";
     };
@@ -41,6 +43,12 @@ export default function Header() {
                         <span className={styles.divider}>|</span> 
                         <Link href="/transparencia" className={isTopBarActive('/transparencia')}>
                             Transparência
+                        </Link>
+                        <span className={styles.divider}>|</span> 
+                        {/* LINK APONTANDO PARA /admin/login */}
+                        <Link href="/admin/login" className={`${isTopBarActive('/admin/login')} ${styles.areaRestritaBtn}`}>
+                            <Lock size={12} style={{ marginRight: '4px' }} />
+                            Área Restrita
                         </Link>
                     </div>
                 </div>
