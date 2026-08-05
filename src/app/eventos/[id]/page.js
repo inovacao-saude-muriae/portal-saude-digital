@@ -10,6 +10,41 @@ import styles from './EventosDetail.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
+// SANITIZA STRINGS DE HORA VINDAS DO GOOGLE SHEETS (REMOVE "Sat Dec 30 1899...")
+function limparHora(horaBruta) {
+  if (!horaBruta) return '';
+  const str = String(horaBruta).trim();
+
+  if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
+    const matchHora = str.match(/\d{2}:\d{2}/);
+    return matchHora ? matchHora[0] : '';
+  }
+
+  return str;
+}
+
+// PARSER SEGURO DE DATA PARA FORMATO BRASILEIRO (DD/MM/AAAA)
+function formatarDataBR(dataBruta) {
+  if (!dataBruta) return 'A definir';
+  let str = String(dataBruta).trim();
+
+  // Remove lixo de fuso horário vindo do Google Sheets
+  if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
+    return 'A definir';
+  }
+
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
+    return str.split('T')[0];
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const partes = str.split('T')[0].split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+
+  return str;
+}
+
 export default function EventoDetailPage() {
   const params = useParams();
   const id = params?.id;
@@ -100,6 +135,7 @@ export default function EventoDetailPage() {
 
   const status = getStatusEvento(evento, styles);
   const imagemExibicao = evento.imgSrc || evento.imagem || '/img/eventos/simposio.png';
+  const horaExibicao = limparHora(evento.hora);
 
   const camposFormulario = Array.isArray(evento.formFields) && evento.formFields.length > 0 
     ? evento.formFields 
@@ -143,7 +179,6 @@ export default function EventoDetailPage() {
         respostas: listaRespostas
       };
 
-      // FETCH COM TRATAMENTO DE REDIRECIONAMENTO DO GOOGLE APPS SCRIPT
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'cors',
@@ -158,7 +193,6 @@ export default function EventoDetailPage() {
       try {
         resData = JSON.parse(textResponse);
       } catch (pErr) {
-        // Se o Google redirecionar e retornar HTML, considera sucesso se os dados chegaram
         resData = { status: 'success' };
       }
 
@@ -177,7 +211,6 @@ export default function EventoDetailPage() {
     } catch (err) {
       console.error('Erro na requisição:', err);
       
-      // FALLBACK: Como a planilha costuma salvar mesmo em redirecionamento de rede
       const codigoFallback = 'INS-' + Math.floor(100000 + Math.random() * 900000);
       setComprovante({
         codigo: codigoFallback,
@@ -190,7 +223,6 @@ export default function EventoDetailPage() {
     }
   };
 
-  // NATIVO: ABRE O GERADOR DE PDF/IMPRESSÃO DO SISTEMA OPERACIONAL
   const handleBaixarPdf = () => {
     window.print();
   };
@@ -209,14 +241,10 @@ export default function EventoDetailPage() {
         <div className={styles.container}>
           <article className={styles.articleCard}>
             
-            {/* CABEÇALHO */}
+            {/* CABEÇALHO COM DATA E HORA DEVIDAMENTE SANITIZADAS */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
-                Data: {
-                  evento.data 
-                    ? String(evento.data).split('T')[0]
-                    : 'A definir'
-                } {evento.hora ? `• ${evento.hora}` : ''}
+                Data: {formatarDataBR(evento.data)} {horaExibicao ? `• ${horaExibicao}` : ''}
               </span>
               <span className={`${styles.statusBadge} ${status.class}`}>
                 {status.label}
@@ -268,7 +296,9 @@ export default function EventoDetailPage() {
               {Array.isArray(evento.descricao) ? (
                 evento.descricao.map((p, idx) => <p key={idx}>{p}</p>)
               ) : (
-                <p>{evento.descricao}</p>
+                String(evento.descricao || '').split('\n').map((paragrafo, idx) => (
+                  paragrafo.trim() ? <p key={idx}>{paragrafo}</p> : null
+                ))
               )}
             </div>
 
@@ -299,7 +329,7 @@ export default function EventoDetailPage() {
                   {evento.cronograma.map((item, idx) => (
                     <div key={idx} className={styles.cronogramaItem}>
                       <span className={styles.cronoHora}>
-                        {item.horario || item.hora}
+                        {limparHora(item.horario || item.hora)}
                       </span>
                       <div className={styles.cronoConteudo}>
                         <strong>{item.atividade || item.tema}</strong>
@@ -407,7 +437,6 @@ export default function EventoDetailPage() {
                   </div>
                 </div>
 
-                {/* AQUI: BOTÕES AGORA ESTÃO DENTRO DA CAIXA BRANCA */}
                 <div className={styles.comprovanteActionButtons}>
                   <button onClick={handleBaixarPdf} className={styles.btnDownloadPdf}>
                     <Download size={16} /> Salvar / Baixar em PDF

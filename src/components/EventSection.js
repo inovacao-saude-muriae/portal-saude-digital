@@ -10,11 +10,28 @@ const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.
 
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
+// FUNÇÃO PARA SANITIZAR STRINGS VINDAS DO GOOGLE SHEETS COM "Sat Dec 30 1899..."
+function limparFormatoTexto(valor) {
+  if (!valor) return '';
+  const str = String(valor).trim();
+  
+  if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
+    const matchHora = str.match(/\d{2}:\d{2}/);
+    if (matchHora) {
+      return matchHora[0];
+    }
+    return '';
+  }
+
+  return str;
+}
+
 function extrairDiaEMes(dataBruta) {
   if (!dataBruta) return { dia: '01', mes: 'JAN' };
 
   try {
-    const dataString = String(dataBruta).split('T')[0].trim();
+    const dataLimpa = limparFormatoTexto(dataBruta);
+    const dataString = String(dataLimpa).split('T')[0].trim();
 
     if (dataString.includes('-')) {
       const partes = dataString.split('-');
@@ -40,7 +57,7 @@ function extrairDiaEMes(dataBruta) {
       }
     }
 
-    const d = new Date(dataBruta);
+    const d = new Date(dataLimpa);
     if (!isNaN(d.getTime())) {
       return {
         dia: String(d.getUTCDate()).padStart(2, '0'),
@@ -59,7 +76,7 @@ export default function EventSection() {
 
   useEffect(() => {
     async function carregarEventos() {
-      // 1. Tenta carregar do Cache Local para renderização instantânea
+      // 1. Cache Local
       try {
         const cache = localStorage.getItem('cache_portal_eventos');
         if (cache) {
@@ -72,7 +89,7 @@ export default function EventSection() {
         console.warn('Erro ao ler cache local de eventos:', err);
       }
 
-      // 2. Busca atualizações do Google Apps Script em segundo plano
+      // 2. Busca do Apps Script
       try {
         const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`, {
           method: 'GET',
@@ -105,21 +122,19 @@ export default function EventSection() {
     carregarEventos();
   }, []);
 
-  // Ordena os eventos do mais recente para o mais antigo
   const eventosOrdenados = [...eventos].sort((a, b) => {
     const dataA = new Date(a.data || '2026-01-01').getTime();
     const dataB = new Date(b.data || '2026-01-01').getTime();
     return dataB - dataA;
   });
 
-  // Pega os 3 mais recentes para exibir na Home
   const ultimosEventos = eventosOrdenados.slice(0, 3);
 
   return (
     <section className={styles.eventsSection}>
       <div className={styles.container}>
         
-        {/* CABEÇALHO DA SEÇÃO */}
+        {/* CABEÇALHO */}
         <div className={styles.headerArea}>
           <div className={styles.titleBlock}>
             <span className={styles.subtitle}>AGENDA DA SAÚDE</span>
@@ -136,8 +151,16 @@ export default function EventSection() {
             const { dia, mes } = extrairDiaEMes(evento.data);
             const status = getStatusEvento(evento, styles);
             
-            // GARANTE QUE O ID DO LINK ESTEJA SEMPRE EM FORMATO STRING VÁLIDO
             const eventoIdFinal = String(evento.id || '').trim();
+
+            // SANITIZA AS STRINGS DE HORA
+            const horaExibicao = limparFormatoTexto(evento.hora);
+            const horaInicioLimpa = limparFormatoTexto(evento.horaInicio);
+            const horaFimLimpa = limparFormatoTexto(evento.horaFim);
+
+            const textoHoraFinal = horaExibicao 
+              ? horaExibicao 
+              : (horaInicioLimpa ? `${horaInicioLimpa}h${horaFimLimpa ? ` às ${horaFimLimpa}h` : ''}` : 'Consulte a programação');
 
             return (
               <Link 
@@ -146,13 +169,13 @@ export default function EventSection() {
                 className={styles.eventCard}
               >
                 
-                {/* BLOCO DA DATA (AZUL) */}
+                {/* BLOCO DA DATA */}
                 <div className={styles.dateBox}>
                   <span className={styles.dayNumber}>{dia}</span>
                   <span className={styles.monthText}>{mes}</span>
                 </div>
 
-                {/* CONTEÚDO DE TEXTO */}
+                {/* CONTEÚDO */}
                 <div className={styles.eventContent}>
                   <div className={styles.cardHeaderRow}>
                     <h3 className={styles.eventTitle}>{evento.titulo}</h3>
@@ -172,11 +195,7 @@ export default function EventSection() {
                   
                   <div className={styles.metaRow}>
                     <Clock size={14} className={styles.icon} />
-                    <span>
-                      {evento.hora 
-                        ? evento.hora 
-                        : (evento.horaInicio ? `${evento.horaInicio}h${evento.horaFim ? ` às ${evento.horaFim}h` : ''}` : 'Consulte a programação')}
-                    </span>
+                    <span>{textoHoraFinal}</span>
                   </div>
 
                   <span 

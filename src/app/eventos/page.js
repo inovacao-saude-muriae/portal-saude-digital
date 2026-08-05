@@ -60,31 +60,27 @@ export default function EventosPage() {
 
   useEffect(() => {
     async function carregarEventosOnline() {
-      // 1. Lê cache se existir
+      // 1. Lê o cache se existir
       const cachedData = localStorage.getItem('cache_portal_eventos');
       if (cachedData) {
         try {
           const parsed = JSON.parse(cachedData);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setEventos(parsed);
           }
         } catch (e) {
-          console.error(e);
+          console.error('Erro ao ler cache de eventos:', e);
         }
       }
 
-      // 2. Atualiza via Apps Script em segundo plano
+      // 2. Busca a lista atualizada do servidor de eventos
       try {
         const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
         const resData = await response.json();
         
-        if (resData.status === 'success' && Array.isArray(resData.eventos) && resData.eventos.length > 0) {
-          const idsOnline = new Set(resData.eventos.map(e => String(e.id)));
-          const locaisFiltrados = dbEventosLocal.filter(e => !idsOnline.has(String(e.id)));
-          const listaFinal = [...resData.eventos, ...locaisFiltrados];
-
-          setEventos(listaFinal);
-          localStorage.setItem('cache_portal_eventos', JSON.stringify(listaFinal));
+        if (resData.status === 'success' && Array.isArray(resData.eventos)) {
+          setEventos(resData.eventos);
+          localStorage.setItem('cache_portal_eventos', JSON.stringify(resData.eventos));
         }
       } catch (err) {
         console.error('Erro ao buscar eventos online:', err);

@@ -6,6 +6,21 @@ import Link from 'next/link';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData'; 
 import styles from './NewsSection.module.css';
 
+// Função para mapear dinamicamente a cor da badge pela categoria
+function getClasseCategoria(categoria) {
+  const catNormalizada = String(categoria || '').toLowerCase().trim();
+
+  if (catNormalizada.includes('vacina')) return styles.catVacinacao;
+  if (catNormalizada.includes('infra')) return styles.catInfraestrutura;
+  if (catNormalizada.includes('comunit')) return styles.catAcaoComunitaria;
+  if (catNormalizada.includes('comunicado')) return styles.catComunicado;
+  if (catNormalizada.includes('inovac') || catNormalizada.includes('inovação')) return styles.catInovacao;
+  if (catNormalizada.includes('campanha')) return styles.catCampanha;
+  if (catNormalizada.includes('inaugura')) return styles.catInauguracao;
+
+  return styles.catPadrao;
+}
+
 export default function NewsSection() {
   const [noticias, setNoticias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +93,7 @@ export default function NewsSection() {
               {/* ÁREA DE TEXTO */}
               <div className={styles.cardContent}>
                 <div className={styles.metaArea}>
-                  <span className={styles.categoryTag}>
+                  <span className={`${styles.categoryTag} ${getClasseCategoria(noticia.categoria)}`}>
                     {noticia.categoria}
                   </span>
                   <span className={styles.dateText}>{noticia.data}</span>

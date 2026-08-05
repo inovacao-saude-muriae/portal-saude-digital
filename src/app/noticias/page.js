@@ -7,10 +7,22 @@ import { Search } from 'lucide-react';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData';
 import styles from './Noticias.module.css';
 
-const categoriaClassMap = {
-  infra: styles.catInfra,
-  vacinacao: styles.catVacinacao
-};
+// Mapeamento dinâmico baseado no texto da categoria
+function getClasseCategoria(categoria, tipoCategoria) {
+  const catNormalizada = String(categoria || '').toLowerCase().trim();
+
+  if (catNormalizada.includes('vacina')) return styles.catVacinacao;
+  if (catNormalizada.includes('infra')) return styles.catInfra;
+  if (catNormalizada.includes('comunit')) return styles.catAcaoComunitaria;
+  if (catNormalizada.includes('comunicado')) return styles.catComunicado;
+  if (catNormalizada.includes('inovac') || catNormalizada.includes('inovação')) return styles.catInovacao;
+  if (catNormalizada.includes('campanha')) return styles.catCampanha;
+  if (catNormalizada.includes('inaugura')) return styles.catInauguracao;
+
+  // Fallback para o tipo de categoria antigo ou estilo padrão
+  if (tipoCategoria === 'vacinacao') return styles.catVacinacao;
+  return styles.catInfra;
+}
 
 function normalizarTexto(texto) {
   if (!texto) return '';
@@ -141,7 +153,8 @@ export default function NoticiasPage() {
             <>
               <div className={styles.gridNoticias}>
                 {noticiasPagina.map((noticia) => {
-                  const classCategoriaCss = categoriaClassMap[noticia.tipoCategoria] || styles.catInfra;
+                  // Mapeia a classe da badge com base na categoria cadastrada
+                  const classCategoriaCss = getClasseCategoria(noticia.categoria, noticia.tipoCategoria);
 
                   return (
                     <Link className={styles.cardNoticia} href={`/noticias/${noticia.id}`} key={noticia.id}>
@@ -198,7 +211,7 @@ export default function NoticiasPage() {
                   <button 
                     className={styles.paginationNavBtn} 
                     disabled={paginaAtual === totalPaginas}
-                    onClick={() => handleMudarPagina(paginaAtual + 1)} // Correção: avança 1 página por vez
+                    onClick={() => handleMudarPagina(paginaAtual + 1)}
                   >
                     Próximo →
                   </button>

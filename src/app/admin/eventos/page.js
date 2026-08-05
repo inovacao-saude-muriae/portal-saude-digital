@@ -32,6 +32,52 @@ import styles from './AdminEventos.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
+const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+
+function extrairDiaEMes(dataBruta) {
+  if (!dataBruta) return { dia: '01', mes: 'JAN' };
+
+  try {
+    const dataString = String(dataBruta).split('T')[0].trim();
+
+    if (dataString.includes('-')) {
+      const partes = dataString.split('-');
+      if (partes.length === 3) {
+        const [ano, mes, dia] = partes;
+        const mesIndex = parseInt(mes, 10) - 1;
+        return {
+          dia: dia.padStart(2, '0'),
+          mes: MESES[mesIndex] || 'JAN'
+        };
+      }
+    }
+
+    if (dataString.includes('/')) {
+      const partes = dataString.split('/');
+      if (partes.length === 3) {
+        const [dia, mes] = partes;
+        const mesIndex = parseInt(mes, 10) - 1;
+        return {
+          dia: dia.padStart(2, '0'),
+          mes: MESES[mesIndex] || 'JAN'
+        };
+      }
+    }
+
+    const d = new Date(dataBruta);
+    if (!isNaN(d.getTime())) {
+      return {
+        dia: String(d.getUTCDate()).padStart(2, '0'),
+        mes: MESES[d.getUTCMonth()] || 'JAN'
+      };
+    }
+  } catch (err) {
+    console.error('Erro ao extrair dia/mês:', err);
+  }
+
+  return { dia: '01', mes: 'JAN' };
+}
+
 function formatarDataParaEnvio(dataInput) {
   if (!dataInput) return '';
   const str = String(dataInput).trim();
@@ -62,21 +108,19 @@ function formatarDataPorExtenso(dataStr) {
 
   let dia, mes, ano;
 
-  // Trata formato DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
     const partes = str.split('/');
     dia = partes[0];
     mes = parseInt(partes[1], 10) - 1;
     ano = partes[2];
   } 
-  // Trata formato YYYY-MM-DD
   else if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     const partes = str.split('T')[0].split('-');
     dia = partes[2];
     mes = parseInt(partes[1], 10) - 1;
     ano = partes[0];
   } else {
-    return str; // Se já vier em texto ou outro formato, retorna como está
+    return str;
   }
 
   const meses = [
@@ -131,7 +175,6 @@ export default function AdminEventosPage() {
   const [geraCertificado, setGeraCertificado] = useState(false);
   const [cronograma, setCronograma] = useState([]);
 
-  // ESTADO DOS CAMPOS DINÂMICOS DO FORMULÁRIO DE INSCRIÇÃO
   const [formFields, setFormFields] = useState([
     { id: 1, label: 'Nome Completo', type: 'text', required: true },
     { id: 2, label: 'CPF', type: 'text', required: true },
@@ -142,7 +185,6 @@ export default function AdminEventosPage() {
   const [loadingEventos, setLoadingEventos] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
-  // ESTADOS DO GERADOR E SELEÇÃO DE CERTIFICADOS
   const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
   const [eventoCertificado, setEventoCertificado] = useState(null);
   const [inscritos, setInscritos] = useState([]);
@@ -150,7 +192,6 @@ export default function AdminEventosPage() {
   const [selecionados, setSelecionados] = useState([]);
   const [cargaHorariaGeral, setCargaHorariaGeral] = useState('8');
 
-  // BUSCA EVENTOS QUANDO A ABA "GERENCIAR" FOR SELECIONADA
   useEffect(() => {
     async function carregarEventos() {
       setLoadingEventos(true);
@@ -175,7 +216,6 @@ export default function AdminEventosPage() {
     }
   }, [abaSub]);
 
-  // CRONOGRAMA
   const handleAdicionarItemCronograma = () => {
     setCronograma((prev) => [...prev, { horario: '', atividade: '', palestrante: '' }]);
   };
@@ -192,7 +232,6 @@ export default function AdminEventosPage() {
     });
   };
 
-  // CAMPOS DINÂMICOS
   const handleAdicionarCampoForm = () => {
     setFormFields((prev) => [
       ...prev,
@@ -373,7 +412,6 @@ export default function AdminEventosPage() {
     }
   };
 
-  // BUSCA OS INSCRITOS DA PLANILHA PARA A EMISSÃO DE CERTIFICADOS
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
@@ -399,7 +437,6 @@ export default function AdminEventosPage() {
     }
   };
 
-  // SELEÇÃO INDIVIDUAL E EM LOTE
   const handleToggleSelecionarTudo = () => {
     if (selecionados.length === inscritos.length) {
       setSelecionados([]);
@@ -527,7 +564,6 @@ export default function AdminEventosPage() {
                   <textarea name="descricao" rows={5} required defaultValue={eventoEmEdicao?.descricao || ''} placeholder="Informe detalhes do evento, documentos necessários, público-alvo..." className={styles.textarea} />
                 </div>
 
-                {/* CONFIGURAÇÃO DE INSCRIÇÃO E CERTIFICADO */}
                 <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ClipboardList size={18} color="#0065a4" /> Configuração de Inscrição
@@ -617,7 +653,6 @@ export default function AdminEventosPage() {
                   </div>
                 </div>
 
-                {/* CRONOGRAMA */}
                 <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div>
@@ -717,43 +752,53 @@ export default function AdminEventosPage() {
               <p className={styles.loadingText}>Carregando lista de eventos...</p>
             ) : listaEventos.length > 0 ? (
               <div className={styles.newsListContainer}>
-                {listaEventos.map((item) => (
-                  <div key={item.id} className={styles.newsItemRow}>
-                    <div className={styles.newsItemContent}>
-                      <div className={styles.imageThumbnailWrapper}>
-                        <Image src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} alt={item.titulo} fill className={styles.thumbnailImg} unoptimized />
-                      </div>
-                      <div>
-                        <span className={styles.newsMetaText}>
-                          {item.categoria} {item.requerInscricao && ' • Inscrição'} {item.geraCertificado && ' • 📜 Certificado'}
-                        </span>
-                        <h3 className={styles.newsItemTitle}>{item.titulo}</h3>
-                        <div className={styles.eventDetailsRow}>
-                          <span><MapPin size={12} /> {item.local}</span>
-                          <span><Clock size={12} /> {item.data} - {item.hora}</span>
+                {listaEventos.map((item) => {
+                  const { dia, mes } = extrairDiaEMes(item.data);
+
+                  return (
+                    <div key={item.id} className={styles.newsItemRow}>
+                      <div className={styles.newsItemContent}>
+                        <div className={styles.imageThumbnailWrapper}>
+                          <Image src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} alt={item.titulo} fill className={styles.thumbnailImg} unoptimized />
+                          
+                          {/* BADGE DA DATA DE EVENTO EM DESTAQUE NO CARD DE ADMIN */}
+                          <div className={styles.dateBadgeOverlay}>
+                            <span className={styles.badgeDay}>{dia}</span>
+                            <span className={styles.badgeMonth}>{mes}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <span className={styles.newsMetaText}>
+                            {item.categoria} {item.requerInscricao && ' • Inscrição'} {item.geraCertificado && ' • 📜 Certificado'}
+                          </span>
+                          <h3 className={styles.newsItemTitle}>{item.titulo}</h3>
+                          <div className={styles.eventDetailsRow}>
+                            <span><MapPin size={12} /> {item.local}</span>
+                            <span><Clock size={12} /> {item.hora}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className={styles.actionButtonsGroup}>
-                      {item.geraCertificado && (
-                        <button 
-                          onClick={() => handleAbrirEmissorCertificado(item)} 
-                          style={{ backgroundColor: '#0284c7', color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                        >
-                          <Award size={15} /> Emitir Certificados
+                      <div className={styles.actionButtonsGroup}>
+                        {item.geraCertificado && (
+                          <button 
+                            onClick={() => handleAbrirEmissorCertificado(item)} 
+                            style={{ backgroundColor: '#0284c7', color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <Award size={15} /> Emitir Certificados
+                          </button>
+                        )}
+                        
+                        <button onClick={() => handleIniciarEdicao(item)} className={styles.editBtn}>
+                          <Pencil size={15} /> Editar
                         </button>
-                      )}
-                      
-                      <button onClick={() => handleIniciarEdicao(item)} className={styles.editBtn}>
-                        <Pencil size={15} /> Editar
-                      </button>
-                      <button onClick={() => handleDeletarEvento(item.id, item.titulo)} disabled={deletandoId === item.id} className={styles.deleteBtn}>
-                        <Trash2 size={15} /> {deletandoId === item.id ? 'Excluindo...' : 'Remover'}
-                      </button>
+                        <button onClick={() => handleDeletarEvento(item.id, item.titulo)} disabled={deletandoId === item.id} className={styles.deleteBtn}>
+                          <Trash2 size={15} /> {deletandoId === item.id ? 'Excluindo...' : 'Remover'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className={styles.emptyText}>Nenhum evento cadastrado no momento.</p>
@@ -763,9 +808,6 @@ export default function AdminEventosPage() {
 
       </div>
 
-      {/* ========================================================================== */}
-      {/* MODAL DE LISTAGEM DE INSCRITOS E GERADOR DE CERTIFICADOS */}
-      {/* ========================================================================== */}
       {modalCertificadoAberto && eventoCertificado && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '20px' }}>
           <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', maxWidth: '900px', width: '100%', padding: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
@@ -784,7 +826,6 @@ export default function AdminEventosPage() {
               </h3>
             </div>
 
-            {/* SELEÇÃO E CONFIGURAÇÃO DA CARGA HORÁRIA */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px', backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button 
@@ -811,7 +852,6 @@ export default function AdminEventosPage() {
               </div>
             </div>
 
-            {/* LISTA DE PARTICIPANTES COM SELEÇÃO */}
             <div style={{ overflowY: 'auto', flexGrow: 1, border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '16px' }}>
               {loadingInscritos ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
@@ -870,7 +910,6 @@ export default function AdminEventosPage() {
               )}
             </div>
 
-            {/* ÁREA DE IMPRESSÃO EM LOTE (FONTE MONTSERRAT 17PX - CARGA HORÁRIA E EXTENSO DINÂMICOS) */}
             <div id="certificados-em-lote-print" style={{ display: 'none' }}>
               {selecionados.map((idxSelect) => {
                 const p = inscritos[idxSelect];
@@ -891,7 +930,6 @@ export default function AdminEventosPage() {
                 const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
                 const localEvento = eventoCertificado?.local || 'Local';
                 
-                // CARGA HORÁRIA E SEU EXTENSO DINÂMICO
                 const cargaHoraria = cargaHorariaGeral || '8';
                 const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
@@ -910,7 +948,6 @@ export default function AdminEventosPage() {
                       backgroundColor: '#ffffff'
                     }}
                   >
-                    {/* 1. IMAGEM DO MODELO OFICIAL */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src="/img/modelo-certificado.png" 
@@ -926,7 +963,6 @@ export default function AdminEventosPage() {
                       }}
                     />
 
-                    {/* 2. NOME DO PARTICIPANTE */}
                     <div style={{
                       position: 'absolute',
                       top: '32.5%',
@@ -949,7 +985,6 @@ export default function AdminEventosPage() {
                       </h2>
                     </div>
 
-                    {/* 3. PARÁGRAFO CORRIDO (MONTSERRAT 17PX, APENAS TÍTULO EM NEGRITO) */}
                     <div style={{
                       position: 'absolute',
                       top: '43%',
@@ -973,7 +1008,6 @@ export default function AdminEventosPage() {
                       </p>
                     </div>
 
-                    {/* 4. CÓDIGO DE AUTENTICIDADE */}
                     <div style={{
                       position: 'absolute',
                       bottom: '12px',
@@ -991,7 +1025,6 @@ export default function AdminEventosPage() {
               })}
             </div>
 
-            {/* BOTÕES DE AÇÃO */}
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
                 onClick={handleImprimirCertificados}

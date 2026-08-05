@@ -60,7 +60,7 @@ export default function Footer() {
             <div className={styles.infoRow}>
               <Phone size={18} className={styles.infoIcon} />
               <div>
-                <p>(32) 3721-0000</p>
+                <p>(32) 3696-3305</p>
               </div>
             </div>
 
