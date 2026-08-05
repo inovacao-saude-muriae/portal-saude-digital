@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-import modelo1Img from '@/../public/img/modelo-certificado/modelo1.png';
-import modelo2Img from '@/../public/img/modelo-certificado/modelo2.png';
-
 import { 
   ArrowLeft, 
   Send, 
@@ -39,20 +36,31 @@ const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.
 
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
-// FUNÇÃO PARA TRATAR O CAMINHO TANTO DE IMPORTAÇÃO MÓDULO QUANTO STRING
-function obterSrcImagem(modeloObj) {
-  if (!modeloObj) return '';
-  if (typeof modeloObj.imagem === 'string') return modeloObj.imagem;
-  if (modeloObj.imagem && modeloObj.imagem.src) return modeloObj.imagem.src;
-  return '';
+// TRATAMENTO DE CAMINHO UNIVERSAL (LOCAL + VERCEL)
+function formatarCaminhoImagemModelo(caminho) {
+  if (!caminho || typeof caminho !== 'string') return '/img/modelo-certificado/modelo1.png';
+  let url = caminho.trim();
+
+  if (url.includes('drive.google.com') || url.includes('googleusercontent.com')) {
+    let fileId = '';
+    if (url.includes('/d/')) fileId = url.split('/d/')[1].split('/')[0].split('?')[0];
+    else if (url.includes('id=')) fileId = url.split('id=')[1].split('&')[0];
+    if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}`;
+  }
+
+  if (!url.startsWith('/') && !url.startsWith('http')) {
+    return `/${url}`;
+  }
+
+  return url;
 }
 
-// CATÁLOGO DE MODELOS VINCULADO ÀS IMAGENS IMPORTADAS
+// CATÁLOGO APONTANDO PARA A SUBPASTA CORRETA 'img/modelo-certificado/'
 const MODELOS_CERTIFICADO = {
   modelo1: {
     id: 'modelo1',
     nome: 'Modelo 1 - Plenária Municipal de Saúde',
-    imagem: modelo1Img,
+    imagem: '/img/modelo-certificado/modelo1.png',
     gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
         Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
@@ -62,7 +70,7 @@ const MODELOS_CERTIFICADO = {
   modelo2: {
     id: 'modelo2',
     nome: 'Modelo 2 - Simpósio / Workshop',
-    imagem: modelo2Img,
+    imagem: '/img/modelo-certificado/modelo2.png',
     gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
         Concluiu com êxito a participação no Simpósio de Saúde sobre <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
@@ -186,6 +194,7 @@ export default function AdminEventosPage() {
   const [cargaHorariaGeral, setCargaHorariaGeral] = useState('8');
 
   const [modeloCertificadoSelecionado, setModeloCertificadoSelecionado] = useState('modelo1');
+  const [imagemModeloBase64, setImagemModeloBase64] = useState('');
 
   useEffect(() => {
     async function carregarEventos() {
@@ -210,6 +219,32 @@ export default function AdminEventosPage() {
       carregarEventos();
     }
   }, [abaSub]);
+
+  // CONVERTE A IMAGEM EM BASE64 PARA FUNCIONAR PERFEITAMENTE NA VERCEL E IMPRESSÃO
+  useEffect(() => {
+    async function converterImagemParaBase64() {
+      const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
+      const urlNormal = formatarCaminhoImagemModelo(modeloAtual?.imagem);
+
+      try {
+        const response = await fetch(urlNormal);
+        if (!response.ok) throw new Error('Não foi possível carregar a imagem');
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagemModeloBase64(reader.result);
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.error('Erro ao converter imagem para base64:', err);
+        setImagemModeloBase64(urlNormal);
+      }
+    }
+
+    if (modalCertificadoAberto) {
+      converterImagemParaBase64();
+    }
+  }, [modeloCertificadoSelecionado, modalCertificadoAberto]);
 
   const handleAdicionarItemCronograma = () => {
     setCronograma((prev) => [...prev, { horario: '', atividade: '', palestrante: '' }]);
@@ -751,7 +786,6 @@ export default function AdminEventosPage() {
                   return (
                     <div key={item.id} className={styles.newsItemRow}>
                       <div className={styles.newsItemContent}>
-                        {/* CAPA LIMPA SEM BADGE DE DATA */}
                         <div className={styles.imageThumbnailWrapper}>
                           <Image 
                             src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} 
@@ -925,7 +959,7 @@ export default function AdminEventosPage() {
               )}
             </div>
 
-            {/* AREA IMPRESSÃO DAS IMAGENS DAS PÁGINAS */}
+            {/* ÁREA DE IMPRESSÃO QUE UTILIZA O BASE64 OU O CAMINHO DIRETO DO PUBLIC */}
             <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
               {selecionados.map((idxSelect) => {
                 const p = inscritos[idxSelect];
@@ -950,7 +984,6 @@ export default function AdminEventosPage() {
                 const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
                 const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
-                const srcImagemTratada = obterSrcImagem(modeloAtual);
 
                 return (
                   <div 
@@ -959,7 +992,7 @@ export default function AdminEventosPage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
-                      src={srcImagemTratada} 
+                      src={imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem)} 
                       alt={modeloAtual?.nome || 'Certificado'}
                       className={styles.certificadoBgImage}
                     />
