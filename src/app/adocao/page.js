@@ -7,7 +7,6 @@ import { Search } from 'lucide-react';
 import { animaisDisponiveis } from '@/data/animaisData';
 import styles from './Adocao.module.css';
 
-// URL DO SCRIPT DO GOOGLE SHEETS
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJgl-EYVzUXS8KvJogh2yn_iiFwIC7NwDS8iwnIV23DcZaFnBtSBkY-pKz8tY5sA3xsg/exec";
 
 // FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS

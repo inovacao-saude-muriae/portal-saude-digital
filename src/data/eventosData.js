@@ -10,7 +10,6 @@
 
     const agora = new Date();
 
-    // 1. Extrai estritamente o formato YYYY-MM-DD para evitar problemas de fuso horário
     let dataISO = '';
     const strData = String(evento.data).trim();
 

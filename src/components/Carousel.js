@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useKeenSlider } from 'keen-slider/react'; // Slider para React
-import 'keen-slider/keen-slider.min.css'; // Estilos obrigatórios padrão do Keen Slider
+import { useKeenSlider } from 'keen-slider/react'; 
+import 'keen-slider/keen-slider.min.css'; 
 import styles from './Carousel.module.css'; 
 import Image from 'next/image'; 
 

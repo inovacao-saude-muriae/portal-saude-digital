@@ -10,7 +10,6 @@ import styles from './EventosDetail.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
-// SANITIZA STRINGS DE HORA VINDAS DO GOOGLE SHEETS (REMOVE "Sat Dec 30 1899...")
 function limparHora(horaBruta) {
   if (!horaBruta) return '';
   const str = String(horaBruta).trim();
@@ -23,7 +22,6 @@ function limparHora(horaBruta) {
   return str;
 }
 
-// PARSER SEGURO DE DATA PARA FORMATO BRASILEIRO (DD/MM/AAAA)
 function formatarDataBR(dataBruta) {
   if (!dataBruta) return 'A definir';
   let str = String(dataBruta).trim();

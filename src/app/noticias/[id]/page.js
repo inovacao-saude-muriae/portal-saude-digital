@@ -44,12 +44,10 @@ export default function NoticiaDetalhePage({ params }) {
     );
   }
 
-  // TRATAMENTO DE PARÁGRAFOS DO CONTEÚDO (seja do Sheets ou estático)
   let paragrafos = [];
   if (Array.isArray(noticia.conteudo)) {
     paragrafos = noticia.conteudo;
   } else if (typeof noticia.conteudo === 'string') {
-    // Separa por quebra de linha (\n) se vier uma string longa do Google Sheets
     paragrafos = noticia.conteudo
       .split('\n')
       .map((p) => p.trim())

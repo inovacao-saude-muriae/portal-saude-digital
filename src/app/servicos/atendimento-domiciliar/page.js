@@ -91,7 +91,7 @@ export default function AtendimentoDomiciliarPage() {
                 </ol>
               </div>
 
-              {/* REQUISITOS PARA ACESSAR O SERVIÇO (AGORA NA COLUNA PRINCIPAL) */}
+              {/* REQUISITOS PARA ACESSAR O SERVIÇO */}
               <div className={styles.infoBlock}>
                 <h3>
                   <CheckCircle2 size={22} color="#008a83" /> Requisitos para Acessar o Serviço
@@ -107,7 +107,7 @@ export default function AtendimentoDomiciliarPage() {
             {/* BARRA LATERAL (SIDEBAR) */}
             <aside className={styles.sidebarArea}>
               
-              {/* INFORMAÇÕES IMPORTANTES (AGORA NA BARRA LATERAL) */}
+              {/* INFORMAÇÕES IMPORTANTES */}
               <div className={styles.widgetBox} style={{ backgroundColor: '#f0fdfa', borderColor: '#008a83' }}>
                 <div className={styles.widgetHeader} style={{ color: '#008a83', borderBottomColor: '#ccfbf1' }}>
                   <Info size={20} color="#008a83" /> Informações Importantes

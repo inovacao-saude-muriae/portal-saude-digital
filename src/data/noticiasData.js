@@ -1,9 +1,7 @@
 import Papa from 'papaparse';
 
-// LINK DO GOOGLE SHEETS PUBLICADO EM CSV
 const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqaHp2GoWXoHsYmsELjBXVwfVvserOmyipeTHbvxAq939fLXoArpDEIMwCFqdB_3lPSS89Yyq6Ncv4/pub?output=csv";
 
-// Sem notícias estáticas (dados 100% dinâmicos do Google Sheets)
 const noticiasEstaticas = {};
 
 /**
@@ -58,9 +56,7 @@ export async function getDbNoticias() {
   }
 }
 
-/**
- * Função utilitária para conversão resiliente de datas no padrão BR ou ISO
- */
+
 export function converterParaDate(dataStr) {
   if (!dataStr) return new Date(0);
   const str = String(dataStr).trim();

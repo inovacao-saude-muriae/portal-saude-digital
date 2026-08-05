@@ -14,9 +14,8 @@ import {
   ArrowRight 
 } from 'lucide-react';
 
-// IMPORTAÇÃO DAS BASES DE DADOS DO SITE
 import { dbEventos } from '@/data/eventosData';
-import { getDbNoticias } from '@/data/noticiasData'; // Atualizado para a função assíncrona
+import { getDbNoticias } from '@/data/noticiasData'; 
 import { animaisDisponiveis } from '@/data/animaisData';
 import { listaContatos } from '@/data/contatosData';
 import { servicos } from '@/data/servicosData';
@@ -83,7 +82,7 @@ function SearchResultsContent() {
 
   // --- VARREDURA NAS BASES DE DADOS ---
 
-  // 1. CARTA DE SERVIÇOS (Corrigido para usar a variável 'servicos')
+  // 1. CARTA DE SERVIÇOS 
   const baseServicos = servicos || {};
   const servicosEncontrados = termo ? Object.keys(baseServicos).map(key => ({
     id: key,

@@ -15,7 +15,6 @@ import styles from './Aplicativos.module.css';
 export default function AplicativosPage() {
   const [appAtivo, setAppAtivo] = useState('saude-digital');
 
-  // Dados do serviço declarados localmente dentro da página
   const servico = {
     title: "Aplicativos Digitais de Saúde",
     desc: "Acesse os serviços digitais de saúde na palma da sua mão para acompanhar atendimentos, histórico de saúde e agendamentos.",

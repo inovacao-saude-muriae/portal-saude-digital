@@ -29,7 +29,6 @@ export default function AdminHubPage() {
     const savedUser = localStorage.getItem('user_info');
     if (savedUser) {
       try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUserInfo(JSON.parse(savedUser));
       } catch (err) {
         console.error('Erro ao ler informações do usuário:', err);

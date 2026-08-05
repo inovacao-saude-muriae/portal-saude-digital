@@ -90,7 +90,6 @@ export default function FarmaciaMunicipalPage() {
           
           <div className={styles.serviceLayout}>
             
-            {/* COLUNA PRINCIPAL */}
             <div>
               {/* SOBRE A ASSISTÊNCIA FARMACÊUTICA */}
               <div className={styles.infoBlock}>

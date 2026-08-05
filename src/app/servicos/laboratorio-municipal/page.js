@@ -73,7 +73,6 @@ export default function LaboratorioMunicipalPage() {
           
           <div className={styles.serviceLayout}>
             
-            {/* COLUNA PRINCIPAL */}
             <div>
               {/* SOBRE O LABORATÓRIO MUNICIPAL */}
               <div className={styles.infoBlock}>

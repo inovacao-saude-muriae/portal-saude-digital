@@ -9,12 +9,10 @@ import { Search } from 'lucide-react';
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
-// PARSER SEGURO PARA ORDENAÇÃO DE DATAS
 function timestampSeguro(dataBruta) {
   if (!dataBruta) return 0;
   const str = String(dataBruta).trim();
 
-  // Se for no formato DD/MM/AAAA
   if (str.includes('/')) {
     const partes = str.split('/');
     if (partes.length === 3) {
@@ -22,7 +20,6 @@ function timestampSeguro(dataBruta) {
     }
   }
 
-  // Se for YYYY-MM-DD
   const t = new Date(str.includes('T') ? str : `${str}T00:00:00`).getTime();
   return isNaN(t) ? 0 : t;
 }
@@ -108,7 +105,7 @@ export default function EventosPage() {
 
   // FILTRAGEM
   const eventosFiltrados = eventosOrdenados.filter(e => {
-    if (!termo) return true; // Se a busca está vazia, exibe todos os eventos!
+    if (!termo) return true; 
     const bateTitulo = normalizarTexto(e.titulo).includes(termo);
     const bateResumo = normalizarTexto(e.resumo || e.descricao).includes(termo);
     const bateDescricao = normalizarTexto(e.descricao).includes(termo);

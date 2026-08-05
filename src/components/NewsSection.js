@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData'; 
 import styles from './NewsSection.module.css';
 
-// Função para mapear dinamicamente a cor da badge pela categoria
 function getClasseCategoria(categoria) {
   const catNormalizada = String(categoria || '').toLowerCase().trim();
 

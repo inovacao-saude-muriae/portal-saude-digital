@@ -279,7 +279,7 @@ export default function AdminNoticiasPage() {
         data: dataFormatadaEnvio,
         categoria: formData.get('categoria'),
         conteudo: formData.get('conteudo'),
-        autor: autorNome, // ENVIANDO O USUÁRIO RESPONSÁVEL PARA A PLANILHA
+        autor: autorNome,
         imagemBase64: base64Image,
         imagemNome: name,
         imagemType: type

@@ -77,8 +77,6 @@ export default function VigilanciaSanitariaPage() {
         <div className={styles.container}>
           
           <div className={styles.serviceLayout}>
-            
-            {/* COLUNA PRINCIPAL */}
             <div>
               {/* SOBRE A VIGILÂNCIA SANITÁRIA */}
               <div className={styles.infoBlock}>
@@ -88,7 +86,6 @@ export default function VigilanciaSanitariaPage() {
                 <p>{dados.desc}</p>
               </div>
 
-              {/* MUDANÇA DE RESPONSÁVEL TÉCNICO */}
               <div className={styles.infoBlock}>
                 <h3>
                   <UserCheck size={22} color="#008a83" /> {dados.mudancaRT.titulo}

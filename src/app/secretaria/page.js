@@ -20,7 +20,7 @@ export default function SecretariaPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER COM IMAGEM DE FUNDO (IGUAL AO MODELO) */}
+      {/* 1. HERO BANNER COM IMAGEM DE FUNDO */}
       <section 
         className={styles.heroBanner}
         style={{ backgroundImage: "url('/img/banner-header.png')" }}
