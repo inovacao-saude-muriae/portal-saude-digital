@@ -19,30 +19,37 @@ import styles from './Secretaria.module.css';
 export default function SecretariaPage() {
   return (
     <div className={styles.pageWrapper}>
-      {/* CABEÇALHO HERO */}
-      <section className={styles.heroSection}>
-        <div className={styles.container}>
-          <div className={styles.heroHeader}>
-            <Link href="/" className={styles.backButton}>
-              <ArrowLeft size={16} /> Voltar ao Início
-            </Link>
-            <span className={styles.badge}>
-              <Building2 size={14} /> Gestão Pública de Saúde
-            </span>
+      
+      {/* 1. HERO BANNER COM IMAGEM DE FUNDO (IGUAL AO MODELO) */}
+      <section 
+        className={styles.heroBanner}
+        style={{ backgroundImage: "url('/img/banner-header.png')" }}
+      >
+        <div className={styles.overlay}>
+          <div className={styles.container}>
+            <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
+            <h1 className={styles.heroTitle}>Secretaria Municipal de Saúde</h1>
+            <p className={styles.heroDesc}>
+              Planejando, coordenando e executando políticas públicas com qualidade, transparência e humanização no Sistema Único de Saúde (SUS) de Muriaé.
+            </p>
           </div>
-          
-          <h1 className={styles.heroTitle}>Secretaria Municipal de Saúde de Muriaé</h1>
-          <p className={styles.heroSubtitle}>
-            Planejando, coordenando e executando políticas públicas com qualidade, transparência e humanização no Sistema Único de Saúde (SUS).
-          </p>
         </div>
       </section>
 
-      {/* CONTEÚDO PRINCIPAL */}
-      <section className={styles.mainSection}>
+      {/* 2. BARRA DE NAVEGAÇÃO DE VOLTAR */}
+      <div className={styles.navigationBar}>
+        <div className={styles.container}>
+          <Link href="/" className={styles.backLink}>
+            ← Voltar para a Página Principal
+          </Link>
+        </div>
+      </div>
+
+      {/* 3. CONTEÚDO PRINCIPAL */}
+      <section className={styles.contentSection}>
         <div className={styles.container}>
           
-          {/* CARDS DE DESTAQUE INSTITUCIONAL */}
+          {/* CARDS DE ESTATÍSTICAS DE DESTAQUE */}
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statIconWrapper} style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }}>
@@ -76,7 +83,7 @@ export default function SecretariaPage() {
           </div>
 
           <div className={styles.contentGrid}>
-            {/* COLUNA ESQUERDA - TEXTO PRINCIPAL */}
+            {/* COLUNA ESQUERDA - TEXTO INSTITUCIONAL */}
             <div className={styles.textContent}>
               
               <div className={styles.paragraphBlock}>
@@ -139,7 +146,6 @@ export default function SecretariaPage() {
             {/* COLUNA DIREITA - SIDEBAR INSTITUCIONAL */}
             <aside className={styles.sidebar}>
               
-              {/* CARD GESTORA */}
               <div className={styles.sidebarCard}>
                 <div className={styles.cardHeader}>
                   <ShieldCheck size={20} color="#0284c7" />
@@ -156,7 +162,6 @@ export default function SecretariaPage() {
                 </div>
               </div>
 
-              {/* CARD RECONHECIMENTO */}
               <div className={styles.sidebarCard}>
                 <div className={styles.cardHeader}>
                   <Award size={20} color="#d97706" />
@@ -167,7 +172,6 @@ export default function SecretariaPage() {
                 </p>
               </div>
 
-              {/* CARD PILARES DA GESTÃO */}
               <div className={styles.sidebarCard}>
                 <div className={styles.cardHeader}>
                   <Building2 size={20} color="#16a34a" />
