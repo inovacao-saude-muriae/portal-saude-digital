@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+
+import modelo1Img from '@/../public/img/modelo-certificado/modelo1.png';
+import modelo2Img from '@/../public/img/modelo-certificado/modelo2.png';
+
 import { 
   ArrowLeft, 
   Send, 
@@ -26,7 +30,8 @@ import {
   Download,
   CheckSquare,
   Square,
-  Loader2
+  Loader2,
+  FileText
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
@@ -34,49 +39,37 @@ const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.
 
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
-function extrairDiaEMes(dataBruta) {
-  if (!dataBruta) return { dia: '01', mes: 'JAN' };
-
-  try {
-    const dataString = String(dataBruta).split('T')[0].trim();
-
-    if (dataString.includes('-')) {
-      const partes = dataString.split('-');
-      if (partes.length === 3) {
-        const [ano, mes, dia] = partes;
-        const mesIndex = parseInt(mes, 10) - 1;
-        return {
-          dia: dia.padStart(2, '0'),
-          mes: MESES[mesIndex] || 'JAN'
-        };
-      }
-    }
-
-    if (dataString.includes('/')) {
-      const partes = dataString.split('/');
-      if (partes.length === 3) {
-        const [dia, mes] = partes;
-        const mesIndex = parseInt(mes, 10) - 1;
-        return {
-          dia: dia.padStart(2, '0'),
-          mes: MESES[mesIndex] || 'JAN'
-        };
-      }
-    }
-
-    const d = new Date(dataBruta);
-    if (!isNaN(d.getTime())) {
-      return {
-        dia: String(d.getUTCDate()).padStart(2, '0'),
-        mes: MESES[d.getUTCMonth()] || 'JAN'
-      };
-    }
-  } catch (err) {
-    console.error('Erro ao extrair dia/mês:', err);
-  }
-
-  return { dia: '01', mes: 'JAN' };
+// FUNÇÃO PARA TRATAR O CAMINHO TANTO DE IMPORTAÇÃO MÓDULO QUANTO STRING
+function obterSrcImagem(modeloObj) {
+  if (!modeloObj) return '';
+  if (typeof modeloObj.imagem === 'string') return modeloObj.imagem;
+  if (modeloObj.imagem && modeloObj.imagem.src) return modeloObj.imagem.src;
+  return '';
 }
+
+// CATÁLOGO DE MODELOS VINCULADO ÀS IMAGENS IMPORTADAS
+const MODELOS_CERTIFICADO = {
+  modelo1: {
+    id: 'modelo1',
+    nome: 'Modelo 1 - Plenária Municipal de Saúde',
+    imagem: modelo1Img,
+    gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
+      <>
+        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
+      </>
+    )
+  },
+  modelo2: {
+    id: 'modelo2',
+    nome: 'Modelo 2 - Simpósio / Workshop',
+    imagem: modelo2Img,
+    gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
+      <>
+        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
+      </>
+    )
+  }
+};
 
 function formatarDataParaEnvio(dataInput) {
   if (!dataInput) return '';
@@ -191,6 +184,8 @@ export default function AdminEventosPage() {
   const [loadingInscritos, setLoadingInscritos] = useState(false);
   const [selecionados, setSelecionados] = useState([]);
   const [cargaHorariaGeral, setCargaHorariaGeral] = useState('8');
+
+  const [modeloCertificadoSelecionado, setModeloCertificadoSelecionado] = useState('modelo1');
 
   useEffect(() => {
     async function carregarEventos() {
@@ -416,6 +411,7 @@ export default function AdminEventosPage() {
     setEventoCertificado(evento);
     setInscritos([]);
     setSelecionados([]);
+    setModeloCertificadoSelecionado('modelo1');
     setModalCertificadoAberto(true);
     setLoadingInscritos(true);
 
@@ -564,13 +560,13 @@ export default function AdminEventosPage() {
                   <textarea name="descricao" rows={5} required defaultValue={eventoEmEdicao?.descricao || ''} placeholder="Informe detalhes do evento, documentos necessários, público-alvo..." className={styles.textarea} />
                 </div>
 
-                <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className={styles.sectionDivider}>
+                  <h3 className={styles.subSectionTitle}>
                     <ClipboardList size={18} color="#0065a4" /> Configuração de Inscrição
                   </h3>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#334155' }}>
+                  <div className={styles.flexColumnGap12}>
+                    <label className={styles.checkboxLabelDark}>
                       <input 
                         type="checkbox" 
                         checked={requerInscricao} 
@@ -578,41 +574,41 @@ export default function AdminEventosPage() {
                           setRequerInscricao(e.target.checked);
                           if (!e.target.checked) setGeraCertificado(false);
                         }} 
-                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        className={styles.checkboxInput}
                       />
                       Requer Inscrição prévia dos participantes?
                     </label>
 
                     {requerInscricao && (
                       <>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#0369a1', marginLeft: '28px', backgroundColor: '#f0f9ff', padding: '10px 14px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                        <label className={styles.checkboxLabelBlue}>
                           <input 
                             type="checkbox" 
                             checked={geraCertificado} 
                             onChange={(e) => setGeraCertificado(e.target.checked)} 
-                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            className={styles.checkboxInput}
                           />
                           <Award size={18} color="#0284c7" />
                           Emitir Certificado para este evento?
                         </label>
 
-                        <div style={{ marginTop: '16px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <div className={styles.formFieldsContainer}>
+                          <div className={styles.formFieldsHeader}>
                             <div>
-                              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#0f172a' }}>Campos do Formulário de Inscrição</h4>
-                              <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>Monte as perguntas que os inscritos deverão responder.</p>
+                              <h4 className={styles.formFieldsTitle}>Campos do Formulário de Inscrição</h4>
+                              <p className={styles.formFieldsSubtitle}>Monte as perguntas que os inscritos deverão responder.</p>
                             </div>
                             <button 
                               type="button" 
                               onClick={handleAdicionarCampoForm} 
-                              style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#e0f2fe', color: '#0369a1', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
+                              className={styles.addBtnSmall}
                             >
                               <Plus size={15} /> Adicionar Campo
                             </button>
                           </div>
 
                           {formFields.map((field) => (
-                            <div key={field.id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 85px 38px', gap: '8px', marginBottom: '10px', alignItems: 'center' }}>
+                            <div key={field.id} className={styles.fieldGridRow}>
                               <input 
                                 type="text" 
                                 placeholder="Nome do Campo (ex: Profissão, Telefone...)" 
@@ -630,7 +626,7 @@ export default function AdminEventosPage() {
                                 <option value="number">Número</option>
                                 <option value="date">Data</option>
                               </select>
-                              <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                              <label className={styles.checkboxLabelSmall}>
                                 <input 
                                   type="checkbox" 
                                   checked={field.required} 
@@ -640,7 +636,7 @@ export default function AdminEventosPage() {
                               <button 
                                 type="button" 
                                 onClick={() => handleRemoverCampoForm(field.id)} 
-                                style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                className={styles.deleteSquareBtn}
                                 title="Remover Campo"
                               >
                                 <X size={16} />
@@ -653,24 +649,24 @@ export default function AdminEventosPage() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div className={styles.sectionDividerSpaced}>
+                  <div className={styles.subSectionHeader}>
                     <div>
-                      <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Cronograma & Palestras (Opcional)</h3>
-                      <p style={{ fontSize: '13px', color: '#64748b', margin: '2px 0 0 0' }}>Adicione palestras, horários e responsáveis.</p>
+                      <h3 className={styles.subSectionTitle}>Cronograma & Palestras (Opcional)</h3>
+                      <p className={styles.formFieldsSubtitle}>Adicione palestras, horários e responsáveis.</p>
                     </div>
                     <button 
                       type="button" 
                       onClick={handleAdicionarItemCronograma}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#e0f2fe', color: '#0369a1', border: 'none', padding: '8px 12px', borderRadius: '6px', fontWeight: '700', fontSize: '13px', cursor: 'pointer' }}
+                      className={styles.addBtnMedium}
                     >
                       <Plus size={16} /> Adicionar Horário
                     </button>
                   </div>
 
                   {cronograma.map((item, idx) => (
-                    <div key={idx} style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px', marginBottom: '12px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 40px', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                    <div key={idx} className={styles.cronogramaCard}>
+                      <div className={styles.cronogramaGridRow}>
                         <input 
                           type="text" 
                           placeholder="Horário (09:00)" 
@@ -688,22 +684,21 @@ export default function AdminEventosPage() {
                         <button 
                           type="button" 
                           onClick={() => handleRemoverItemCronograma(idx)}
-                          style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          className={styles.deleteSquareBtn}
                           title="Remover"
                         >
                           <X size={18} />
                         </button>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className={styles.flexRowCenterGap8}>
                         <User size={16} color="#64748b" />
                         <input 
                           type="text" 
                           placeholder="Palestrante / Responsável (Opcional)" 
                           value={item.palestrante || ''} 
                           onChange={(e) => handleAlterarCronograma(idx, 'palestrante', e.target.value)} 
-                          className={styles.input} 
-                          style={{ fontSize: '13px' }}
+                          className={`${styles.input} ${styles.fontSize13}`} 
                         />
                       </div>
                     </div>
@@ -753,19 +748,18 @@ export default function AdminEventosPage() {
             ) : listaEventos.length > 0 ? (
               <div className={styles.newsListContainer}>
                 {listaEventos.map((item) => {
-                  const { dia, mes } = extrairDiaEMes(item.data);
-
                   return (
                     <div key={item.id} className={styles.newsItemRow}>
                       <div className={styles.newsItemContent}>
+                        {/* CAPA LIMPA SEM BADGE DE DATA */}
                         <div className={styles.imageThumbnailWrapper}>
-                          <Image src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} alt={item.titulo} fill className={styles.thumbnailImg} unoptimized />
-                          
-                          {/* BADGE DA DATA DE EVENTO EM DESTAQUE NO CARD DE ADMIN */}
-                          <div className={styles.dateBadgeOverlay}>
-                            <span className={styles.badgeDay}>{dia}</span>
-                            <span className={styles.badgeMonth}>{mes}</span>
-                          </div>
+                          <Image 
+                            src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} 
+                            alt={item.titulo || 'Capa do Evento'} 
+                            fill 
+                            className={styles.thumbnailImg} 
+                            unoptimized 
+                          />
                         </div>
                         <div>
                           <span className={styles.newsMetaText}>
@@ -783,7 +777,7 @@ export default function AdminEventosPage() {
                         {item.geraCertificado && (
                           <button 
                             onClick={() => handleAbrirEmissorCertificado(item)} 
-                            style={{ backgroundColor: '#0284c7', color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            className={styles.emitCertificateBtn}
                           >
                             <Award size={15} /> Emitir Certificados
                           </button>
@@ -809,63 +803,84 @@ export default function AdminEventosPage() {
       </div>
 
       {modalCertificadoAberto && eventoCertificado && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '20px' }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', maxWidth: '900px', width: '100%', padding: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
             
             <button 
               onClick={() => setModalCertificadoAberto(false)} 
-              style={{ position: 'absolute', top: '16px', right: '16px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
+              className={styles.closeModalBtn}
             >
               <X size={18} />
             </button>
 
-            <div style={{ marginBottom: '16px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '800', color: '#0284c7', textTransform: 'uppercase' }}>EMISSÃO EM LOTE</span>
-              <h3 style={{ margin: '2px 0 0 0', color: '#0f172a', fontSize: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className={styles.marginBottom16}>
+              <span className={styles.modalBadgeText}>EMISSÃO EM LOTE</span>
+              <h3 className={styles.modalTitle}>
                 <Award color="#0284c7" size={22} /> Certificados: {eventoCertificado.titulo}
               </h3>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px', backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <button 
-                  type="button"
-                  onClick={handleToggleSelecionarTudo}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', fontWeight: '700', fontSize: '13px', cursor: 'pointer', color: '#334155' }}
+            <div className={styles.modalControlsBox}>
+              <div>
+                <label className={styles.modalLabelWithIcon}>
+                  <FileText size={14} /> Modelo / Layout do Certificado:
+                </label>
+                <select 
+                  value={modeloCertificadoSelecionado}
+                  onChange={(e) => setModeloCertificadoSelecionado(e.target.value)}
+                  className={styles.modalSelect}
                 >
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={16} color="#0284c7" /> : <Square size={16} />} 
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos'}
-                </button>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#0284c7' }}>
-                  {selecionados.length} de {inscritos.length} selecionado(s)
-                </span>
+                  {Object.values(MODELOS_CERTIFICADO).map((mod) => (
+                    <option key={mod.id} value={mod.id}>
+                      {mod.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Carga Horária Geral:</label>
+              <div>
+                <label className={styles.modalLabelBlock}>
+                  Carga Horária Geral:
+                </label>
                 <input 
                   type="text" 
                   value={cargaHorariaGeral} 
                   onChange={(e) => setCargaHorariaGeral(e.target.value)}
-                  style={{ width: '70px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 'bold' }}
+                  className={styles.modalInputCargaHoraria}
                 />
               </div>
             </div>
 
-            <div style={{ overflowY: 'auto', flexGrow: 1, border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '16px' }}>
+            <div className={styles.modalSelectionBar}>
+              <div className={styles.flexRowCenterGap10}>
+                <button 
+                  type="button"
+                  onClick={handleToggleSelecionarTudo}
+                  className={styles.toggleAllBtn}
+                >
+                  {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={16} color="#0284c7" /> : <Square size={16} />} 
+                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                </button>
+                <span className={styles.selectedCountText}>
+                  {selecionados.length} de {inscritos.length} selecionado(s)
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.tableScrollWrapper}>
               {loadingInscritos ? (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                <div className={styles.loadingInscritosBox}>
                   <Loader2 size={20} className="animate-spin" /> Buscando inscritos da planilha...
                 </div>
               ) : inscritos.length > 0 ? (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13.5px' }}>
+                <table className={styles.inscritosTable}>
                   <thead>
-                    <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', color: '#475569' }}>
-                      <th style={{ padding: '10px 14px', width: '40px' }}>#</th>
-                      <th style={{ padding: '10px 14px' }}>Nome / Participante</th>
-                      <th style={{ padding: '10px 14px' }}>CPF / Documento</th>
-                      <th style={{ padding: '10px 14px' }}>Código</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>Gerar?</th>
+                    <tr>
+                      <th className={styles.colIndex}>#</th>
+                      <th>Nome / Participante</th>
+                      <th>CPF / Documento</th>
+                      <th>Código</th>
+                      <th className={styles.textCenter}>Gerar?</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -885,17 +900,17 @@ export default function AdminEventosPage() {
                       const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || '-';
 
                       return (
-                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: isSelected ? '#f0f9ff' : 'transparent' }}>
-                          <td style={{ padding: '10px 14px', color: '#64748b' }}>{idx + 1}</td>
-                          <td style={{ padding: '10px 14px', fontWeight: '700', color: '#0f172a' }}>{nome}</td>
-                          <td style={{ padding: '10px 14px', color: '#334155' }}>{cpf}</td>
-                          <td style={{ padding: '10px 14px', color: '#0284c7', fontWeight: 'bold' }}>{codigo}</td>
-                          <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                        <tr key={idx} className={isSelected ? styles.selectedRow : ''}>
+                          <td className={styles.colIndexText}>{idx + 1}</td>
+                          <td className={styles.nomeParticipanteText}>{nome}</td>
+                          <td className={styles.cpfText}>{cpf}</td>
+                          <td className={styles.codigoText}>{codigo}</td>
+                          <td className={styles.textCenter}>
                             <input 
                               type="checkbox" 
                               checked={isSelected} 
                               onChange={() => handleToggleInscrito(idx)} 
-                              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                              className={styles.checkboxInputLarge}
                             />
                           </td>
                         </tr>
@@ -904,13 +919,14 @@ export default function AdminEventosPage() {
                   </tbody>
                 </table>
               ) : (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                <div className={styles.emptyInscritosBox}>
                   Nenhum participante inscrito encontrado para este evento.
                 </div>
               )}
             </div>
 
-            <div id="certificados-em-lote-print" style={{ display: 'none' }}>
+            {/* AREA IMPRESSÃO DAS IMAGENS DAS PÁGINAS */}
+            <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
               {selecionados.map((idxSelect) => {
                 const p = inscritos[idxSelect];
                 if (!p) return null;
@@ -933,91 +949,40 @@ export default function AdminEventosPage() {
                 const cargaHoraria = cargaHorariaGeral || '8';
                 const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
+                const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
+                const srcImagemTratada = obterSrcImagem(modeloAtual);
+
                 return (
                   <div 
                     key={idxSelect}
                     className={styles.certificadoPageSingle}
-                    style={{
-                      width: '297mm',
-                      height: '210mm',
-                      position: 'relative',
-                      pageBreakAfter: 'always',
-                      breakAfter: 'page',
-                      boxSizing: 'border-box',
-                      overflow: 'hidden',
-                      backgroundColor: '#ffffff'
-                    }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
-                      src="/img/modelo-certificado.png" 
-                      alt="Modelo Certificado"
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'fill',
-                        zIndex: 1
-                      }}
+                      src={srcImagemTratada} 
+                      alt={modeloAtual?.nome || 'Certificado'}
+                      className={styles.certificadoBgImage}
                     />
 
-                    <div style={{
-                      position: 'absolute',
-                      top: '32.5%',
-                      left: '8%',
-                      width: '84%',
-                      textAlign: 'center',
-                      zIndex: 2
-                    }}>
-                      <h2 style={{
-                        fontSize: '30px',
-                        fontWeight: '900',
-                        color: '#000000',
-                        fontFamily: "'Montserrat', sans-serif",
-                        margin: 0,
-                        padding: 0,
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}>
+                    <div className={styles.certificadoNomeWrapper}>
+                      <h2 className={styles.certificadoNomeText}>
                         {nome}
                       </h2>
                     </div>
 
-                    <div style={{
-                      position: 'absolute',
-                      top: '43%',
-                      left: '8%',
-                      width: '84%',
-                      zIndex: 2
-                    }}>
-                      <p style={{
-                        fontSize: '17px',
-                        color: '#000000',
-                        lineHeight: '1.75',
-                        textAlign: 'justify',
-                        fontFamily: "'Montserrat', sans-serif",
-                        margin: 0,
-                        padding: 0,
-                        fontWeight: '400',
-                        display: 'block',
-                        width: '100%'
-                      }}>
-                        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong style={{ fontWeight: '800' }}>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
+                    <div className={styles.certificadoTextoWrapper}>
+                      <p className={styles.certificadoTextoParagraph}>
+                        {typeof modeloAtual?.gerarTexto === 'function' && modeloAtual.gerarTexto({
+                          tituloEvento,
+                          dataEvento,
+                          localEvento,
+                          cargaHoraria,
+                          cargaHorariaExtenso
+                        })}
                       </p>
                     </div>
 
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '12px',
-                      right: '25px',
-                      fontSize: '9px',
-                      fontWeight: '700',
-                      color: '#475569',
-                      zIndex: 2,
-                      fontFamily: "'Montserrat', sans-serif"
-                    }}>
+                    <div className={styles.certificadoAutenticidadeText}>
                       AUTENTICIDADE: CERT-{codigo}
                     </div>
                   </div>
@@ -1025,17 +990,17 @@ export default function AdminEventosPage() {
               })}
             </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div className={styles.flexRowGap12}>
               <button 
                 onClick={handleImprimirCertificados}
                 disabled={selecionados.length === 0}
-                style={{ flex: 1, backgroundColor: selecionados.length > 0 ? '#0284c7' : '#94a3b8', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px', cursor: selecionados.length > 0 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                className={styles.downloadCertificatesBtn}
               >
                 <Download size={18} /> Baixar Certificado(s) Selecionado(s) ({selecionados.length})
               </button>
               <button 
                 onClick={() => setModalCertificadoAberto(false)} 
-                style={{ backgroundColor: '#e2e8f0', color: '#334155', border: 'none', padding: '14px 24px', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}
+                className={styles.closeModalSecondaryBtn}
               >
                 Fechar
               </button>

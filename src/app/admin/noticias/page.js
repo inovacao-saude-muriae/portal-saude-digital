@@ -16,7 +16,7 @@ import {
   Pencil, 
   XCircle 
 } from 'lucide-react';
-import styles from './Noticia.module.css';
+import styles from './AdminNoticia.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwsi09GSHFIZSj_y77dxpz7pRBJAKwk0DE_fi_-O8yddeVtU5S6Ue8VFc1uRiGIRbKKMQ/exec';
 
