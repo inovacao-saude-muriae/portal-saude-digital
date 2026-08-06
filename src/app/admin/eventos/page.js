@@ -28,7 +28,9 @@ import {
   CheckSquare,
   Square,
   Loader2,
-  FileText
+  FileText,
+  Printer,
+  Ticket
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
@@ -132,6 +134,34 @@ function formatarDataPorExtenso(dataStr) {
   return str;
 }
 
+function formatarDataParaExibicao(valor) {
+  if (!valor) return '-';
+  const str = String(valor).trim();
+
+  if (str.includes('GMT') || str.includes('Mon') || str.includes('Tue') || str.includes('Wed') || str.includes('Thu') || str.includes('Fri') || str.includes('Sat') || str.includes('Sun')) {
+    try {
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        const dia = String(d.getDate()).padStart(2, '0');
+        const mes = String(d.getMonth() + 1).padStart(2, '0');
+        const ano = d.getFullYear();
+        return `${dia}/${mes}/${ano}`;
+      }
+    } catch (e) {}
+  }
+
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
+    return str.split('T')[0].split(' ')[0];
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const partes = str.split('T')[0].split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+
+  return str;
+}
+
 function numeroParaExtenso(numero) {
   const num = parseInt(numero, 10);
   if (isNaN(num)) return '';
@@ -147,9 +177,7 @@ function numeroParaExtenso(numero) {
     'sessenta', 'setenta', 'oitenta', 'noventa'
   ];
 
-  if (num < 20) {
-    return unidades[num];
-  }
+  if (num < 20) return unidades[num];
 
   if (num < 100) {
     const d = Math.floor(num / 10);
@@ -184,6 +212,7 @@ export default function AdminEventosPage() {
   const [loadingEventos, setLoadingEventos] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
+  // MODAIS E GERENCIAMENTO DE INSCRITOS / COMPROVANTE / CERTIFICADO
   const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
   const [eventoCertificado, setEventoCertificado] = useState(null);
   const [inscritos, setInscritos] = useState([]);
@@ -193,6 +222,9 @@ export default function AdminEventosPage() {
 
   const [modeloCertificadoSelecionado, setModeloCertificadoSelecionado] = useState('modelo1');
   const [imagemModeloBase64, setImagemModeloBase64] = useState('');
+
+  // MODAL DE COMPROVANTE INDIVIDUAL (ADMIN)
+  const [comprovanteAdmin, setComprovanteAdmin] = useState(null);
 
   useEffect(() => {
     async function carregarEventos() {
@@ -243,7 +275,7 @@ export default function AdminEventosPage() {
     }
   }, [modeloCertificadoSelecionado, modalCertificadoAberto]);
 
-  // CRONOGRAMA
+  // MANIPULAÇÃO DE CRONOGRAMA
   const handleAdicionarItemCronograma = () => {
     setCronograma((prev) => [...prev, { horario: '', atividade: '', palestrante: '' }]);
   };
@@ -287,7 +319,6 @@ export default function AdminEventosPage() {
     );
   };
 
-  // GERENCIAMENTO DAS OPÇÕES LINHA POR LINHA (SELECT / CHECKBOX)
   const handleAdicionarOpcao = (fieldId) => {
     setFormFields((prev) =>
       prev.map((field) => {
@@ -502,11 +533,13 @@ export default function AdminEventosPage() {
     }
   };
 
+  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
     setSelecionados([]);
     setModeloCertificadoSelecionado('modelo1');
+    setCargaHorariaGeral('8');
     setModalCertificadoAberto(true);
     setLoadingInscritos(true);
 
@@ -526,6 +559,72 @@ export default function AdminEventosPage() {
     } finally {
       setLoadingInscritos(false);
     }
+  };
+
+  // EXPORTAR A LISTA DE INSCRITOS EM CSV
+  const handleExportarInscritosCSV = () => {
+    if (inscritos.length === 0) {
+      alert('Não há inscritos para exportar.');
+      return;
+    }
+
+    const extrairValor = (p, termosBusca) => {
+      const chaveEncontrada = Object.keys(p).find((key) => {
+        const k = key.toLowerCase().trim();
+        return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+      });
+      return chaveEncontrada ? p[chaveEncontrada] : '-';
+    };
+
+    let csvContent = '\uFEFF';
+    csvContent += 'Nº Inscrição;Nome Completo;CPF\n';
+
+    inscritos.forEach((p, index) => {
+      const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || ('INS-' + (index + 1));
+      const nome = extrairValor(p, ['nome completo', 'nome']);
+      const cpf = extrairValor(p, ['cpf']);
+
+      csvContent += `"${codigo}";"${nome}";"${cpf}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const nomeArquivoClean = (eventoCertificado?.titulo || 'Inscritos').replace(/[^a-zA-Z0-9]/g, '_');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Inscritos_${nomeArquivoClean}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // VISUALIZAR COMPROVANTE INDIVIDUAL
+  const handleAbrirComprovanteAdmin = (p) => {
+    const extrairValor = (termosBusca) => {
+      const chaveEncontrada = Object.keys(p).find((key) => {
+        const k = key.toLowerCase().trim();
+        return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+      });
+      return chaveEncontrada ? p[chaveEncontrada] : '-';
+    };
+
+    const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || 'INS-000';
+    const nome = extrairValor(['nome completo', 'nome']);
+    const cpf = extrairValor(['cpf']);
+    const dataNascimento = extrairValor(['nascimento', 'data nasc']);
+    const email = extrairValor(['e-mail', 'email']);
+    const dataReg = p['Data Inscrição'] || extrairValor(['data inscricao']) || new Date().toLocaleDateString('pt-BR');
+
+    setComprovanteAdmin({
+      codigo,
+      evento: eventoCertificado?.titulo || 'Evento',
+      dataHora: dataReg,
+      nome,
+      cpf,
+      dataNascimento,
+      email
+    });
   };
 
   const handleToggleSelecionarTudo = () => {
@@ -560,7 +659,7 @@ export default function AdminEventosPage() {
               <Calendar size={14} /> Módulo Exclusivo de Eventos
             </span>
             <h1 className={styles.mainTitle}>Gerenciador de Eventos</h1>
-            <p className={styles.subTitle}>Cadastre e acompanhe mutirões, campanhas e ações de saúde pública.</p>
+            <p className={styles.subTitle}>Cadastre, acompanhe e emita comprovantes e certificados para participantes.</p>
           </div>
 
           <Link href="/admin" className={styles.backLink}>
@@ -687,7 +786,6 @@ export default function AdminEventosPage() {
                           Emitir Certificado para este evento?
                         </label>
 
-                        {/* CONSTRUTOR DE FORMULÁRIO DE INSCRIÇÃO */}
                         <div className={styles.formFieldsContainer}>
                           <div className={styles.formFieldsHeader}>
                             <div>
@@ -747,7 +845,6 @@ export default function AdminEventosPage() {
                                 </button>
                               </div>
 
-                              {/* PAINEL DE OPÇÕES LINHA POR LINHA PARA SELECT E CHECKBOX */}
                               {(field.type === 'select' || field.type === 'checkbox') && (
                                 <div className={styles.optionsContainer}>
                                   <div className={styles.optionsHeader}>
@@ -920,12 +1017,12 @@ export default function AdminEventosPage() {
                       </div>
 
                       <div className={styles.actionButtonsGroup}>
-                        {item.geraCertificado && (
+                        {item.requerInscricao && (
                           <button 
                             onClick={() => handleAbrirEmissorCertificado(item)} 
                             className={styles.emitCertificateBtn}
                           >
-                            <Award size={15} /> Emitir Certificados
+                            <ClipboardList size={15} /> Ver Inscritos
                           </button>
                         )}
                         
@@ -948,7 +1045,7 @@ export default function AdminEventosPage() {
 
       </div>
 
-      {/* MODAL DE CERTIFICADOS */}
+      {/* MODAL DE GERENCIAMENTO DE INSCRITOS E EMISSÃO DE CERTIFICADOS */}
       {modalCertificadoAberto && eventoCertificado && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -961,12 +1058,24 @@ export default function AdminEventosPage() {
             </button>
 
             <div className={styles.marginBottom16}>
-              <span className={styles.modalBadgeText}>EMISSÃO EM LOTE</span>
+              <span className={styles.modalBadgeText}>PAINEL DE INSCRITOS</span>
               <h3 className={styles.modalTitle}>
-                <Award color="#0284c7" size={22} /> Certificados: {eventoCertificado.titulo}
+                <ClipboardList color="#0284c7" size={22} /> {eventoCertificado.titulo}
               </h3>
             </div>
 
+            <div className={styles.adminActionsHeaderBar}>
+              <button 
+                type="button" 
+                onClick={handleExportarInscritosCSV}
+                disabled={inscritos.length === 0}
+                className={styles.btnExportarCsv}
+              >
+                <Download size={16} /> Baixar Lista de Inscritos (CSV)
+              </button>
+            </div>
+
+            {/* PAINEL DE CONFIGURAÇÃO DE CERTIFICADO FIXO/SEMPRE EXIBIDO */}
             <div className={styles.modalControlsBox}>
               <div>
                 <label className={styles.modalLabelWithIcon}>
@@ -987,12 +1096,13 @@ export default function AdminEventosPage() {
 
               <div>
                 <label className={styles.modalLabelBlock}>
-                  Carga Horária Geral:
+                  Carga Horária Geral (Horas):
                 </label>
                 <input 
                   type="text" 
                   value={cargaHorariaGeral} 
                   onChange={(e) => setCargaHorariaGeral(e.target.value)}
+                  placeholder="Ex: 8"
                   className={styles.modalInputCargaHoraria}
                 />
               </div>
@@ -1006,10 +1116,11 @@ export default function AdminEventosPage() {
                   className={styles.toggleAllBtn}
                 >
                   {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={16} color="#0284c7" /> : <Square size={16} />} 
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos para Certificado'}
                 </button>
+                
                 <span className={styles.selectedCountText}>
-                  {selecionados.length} de {inscritos.length} selecionado(s)
+                  Total de Inscritos: <strong>{inscritos.length}</strong>
                 </span>
               </div>
             </div>
@@ -1024,10 +1135,11 @@ export default function AdminEventosPage() {
                   <thead>
                     <tr>
                       <th className={styles.colIndex}>#</th>
+                      <th>Nº Inscrição</th>
                       <th>Nome / Participante</th>
                       <th>CPF / Documento</th>
-                      <th>Código</th>
-                      <th className={styles.textCenter}>Gerar?</th>
+                      <th className={styles.textCenter}>Comprovante</th>
+                      <th className={styles.textCenter}>Certificado?</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1049,9 +1161,21 @@ export default function AdminEventosPage() {
                       return (
                         <tr key={idx} className={isSelected ? styles.selectedRow : ''}>
                           <td className={styles.colIndexText}>{idx + 1}</td>
+                          <td className={styles.codigoText}>{codigo}</td>
                           <td className={styles.nomeParticipanteText}>{nome}</td>
                           <td className={styles.cpfText}>{cpf}</td>
-                          <td className={styles.codigoText}>{codigo}</td>
+                          
+                          <td className={styles.textCenter}>
+                            <button 
+                              type="button"
+                              onClick={() => handleAbrirComprovanteAdmin(p)}
+                              className={styles.btnVerTicketSmall}
+                              title="Visualizar Comprovante do Inscrito"
+                            >
+                              <Ticket size={13} /> Comprovante
+                            </button>
+                          </td>
+
                           <td className={styles.textCenter}>
                             <input 
                               type="checkbox" 
@@ -1072,6 +1196,7 @@ export default function AdminEventosPage() {
               )}
             </div>
 
+            {/* CERTIFICADOS EM LOTE PRONTOS PARA IMPRESSÃO */}
             <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
               {selecionados.map((idxSelect) => {
                 const p = inscritos[idxSelect];
@@ -1141,8 +1266,9 @@ export default function AdminEventosPage() {
                 disabled={selecionados.length === 0}
                 className={styles.downloadCertificatesBtn}
               >
-                <Download size={18} /> Baixar Certificado(s) Selecionado(s) ({selecionados.length})
+                <Download size={18} /> Imprimir Certificado(s) ({selecionados.length})
               </button>
+              
               <button 
                 onClick={() => setModalCertificadoAberto(false)} 
                 className={styles.closeModalSecondaryBtn}
@@ -1151,6 +1277,82 @@ export default function AdminEventosPage() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* MODAL / COMPROVANTE INDIVIDUAL PARA O ADMIN */}
+      {comprovanteAdmin && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalComprovanteBox}>
+            <button 
+              onClick={() => setComprovanteAdmin(null)} 
+              className={styles.closeModalBtn}
+            >
+              <X size={18} />
+            </button>
+
+            <div id="comprovante-admin-pdf-container" className={styles.comprovanteCardPdf}>
+              <div className={styles.ticketHeader}>
+                <div>
+                  <span className={styles.ticketBadgeTag}>SAÚDE PÚBLICA • PORTAL OFICIAL</span>
+                  <h2 className={styles.ticketTitle}>Comprovante de Inscrição</h2>
+                </div>
+                <div className={styles.ticketCodeBox}>
+                  <span className={styles.ticketCodeLabel}>CÓDIGO DE CONFIRMAÇÃO</span>
+                  <strong className={styles.ticketCodeNum}>{comprovanteAdmin.codigo}</strong>
+                </div>
+              </div>
+
+              <div className={styles.ticketDivider}></div>
+
+              <div className={styles.ticketSection}>
+                <span className={styles.ticketSectionLabel}>EVENTO SELECIONADO</span>
+                <h3 className={styles.ticketEventTitle}>{comprovanteAdmin.evento}</h3>
+                <div className={styles.ticketMetaRow}>
+                  <span>📅 <strong>Data de Registro:</strong> {formatarDataParaExibicao(comprovanteAdmin.dataHora)}</span>
+                </div>
+              </div>
+
+              <div className={styles.ticketGridDetails}>
+                <div className={styles.ticketDetailItem}>
+                  <strong className={styles.ticketDetailLabel}>Nome Completo</strong>
+                  <span className={styles.ticketDetailValue}>{comprovanteAdmin.nome}</span>
+                </div>
+                <div className={styles.ticketDetailItem}>
+                  <strong className={styles.ticketDetailLabel}>CPF</strong>
+                  <span className={styles.ticketDetailValue}>{comprovanteAdmin.cpf}</span>
+                </div>
+                <div className={styles.ticketDetailItem}>
+                  <strong className={styles.ticketDetailLabel}>Data de Nascimento</strong>
+                  <span className={styles.ticketDetailValue}>{formatarDataParaExibicao(comprovanteAdmin.dataNascimento)}</span>
+                </div>
+                <div className={styles.ticketDetailItem}>
+                  <strong className={styles.ticketDetailLabel}>E-mail</strong>
+                  <span className={styles.ticketDetailValue}>{comprovanteAdmin.email}</span>
+                </div>
+              </div>
+
+              <div className={styles.ticketFooter}>
+                <span>✓ Inscrição confirmada no sistema.</span>
+                <span className={styles.ticketStamp}>DOCUMENTO VÁLIDO</span>
+              </div>
+            </div>
+
+            <div className={styles.flexRowGap12}>
+              <button 
+                onClick={() => window.print()}
+                className={styles.btnDownloadPdf}
+              >
+                <Printer size={16} /> Imprimir Comprovante
+              </button>
+              <button 
+                onClick={() => setComprovanteAdmin(null)}
+                className={styles.closeModalSecondaryBtn}
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
