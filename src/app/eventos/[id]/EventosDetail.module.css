@@ -483,6 +483,78 @@
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
   transform: translateY(-1px);
 }
+/* COLUNA DE BOTÕES NO BANNER DE INSCRIÇÃO */
+.bannerButtonsCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.btnLinkSegundaVia {
+  background: none;
+  border: none;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.btnLinkSegundaVia:hover {
+  color: #0f5125;
+}
+
+/* TABS DENTRO DO MODAL */
+.modalTabsBar {
+  display: flex;
+  gap: 8px;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.modalTabBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalTabActive {
+  background-color: #ffffff;
+  color: #16a34a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.modalFormFlex {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.modalConsultarTexto {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
 /* ==========================================================================
    --- ESTILIZAÇÃO E AJUSTE DA BARRA DE ROLAGEM (SCROLLBAR) ---
    ========================================================================== */

@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { X, CheckCircle, Send, Loader2, ClipboardList, Download } from 'lucide-react';
+import { X, CheckCircle, Send, Loader2, ClipboardList, Download, Search, FileCheck } from 'lucide-react';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
@@ -35,27 +35,55 @@ function aplicarMascaraTelefone(value) {
 function limparHora(horaBruta) {
   if (!horaBruta) return '';
   const str = String(horaBruta).trim();
-
   if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
     const matchHora = str.match(/\d{2}:\d{2}/);
     return matchHora ? matchHora[0] : '';
   }
-
   return str;
 }
 
 function formatarDataBR(dataBruta) {
   if (!dataBruta) return 'A definir';
   let str = String(dataBruta).trim();
-
   if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
     return 'A definir';
   }
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
+    return str.split('T')[0];
+  }
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const partes = str.split('T')[0].split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+  return str;
+}
 
+// FORMATA DATAS DE REGISTRO E NASCIMENTO (EX: ISO YYYY-MM-DD OU STRINGS GMT BRASÍLIA)
+function formatarDataParaExibicao(valor) {
+  if (!valor) return '-';
+  const str = String(valor).trim();
+
+  // Tratamento para strings tipo GMT JavaScript (Ex: Thu Aug 06 2026 15:15:43 GMT-0300)
+  if (str.includes('GMT') || str.includes('Mon') || str.includes('Tue') || str.includes('Wed') || str.includes('Thu') || str.includes('Fri') || str.includes('Sat') || str.includes('Sun')) {
+    try {
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        const dia = String(d.getDate()).padStart(2, '0');
+        const mes = String(d.getMonth() + 1).padStart(2, '0');
+        const ano = d.getFullYear();
+        const horas = String(d.getHours()).padStart(2, '0');
+        const minutos = String(d.getMinutes()).padStart(2, '0');
+        return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+      }
+    } catch (e) {}
+  }
+
+  // Se já estiver no formato DD/MM/YYYY com ou sem horário
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
     return str.split('T')[0];
   }
 
+  // Se estiver no formato ISO (Ex: 1993-12-26T02:00:00.000Z)
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     const partes = str.split('T')[0].split('-');
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -71,12 +99,19 @@ export default function EventoDetailPage() {
   const [evento, setEvento] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ESTADOS DO MODAL DE INSCRIÇÃO
+  // ESTADOS DO MODAL
   const [modalAberto, setModalAberto] = useState(false);
+  const [abaModal, setAbaModal] = useState('inscricao'); // 'inscricao' | 'consulta'
+  
+  // ESTADOS DO FORMULÁRIO DE INSCRIÇÃO
   const [respostas, setRespostas] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [comprovante, setComprovante] = useState(null);
   const [mensagemErro, setMensagemErro] = useState(null);
+
+  // ESTADOS DA CONSULTA POR CPF
+  const [cpfConsulta, setCpfConsulta] = useState('');
+  const [buscandoCpf, setBuscandoCpf] = useState(false);
 
   useEffect(() => {
     async function carregarEvento() {
@@ -165,89 +200,64 @@ export default function EventoDetailPage() {
         { id: 4, label: 'Telefone Celular', type: 'tel', required: true, options: [] }
       ];
 
-  // GERENCIADOR DE MUDANÇA DE INPUTS E MÁSCARAS
   const handleInputChange = (campo, valorBruto) => {
     let valorFinal = valorBruto;
-
     if (campo.type === 'cpf') {
       valorFinal = aplicarMascaraCPF(valorBruto);
     } else if (campo.type === 'tel') {
       valorFinal = aplicarMascaraTelefone(valorBruto);
     }
-
     setRespostas((prev) => ({ ...prev, [campo.label]: valorFinal }));
   };
 
-  // GERENCIADOR PARA CAIXAS DE SELEÇÃO (CHECKBOXES MÚLTIPLOS)
   const handleCheckboxMultiChange = (label, opcao, checked) => {
     setRespostas((prev) => {
       const selecaoAtual = Array.isArray(prev[label]) ? prev[label] : [];
-      let novaSelecao = [];
-      if (checked) {
-        novaSelecao = [...selecaoAtual, opcao];
-      } else {
-        novaSelecao = selecaoAtual.filter((o) => o !== opcao);
-      }
+      let novaSelecao = checked ? [...selecaoAtual, opcao] : selecaoAtual.filter((o) => o !== opcao);
       return { ...prev, [label]: novaSelecao };
     });
   };
 
-  const handleAbrirModal = () => {
+  const handleAbrirModal = (aba = 'inscricao') => {
+    setAbaModal(aba);
     setModalAberto(true);
     setMensagemErro(null);
     setComprovante(null);
+    setCpfConsulta('');
   };
 
   const handleFecharModal = () => {
     setModalAberto(false);
     setComprovante(null);
     setRespostas({});
+    setMensagemErro(null);
   };
 
+  // ENVIO DA NOVA INSCRIÇÃO
   const handleInscricaoSubmit = async (e) => {
     e.preventDefault();
     setEnviando(true);
     setMensagemErro(null);
 
-    // VALIDAÇÕES ESPECÍFICAS ANTES DE ENVIAR
     for (const campo of camposFormulario) {
       const val = respostas[campo.label];
-
-      if (campo.required) {
-        if (!val || (Array.isArray(val) && val.length === 0)) {
-          setMensagemErro(`O campo "${campo.label}" é de preenchimento obrigatório.`);
-          setEnviando(false);
-          return;
-        }
+      if (campo.required && (!val || (Array.isArray(val) && val.length === 0))) {
+        setMensagemErro(`O campo "${campo.label}" é obrigatório.`);
+        setEnviando(false);
+        return;
       }
-
-      if (campo.type === 'cpf' && val) {
-        const digitos = val.replace(/\D/g, '');
-        if (digitos.length !== 11) {
-          setMensagemErro(`Informe um CPF válido com 11 dígitos no campo "${campo.label}".`);
-          setEnviando(false);
-          return;
-        }
-      }
-
-      if (campo.type === 'email' && val) {
-        if (!val.includes('@') || !val.includes('.')) {
-          setMensagemErro(`Informe um endereço de e-mail válido no campo "${campo.label}".`);
-          setEnviando(false);
-          return;
-        }
+      if (campo.type === 'cpf' && val && val.replace(/\D/g, '').length !== 11) {
+        setMensagemErro(`Informe um CPF válido com 11 dígitos.`);
+        setEnviando(false);
+        return;
       }
     }
 
     const listaRespostas = camposFormulario.map((c) => {
       const resp = respostas[c.label];
-      let valorTratado = resp || '';
-      if (Array.isArray(resp)) {
-        valorTratado = resp.join(', ');
-      }
       return {
         label: c.label,
-        valor: valorTratado
+        valor: Array.isArray(resp) ? resp.join(', ') : (resp || '')
       };
     });
 
@@ -269,16 +279,10 @@ export default function EventoDetailPage() {
 
       const textResponse = await response.text();
       let resData = {};
-      
-      try {
-        resData = JSON.parse(textResponse);
-      } catch (pErr) {
-        resData = { status: 'success' };
-      }
+      try { resData = JSON.parse(textResponse); } catch (e) { resData = { status: 'success' }; }
 
       if (resData.status === 'success' || response.ok) {
         const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
-
         setComprovante({
           codigo: codigoFinal,
           evento: evento.titulo,
@@ -289,8 +293,7 @@ export default function EventoDetailPage() {
         setMensagemErro('Erro ao realizar inscrição: ' + (resData.message || 'Tente novamente.'));
       }
     } catch (err) {
-      console.error('Erro na requisição:', err);
-      
+      console.error(err);
       const codigoFallback = 'INS-' + Math.floor(100000 + Math.random() * 900000);
       setComprovante({
         codigo: codigoFallback,
@@ -300,6 +303,49 @@ export default function EventoDetailPage() {
       });
     } finally {
       setEnviando(false);
+    }
+  };
+
+  // BUSCA NO GOOGLE SHEETS PARA EMISSÃO DE 2ª VIA
+  const handleConsultarCpfSubmit = async (e) => {
+    e.preventDefault();
+    const digitos = cpfConsulta.replace(/\D/g, '');
+
+    if (digitos.length !== 11) {
+      setMensagemErro('Informe um CPF válido com 11 dígitos.');
+      return;
+    }
+
+    setBuscandoCpf(true);
+    setMensagemErro(null);
+
+    try {
+      const url = `${SCRIPT_URL}?action=CONSULTAR_INSCRICOES&cpf=${encodeURIComponent(cpfConsulta)}&eventoTitulo=${encodeURIComponent(evento.titulo)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data.status === 'success' && Array.isArray(data.inscricoes) && data.inscricoes.length > 0) {
+        const item = data.inscricoes[0];
+        
+        setComprovante({
+          codigo: item.codigoInscricao,
+          evento: item.eventoTitulo || evento.titulo,
+          dataHora: item.dataRegistro || new Date().toLocaleDateString('pt-BR'),
+          detalhes: [
+            { label: 'Nome Completo', valor: item.nome },
+            { label: 'CPF', valor: item.cpf },
+            { label: 'Data de Nascimento', valor: item.dataNascimento },
+            { label: 'E-mail', valor: item.email }
+          ]
+        });
+      } else {
+        setMensagemErro('Nenhuma inscrição encontrada neste evento para o CPF informado.');
+      }
+    } catch (err) {
+      console.error('Erro na consulta:', err);
+      setMensagemErro('Erro ao consultar banco de dados. Tente novamente.');
+    } finally {
+      setBuscandoCpf(false);
     }
   };
 
@@ -321,7 +367,6 @@ export default function EventoDetailPage() {
         <div className={styles.container}>
           <article className={styles.articleCard}>
             
-            {/* CABEÇALHO */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
                 Data: {formatarDataBR(evento.data)} {horaExibicao ? `• ${horaExibicao}` : ''}
@@ -333,44 +378,36 @@ export default function EventoDetailPage() {
 
             <h1 className={styles.titulo}>{evento.titulo}</h1>
 
-            {evento.resumo && (
-              <p className={styles.resumo}>{evento.resumo}</p>
-            )}
+            {evento.resumo && <p className={styles.resumo}>{evento.resumo}</p>}
 
-            {/* BANNER DO EVENTO */}
             {imagemExibicao && (
               <div className={styles.imageWrapper}>
-                <Image 
-                  src={imagemExibicao} 
-                  alt={evento.titulo} 
-                  width={900} 
-                  height={450} 
-                  priority 
-                  unoptimized 
-                  className={styles.imagemCapa} 
-                />
+                <Image src={imagemExibicao} alt={evento.titulo} width={900} height={450} priority unoptimized className={styles.imagemCapa} />
               </div>
             )}
 
-            {/* BOTÃO DE DESTAQUE: INSCREVER-SE */}
+            {/* BANNER DE INSCRIÇÃO COM LINK DE SEGUNDA VIA */}
             {evento.requerInscricao && (
               <div className={styles.bannerInscricao}>
                 <div>
-                  <h3 className={styles.bannerInscricaoTitulo}>
-                    Inscrições Abertas!
-                  </h3>
+                  <h3 className={styles.bannerInscricaoTitulo}>Inscrições Abertas!</h3>
                   <p className={styles.bannerInscricaoTexto}>
                     Garanta sua vaga neste evento preenchendo o formulário de participação.
                   </p>
                 </div>
                 
-                <button onClick={handleAbrirModal} className={styles.btnAbrirInscricao}>
-                  <ClipboardList size={20} /> Inscrever-se Agora
-                </button>
+                <div className={styles.bannerButtonsCol}>
+                  <button onClick={() => handleAbrirModal('inscricao')} className={styles.btnAbrirInscricao}>
+                    <ClipboardList size={20} /> Inscrever-se Agora
+                  </button>
+
+                  <button onClick={() => handleAbrirModal('consulta')} className={styles.btnLinkSegundaVia}>
+                    <FileCheck size={15} /> Já se inscreveu? Emitir 2ª via do comprovante
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* SOBRE O EVENTO */}
             <div className={styles.corpoConteudo}>
               <h3>Sobre o Evento</h3>
               {Array.isArray(evento.descricao) ? (
@@ -382,7 +419,6 @@ export default function EventoDetailPage() {
               )}
             </div>
 
-            {/* LOCAL */}
             {evento.local && (
               <div className={styles.infoBlock}>
                 <h3>📍 Local de Realização</h3>
@@ -390,7 +426,6 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* CERTIFICADO */}
             {evento.geraCertificado && (
               <div className={styles.badgeCertificadoBox}>
                 <span className={styles.badgeCertificadoIcone}>📜</span>
@@ -401,23 +436,16 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* CRONOGRAMA */}
             {evento.cronograma && evento.cronograma.length > 0 && (
               <div className={styles.infoBlock}>
                 <h3>🕒 Programação e Palestras</h3>
                 <div className={styles.cronogramaList}>
                   {evento.cronograma.map((item, idx) => (
                     <div key={idx} className={styles.cronogramaItem}>
-                      <span className={styles.cronoHora}>
-                        {limparHora(item.horario || item.hora)}
-                      </span>
+                      <span className={styles.cronoHora}>{limparHora(item.horario || item.hora)}</span>
                       <div className={styles.cronoConteudo}>
                         <strong>{item.atividade || item.tema}</strong>
-                        {item.palestrante && (
-                          <p className={styles.palestranteNome}>
-                            👤 {item.palestrante}
-                          </p>
-                        )}
+                        {item.palestrante && <p className={styles.palestranteNome}>👤 {item.palestrante}</p>}
                       </div>
                     </div>
                   ))}
@@ -429,9 +457,7 @@ export default function EventoDetailPage() {
         </div>
       </main>
 
-      {/* ========================================================================== */}
-      {/* MODAL DE INSCRIÇÃO FLUTUANTE DURA DEDICADA                               */}
-      {/* ========================================================================== */}
+      {/* MODAL DE INSCRIÇÃO / CONSULTA POR CPF */}
       {modalAberto && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modalBoxContainer}>
@@ -441,113 +467,139 @@ export default function EventoDetailPage() {
             </button>
 
             {!comprovante ? (
-              <form onSubmit={handleInscricaoSubmit} className={styles.modalFormContent}>
-                <div className={styles.modalFormHeader}>
-                  <span className={styles.modalFormTag}>Formulário de Inscrição</span>
-                  <h3 className={styles.modalFormTitle}>{evento.titulo}</h3>
+              <div className={styles.modalFormContent}>
+                
+                {/* ALTERNADOR DE ABAS NO MODAL */}
+                <div className={styles.modalTabsBar}>
+                  <button 
+                    type="button"
+                    onClick={() => { setAbaModal('inscricao'); setMensagemErro(null); }}
+                    className={`${styles.modalTabBtn} ${abaModal === 'inscricao' ? styles.modalTabActive : ''}`}
+                  >
+                    <ClipboardList size={16} /> Nova Inscrição
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => { setAbaModal('consulta'); setMensagemErro(null); }}
+                    className={`${styles.modalTabBtn} ${abaModal === 'consulta' ? styles.modalTabActive : ''}`}
+                  >
+                    <Search size={16} /> Emitir 2ª Via / Comprovante
+                  </button>
                 </div>
 
-                {mensagemErro && (
-                  <div className={styles.msgErro}>{mensagemErro}</div>
+                {mensagemErro && <div className={styles.msgErro}>{mensagemErro}</div>}
+
+                {/* ABA 1: FORMULÁRIO DE NOVA INSCRIÇÃO */}
+                {abaModal === 'inscricao' && (
+                  <form onSubmit={handleInscricaoSubmit} className={styles.modalFormFlex}>
+                    <div className={styles.modalFormBodyFields}>
+                      {camposFormulario.map((campo, idx) => {
+                        const opcoesArray = Array.isArray(campo.options) 
+                          ? campo.options.filter((o) => typeof o === 'string' && o.trim() !== '') 
+                          : (typeof campo.options === 'string' ? campo.options.split(',').map(o => o.trim()).filter(Boolean) : []);
+
+                        return (
+                          <div key={idx} className={styles.modalFieldGroup}>
+                            <label className={styles.modalFieldLabel}>
+                              {campo.label} {campo.required && <span className={styles.fieldRequiredMark}>*</span>}
+                            </label>
+
+                            {campo.type === 'select' ? (
+                              <select
+                                required={campo.required}
+                                value={respostas[campo.label] || ''}
+                                onChange={(e) => handleInputChange(campo, e.target.value)}
+                                className={styles.modalFieldSelect}
+                              >
+                                <option value="">Selecione uma opção...</option>
+                                {opcoesArray.map((opcaoText, oIdx) => (
+                                  <option key={oIdx} value={opcaoText}>{opcaoText}</option>
+                                ))}
+                              </select>
+                            ) : campo.type === 'checkbox' ? (
+                              opcoesArray.length > 0 ? (
+                                <div className={styles.checkboxGroupWrapper}>
+                                  {opcoesArray.map((opcaoText, oIdx) => {
+                                    const marcado = Array.isArray(respostas[campo.label]) && respostas[campo.label].includes(opcaoText);
+                                    return (
+                                      <label key={oIdx} className={styles.checkboxOptionLabel}>
+                                        <input
+                                          type="checkbox"
+                                          checked={marcado}
+                                          onChange={(e) => handleCheckboxMultiChange(campo.label, opcaoText, e.target.checked)}
+                                          className={styles.modalCheckboxInput}
+                                        />
+                                        <span>{opcaoText}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <label className={styles.checkboxOptionLabel}>
+                                  <input
+                                    type="checkbox"
+                                    required={campo.required}
+                                    checked={!!respostas[campo.label]}
+                                    onChange={(e) => handleInputChange(campo, e.target.checked ? 'Sim' : '')}
+                                    className={styles.modalCheckboxInput}
+                                  />
+                                  <span>Concordo e confirmo minha participação</span>
+                                </label>
+                              )
+                            ) : (
+                              <input 
+                                type={campo.type === 'number' ? 'number' : campo.type === 'date' ? 'date' : campo.type === 'email' ? 'email' : 'text'} 
+                                required={campo.required} 
+                                value={respostas[campo.label] || ''} 
+                                onChange={(e) => handleInputChange(campo, e.target.value)} 
+                                placeholder={campo.type === 'cpf' ? '000.000.000-00' : campo.type === 'tel' ? '(00) 00000-0000' : `Informe seu ${campo.label.toLowerCase()}`}
+                                className={styles.modalFieldInput}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button type="submit" disabled={enviando} className={styles.btnConfirmarInscricao}>
+                      {enviando ? <><Loader2 size={18} className="animate-spin" /> Processando...</> : <><Send size={18} /> Confirmar Inscrição</>}
+                    </button>
+                  </form>
                 )}
 
-                <div className={styles.modalFormBodyFields}>
-                  {camposFormulario.map((campo, idx) => {
-                    const opcoesArray = Array.isArray(campo.options) 
-                      ? campo.options.filter((o) => typeof o === 'string' && o.trim() !== '') 
-                      : (typeof campo.options === 'string' ? campo.options.split(',').map(o => o.trim()).filter(Boolean) : []);
+                {/* ABA 2: CONSULTA POR CPF DIRETA NA PLANILHA */}
+                {abaModal === 'consulta' && (
+                  <form onSubmit={handleConsultarCpfSubmit} className={styles.modalFormFlex}>
+                    <p className={styles.modalConsultarTexto}>
+                      Informe seu CPF para localizar a inscrição realizada neste evento e emitir a 2ª via do comprovante.
+                    </p>
 
-                    return (
-                      <div key={idx} className={styles.modalFieldGroup}>
-                        <label className={styles.modalFieldLabel}>
-                          {campo.label} {campo.required && <span className={styles.fieldRequiredMark}>*</span>}
-                        </label>
+                    <div className={styles.modalFieldGroup}>
+                      <label className={styles.modalFieldLabel}>CPF do Participante*</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={cpfConsulta} 
+                        onChange={(e) => setCpfConsulta(aplicarMascaraCPF(e.target.value))} 
+                        placeholder="000.000.000-00"
+                        className={styles.modalFieldInput}
+                      />
+                    </div>
 
-                        {/* 1. RENDERIZAÇÃO PARA CAMPO SELECT (LISTA SUSPENSA) */}
-                        {campo.type === 'select' ? (
-                          <select
-                            required={campo.required}
-                            value={respostas[campo.label] || ''}
-                            onChange={(e) => handleInputChange(campo, e.target.value)}
-                            className={styles.modalFieldSelect}
-                          >
-                            <option value="">Selecione uma opção...</option>
-                            {opcoesArray.map((opcaoText, oIdx) => (
-                              <option key={oIdx} value={opcaoText}>
-                                {opcaoText}
-                              </option>
-                            ))}
-                          </select>
-                        ) : 
+                    <button type="submit" disabled={buscandoCpf} className={styles.btnConfirmarInscricao}>
+                      {buscandoCpf ? <><Loader2 size={18} className="animate-spin" /> Aguarde</> : <><Search size={18} /> Localizar Comprovante</>}
+                    </button>
+                  </form>
+                )}
 
-                        /* 2. RENDERIZAÇÃO PARA CAMPO CHECKBOX (CAIXAS DE SELEÇÃO) */
-                        campo.type === 'checkbox' ? (
-                          opcoesArray.length > 0 ? (
-                            <div className={styles.checkboxGroupWrapper}>
-                              {opcoesArray.map((opcaoText, oIdx) => {
-                                const marcado = Array.isArray(respostas[campo.label]) && respostas[campo.label].includes(opcaoText);
-                                return (
-                                  <label key={oIdx} className={styles.checkboxOptionLabel}>
-                                    <input
-                                      type="checkbox"
-                                      checked={marcado}
-                                      onChange={(e) => handleCheckboxMultiChange(campo.label, opcaoText, e.target.checked)}
-                                      className={styles.modalCheckboxInput}
-                                    />
-                                    <span>{opcaoText}</span>
-                                  </label>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <label className={styles.checkboxOptionLabel}>
-                              <input
-                                type="checkbox"
-                                required={campo.required}
-                                checked={!!respostas[campo.label]}
-                                onChange={(e) => handleInputChange(campo, e.target.checked ? 'Sim' : '')}
-                                className={styles.modalCheckboxInput}
-                              />
-                              <span>Concordo e confirmo minha participação</span>
-                            </label>
-                          )
-                        ) : 
-
-                        /* 3. INPUTS DEMAIS TIPOS (TEXT, CPF, TEL, EMAIL, NUMBER, DATE) */
-                        (
-                          <input 
-                            type={
-                              campo.type === 'number' ? 'number' : 
-                              campo.type === 'date' ? 'date' : 
-                              campo.type === 'email' ? 'email' : 'text'
-                            } 
-                            required={campo.required} 
-                            value={respostas[campo.label] || ''} 
-                            onChange={(e) => handleInputChange(campo, e.target.value)} 
-                            placeholder={
-                              campo.type === 'cpf' ? '000.000.000-00' :
-                              campo.type === 'tel' ? '(00) 00000-0000' :
-                              `Informe seu ${campo.label.toLowerCase()}`
-                            }
-                            className={styles.modalFieldInput}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <button type="submit" disabled={enviando} className={styles.btnConfirmarInscricao}>
-                  {enviando ? <><Loader2 size={18} className="animate-spin" /> Processando...</> : <><Send size={18} /> Confirmar Inscrição</>}
-                </button>
-              </form>
+              </div>
             ) : (
+              /* COMPROVANTE ENCONTRADO / GERADO */
               <div className={styles.comprovanteWrapper}>
                 <CheckCircle size={48} className={styles.comprovanteCheckIcon} />
-                <h3 className={styles.comprovanteTituloSucesso}>Inscrição Confirmada!</h3>
-                <p className={styles.comprovanteSubtitulo}>Apresente este comprovante no dia do evento.</p>
+                <h3 className={styles.comprovanteTituloSucesso}>Comprovante de Inscrição</h3>
+                <p className={styles.comprovanteSubtitulo}>Documento oficial registrado no sistema.</p>
 
-                {/* TICKET / COMPROVANTE OFICIAL */}
                 <div id="comprovante-pdf-container" className={styles.comprovanteCardPdf}>
                   <div className={styles.ticketHeader}>
                     <div>
@@ -566,21 +618,44 @@ export default function EventoDetailPage() {
                     <span className={styles.ticketSectionLabel}>EVENTO SELECIONADO</span>
                     <h3 className={styles.ticketEventTitle}>{comprovante.evento}</h3>
                     <div className={styles.ticketMetaRow}>
-                      <span>📅 <strong>Data de Emissão:</strong> {comprovante.dataHora}</span>
+                      <span>📅 <strong>Data da inscrição:</strong> {formatarDataParaExibicao(comprovante.dataHora)}</span>
                     </div>
                   </div>
 
+                  {/* EXIBIÇÃO DE DADOS FILTRADOS COM TRATATIVA DE DATA */}
                   <div className={styles.ticketGridDetails}>
-                    {comprovante.detalhes.map((d, i) => (
-                      <div key={i} className={styles.ticketDetailItem}>
-                        <strong className={styles.ticketDetailLabel}>{d.label}</strong>
-                        <span className={styles.ticketDetailValue}>{d.valor || '-'}</span>
-                      </div>
-                    ))}
+                    {(() => {
+                      const chavesDesejadas = [
+                        { labelExibicao: 'Nome Completo', termos: ['nome', 'nome completo'] },
+                        { labelExibicao: 'CPF', termos: ['cpf'] },
+                        { labelExibicao: 'Data de Nascimento', termos: ['data de nascimento', 'nascimento', 'data nasc'], isDate: true },
+                        { labelExibicao: 'E-mail', termos: ['e-mail', 'email'] }
+                      ];
+
+                      return chavesDesejadas.map((item, i) => {
+                        const itemEncontrado = comprovante.detalhes.find((d) => {
+                          const lbl = (d.label || '').toLowerCase().trim();
+                          return item.termos.some((termo) => lbl.includes(termo));
+                        });
+
+                        let valorExibicao = itemEncontrado?.valor ? itemEncontrado.valor : '-';
+
+                        if (item.isDate && valorExibicao !== '-') {
+                          valorExibicao = formatarDataParaExibicao(valorExibicao);
+                        }
+
+                        return (
+                          <div key={i} className={styles.ticketDetailItem}>
+                            <strong className={styles.ticketDetailLabel}>{item.labelExibicao}</strong>
+                            <span className={styles.ticketDetailValue}>{valorExibicao}</span>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
 
                   <div className={styles.ticketFooter}>
-                    <span>✓ Inscrição registrada com sucesso no sistema.</span>
+                    <span>✓ Inscrição confirmada no sistema.</span>
                     <span className={styles.ticketStamp}>DOCUMENTO VÁLIDO</span>
                   </div>
                 </div>
