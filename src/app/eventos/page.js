@@ -127,14 +127,12 @@ export default function EventosPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      <section 
-        className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-header.png')" }}
-      >
+      {/* 1. BANNER DE TOPO COM GRADIENTE E BARRA COLORIDA */}
+      <section className={styles.heroBanner}>
         <div className={styles.overlay}>
           <div className={styles.container}>
-            <span className={styles.heroSubtitle}>AGENDA & REGISTROS</span>
-            <h1 className={styles.heroTitle}>Eventos da Saúde</h1>
+            <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
+            <h1 className={styles.heroTitle}>Nossos Eventos</h1>
             <p className={styles.heroDesc}>
               Acompanhe simpósios, inaugurações, encontros e capacitações promovidos pela Secretaria Municipal de Saúde.
             </p>

@@ -10,7 +10,6 @@
     box-sizing: border-box;
     overflow: hidden;
 
-    /* SEU GRADIENTE (com 88% de opacidade) + SUAM IMAGEM DA PASTA PUBLIC */
     background-image: 
         linear-gradient(
             135deg, 

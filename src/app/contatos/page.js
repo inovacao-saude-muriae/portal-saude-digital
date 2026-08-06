@@ -37,13 +37,11 @@ export default function ContatosPage() {
     <div className={styles.pageWrapper}>
       
       {/* 1. HERO BANNER */}
-      <section 
-        className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-header.png')" }}
-      >
+      {/* 1. BANNER DE TOPO COM GRADIENTE E BARRA COLORIDA */}
+      <section className={styles.heroBanner}>
         <div className={styles.overlay}>
           <div className={styles.container}>
-            <span className={styles.heroSubtitle}>REDES DE ATENDIMENTO</span>
+            <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
             <h1 className={styles.heroTitle}>Guia de Contatos da Saúde</h1>
             <p className={styles.heroDesc}>
               Encontre telefones, endereços, e-mails e localizações das Unidades Básicas, Policlínicas e Centros Especializados de Muriaé.

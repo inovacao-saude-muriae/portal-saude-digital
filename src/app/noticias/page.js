@@ -93,11 +93,7 @@ export default function NoticiasPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. BANNER DE TOPO */}
-      <section 
-        className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-header.png')" }}
-      >
+      <section className={styles.heroBanner}>
         <div className={styles.overlay}>
           <div className={styles.container}>
             <span className={styles.heroSubtitle}>INSTITUCIONAL</span>

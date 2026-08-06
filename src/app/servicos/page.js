@@ -35,11 +35,9 @@ export default function ServicesPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. BANNER DE TOPO */}
-      <section 
-        className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-header.png')" }} 
-      >
+    
+      {/* 1. BANNER DE TOPO COM GRADIENTE E BARRA COLORIDA */}
+      <section className={styles.heroBanner}>
         <div className={styles.overlay}>
           <div className={styles.container}>
             <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
