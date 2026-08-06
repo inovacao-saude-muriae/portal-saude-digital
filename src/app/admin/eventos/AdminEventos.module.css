@@ -1,1078 +1,1094 @@
-/* src/app/admin/eventos/AdminEventos.module.css */
-
+/* ==========================================================
+   ESTILOS GERAIS DA PÁGINA ADMIN DE EVENTOS
+   ========================================================== */
 .pageWrapper {
-  min-height: 100vh;
-  background-color: #f8fafc;
-  padding: 40px 20px 80px 20px;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f1f5f9;
+    padding: 30px 0 60px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1e293b;
 }
 
 .container {
-  max-width: 1100px;
-  margin: 0 auto;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-/* BARRA DE CABEÇALHO */
+/* ==========================================================
+   CABEÇALHO E NAVEGAÇÃO SUPERIOR
+   ========================================================== */
 .headerBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
 }
 
 .badgeHeader {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
 }
 
 .mainTitle {
-  font-size: 28px;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 6px 0;
-  letter-spacing: -0.5px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
 }
 
 .subTitle {
-  font-size: 15px;
-  color: #64748b;
-  margin: 0;
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
 }
 
 .backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #0065a4;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  background-color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #0065a4;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    transition: all 0.2s ease;
 }
 
 .backLink:hover {
-  background-color: #f1f5f9;
-  color: #004066;
+    background-color: #e2e8f0;
+    color: #003f66;
 }
 
-/* NAVEGAÇÃO POR SUB-ABAS */
+/* ==========================================================
+   SUB-ABAS (CADASTRAR vs GERENCIAR)
+   ========================================================== */
 .subTabContainer {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .subTabBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #cbd5e1;
-  background-color: #ffffff;
-  color: #334155;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.subTabCadastrarActive {
-  background-color: #2b943d;
-  color: #ffffff;
-  border-color: #2b943d;
-}
-
-.subTabGerenciarActive {
-  background-color: #0065a4;
-  color: #ffffff;
-  border-color: #0065a4;
-}
-
-/* BANNER DE EDIÇÃO */
-.editModeBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #fffbebf5;
-  border: 1px solid #fde047;
-  color: #854d0e;
-  padding: 12px 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.cancelEditBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #dc2626;
-  color: #ffffff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.cancelEditBtn:hover {
-  background-color: #b91c1c;
-}
-
-/* ESTRUTURA DO FORMULÁRIO */
-.formGrid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-}
-
-.rowTwoCols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.cardSection {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-}
-
-.sectionTitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 20px 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.formGroup {
-  margin-bottom: 20px;
-}
-
-.label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
-  margin-bottom: 6px;
-}
-
-.input,
-.select,
-.textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 14px;
-  color: #0f172a;
-  outline: none;
-  background-color: #f8fafc;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-}
-
-.input:focus,
-.select:focus,
-.textarea:focus {
-  border-color: #0065a4;
-  background-color: #ffffff;
-}
-
-.textarea {
-  resize: vertical;
-  line-height: 1.6;
-}
-
-/* DIVISÓRIAS E SUBSEÇÕES */
-.sectionDivider {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.sectionDividerSpaced {
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.subSectionTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.subSectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.flexColumnGap12 {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.flexRowCenterGap8 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.flexRowCenterGap10 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.flexRowGap12 {
-  display: flex;
-  gap: 12px;
-}
-
-.marginBottom16 {
-  margin-bottom: 16px;
-}
-
-.fontSize13 {
-  font-size: 13px !important;
-}
-
-.boldText {
-  font-weight: 800;
-}
-
-/* CHECKBOXES ESTILIZADOS */
-.checkboxLabelDark {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.checkboxLabelBlue {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0369a1;
-  margin-left: 28px;
-  background-color: #f0f9ff;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #bae6fd;
-}
-
-.checkboxLabelSmall {
-  font-size: 12px;
-  font-weight: 600;
-  color: #475569;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.checkboxInput,
-.checkboxInputLarge {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-/* CAMPOS DINÂMICOS E CRONOGRAMA */
-.formFieldsContainer {
-  margin-top: 16px;
-  background-color: #f8fafc;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-}
-
-.formFieldsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.formFieldsTitle {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.formFieldsSubtitle {
-  margin: 2px 0 0 0;
-  font-size: 12px;
-  color: #64748b;
-}
-
-.fieldGridRow {
-  display: grid;
-  grid-template-columns: 1fr 120px 85px 38px;
-  gap: 8px;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.cronogramaCard {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-
-.cronogramaGridRow {
-  display: grid;
-  grid-template-columns: 130px 1fr 40px;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-/* BOTÕES DE AÇÃO INTERNOS */
-.addBtnSmall {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.addBtnMedium {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.deleteSquareBtn {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* ÁREA DE UPLOAD (DROPZONE) */
-.dropZone {
-  position: relative;
-  border: 2px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 30px 16px;
-  text-align: center;
-  background-color: #f8fafc;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.dropZone:hover {
-  background-color: #f1f5f9;
-}
-
-.uploadIcon {
-  color: #0065a4;
-  margin-bottom: 8px;
-}
-
-.uploadText {
-  font-size: 14px;
-  font-weight: 700;
-  color: #334155;
-}
-
-.uploadSubtext {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 4px;
-}
-
-.fileNameBadge {
-  display: inline-block;
-  margin-top: 10px;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-.fileInputHidden {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.submitBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #2b943d;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 15px;
-  padding: 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.2s ease;
-}
-
-.submitBtn:hover {
-  background-color: #237a32;
-}
-
-.submitBtn:disabled {
-  background-color: #cbd5e1;
-  cursor: not-allowed;
-}
-
-/* LISTAGEM DE EVENTOS NO PAINEL */
-.newsListContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.newsItemRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-}
-
-.newsItemContent {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.imageThumbnailWrapper {
-  width: 70px;
-  height: 50px;
-  position: relative;
-  border-radius: 6px;
-  overflow: hidden;
-  background-color: #cbd5e1;
-  flex-shrink: 0;
-}
-
-.thumbnailImg {
-  object-fit: cover;
-}
-
-.newsMetaText {
-  font-size: 12px;
-  color: #0065a4;
-  font-weight: bold;
-}
-
-.newsItemTitle {
-  margin: 2px 0 4px 0;
-  font-size: 15px;
-  color: #0f172a;
-}
-
-.eventDetailsRow {
-  display: flex;
-  gap: 12px;
-  font-size: 12px;
-  color: #64748b;
-}
-
-.eventDetailsRow span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.actionButtonsGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.emitCertificateBtn {
-  background-color: #0284c7;
-  color: #ffffff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.editBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #0065a4;
-  color: #ffffff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
-  transition: background-color 0.2s ease;
-}
-
-.editBtn:hover {
-  background-color: #004066;
-}
-
-.deleteBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #dc2626;
-  color: #ffffff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
-  transition: background-color 0.2s ease;
-}
-
-.deleteBtn:hover {
-  background-color: #b91c1c;
-}
-
-.deleteBtn:disabled {
-  background-color: #cbd5e1;
-  cursor: not-allowed;
-}
-
-/* ALERTAS DE SUCESSO / ERRO */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.subTabBtn:hover {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+.subTabCadastrarActive, .subTabGerenciarActive {
+    background-color: #0065a4 !important;
+    color: #ffffff !important;
+    border-color: #0065a4 !important;
+    box-shadow: 0 2px 8px rgba(0, 101, 164, 0.25);
+}
+
+/* ==========================================================
+   ALERTAS DE FEEDBACK E BANNERS DE EDIÇÃO
+   ========================================================== */
 .alertMessage {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 20px;
 }
 
 .alertSucesso {
-  background-color: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
 }
 
 .alertErro {
-  background-color: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
 }
 
-.loadingText,
-.emptyText {
-  text-align: center;
-  padding: 30px;
-  color: #64748b;
+.editModeBanner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fef3c7;
+    border: 1px solid #fde047;
+    color: #92400e;
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
 }
 
-/* MODAL DE CERTIFICADOS */
+.cancelEditBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ffffff;
+    border: 1px solid #f59e0b;
+    color: #b45309;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ==========================================================
+   FORMULÁRIO E GRID
+   ========================================================== */
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+}
+
+.cardSection {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input, .select, .textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #ffffff;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+    border-color: #0065a4;
+    box-shadow: 0 0 0 3px rgba(0, 101, 164, 0.12);
+}
+
+.rowTwoCols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.sectionDivider {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.sectionDividerSpaced {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.subSectionTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+}
+
+.subSectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.flexColumnGap12 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkboxLabelDark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.checkboxLabelBlue {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0284c7;
+    background-color: #f0f9ff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #bae6fd;
+    cursor: pointer;
+}
+
+.checkboxInput {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* ==========================================================
+   CONSTRUTOR DE FORMULÁRIO DE INSCRIÇÃO & OPÇÕES
+   ========================================================== */
+.formFieldsContainer {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 8px;
+}
+
+.formFieldsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.formFieldsTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.formFieldsSubtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+.fieldBoxWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.fieldGridRow {
+    display: grid;
+    grid-template-columns: 1fr 180px 80px 38px;
+    gap: 10px;
+    align-items: center;
+}
+
+.checkboxLabelSmall {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+}
+
+/* CONTAINER DE OPÇÕES LINHA POR LINHA PARA SELECT E CHECKBOX */
+.optionsContainer {
+    margin-top: 8px;
+    padding: 12px;
+    background-color: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.optionsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.optionsTitle {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0284c7;
+}
+
+.optionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.optionRowItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.optionNumber {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    min-width: 18px;
+}
+
+.addOptionBtn {
+    align-self: flex-start;
+    background-color: #ffffff;
+    color: #0065a4;
+    border: 1px solid #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.addOptionBtn:hover {
+    background-color: #e2e8f0;
+    color: #003f66;
+}
+
+.deleteSquareBtnSmall {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+}
+
+.deleteSquareBtnSmall:hover {
+    background-color: #fca5a5;
+    color: #991b1b;
+}
+
+.addBtnSmall {
+    background-color: #0284c7;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.addBtnSmall:hover {
+    background-color: #0369a1;
+}
+
+.addBtnMedium {
+    background-color: #f1f5f9;
+    color: #0065a4;
+    border: 1px solid #cbd5e1;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.addBtnMedium:hover {
+    background-color: #e2e8f0;
+}
+
+.deleteSquareBtn {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.deleteSquareBtn:hover {
+    background-color: #fca5a5;
+}
+
+/* ==========================================================
+   CRONOGRAMA DE HORÁRIOS
+   ========================================================== */
+.cronogramaCard {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cronogramaGridRow {
+    display: grid;
+    grid-template-columns: 130px 1fr 38px;
+    gap: 10px;
+}
+
+.flexRowCenterGap8 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fontSize13 {
+    font-size: 13px !important;
+}
+
+/* ==========================================================
+   COLUNA DIREITA (DROPZONE & CLASSIFICAÇÃO)
+   ========================================================== */
+.rightColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropZone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 30px 16px;
+    text-align: center;
+    background-color: #f8fafc;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.dropZone:hover {
+    border-color: #0065a4;
+    background-color: #f0f9ff;
+}
+
+.uploadIcon {
+    color: #0065a4;
+    margin-bottom: 8px;
+}
+
+.uploadText {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.uploadSubtext {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.fileNameBadge {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.fileInputHidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.submitBtn {
+    width: 100%;
+    background-color: #0065a4;
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+}
+
+.submitBtn:hover {
+    background-color: #004d7d;
+}
+
+.submitBtn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* ==========================================================
+   LISTAGEM DE EVENTOS CADASTRADOS (ABA GERENCIAR)
+   ========================================================== */
+.newsListContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.newsItemRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background-color: #ffffff;
+    gap: 16px;
+}
+
+.newsItemContent {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.imageThumbnailWrapper {
+    position: relative;
+    width: 90px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.thumbnailImg {
+    object-fit: cover;
+}
+
+.newsMetaText {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0284c7;
+    text-transform: uppercase;
+}
+
+.newsItemTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 2px 0 6px 0;
+}
+
+.eventDetailsRow {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.eventDetailsRow span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.actionButtonsGroup {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.editBtn, .deleteBtn, .emitCertificateBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.emitCertificateBtn {
+    background-color: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+}
+
+.emitCertificateBtn:hover {
+    background-color: #e0f2fe;
+}
+
+.editBtn {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.editBtn:hover {
+    background-color: #e2e8f0;
+}
+
+.deleteBtn {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+.deleteBtn:hover {
+    background-color: #fca5a5;
+}
+
+.loadingText, .emptyText {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ==========================================================
+   MODAL DE CERTIFICADOS & IMPRESSÃO
+   ========================================================== */
 .modalOverlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .modalContent {
-  background-color: #ffffff;
-  border-radius: 16px;
-  max-width: 950px;
-  width: 100%;
-  padding: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  position: relative;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .closeModalBtn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #64748b;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.closeModalBtn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.marginBottom16 {
+    margin-bottom: 16px;
 }
 
 .modalBadgeText {
-  font-size: 12px;
-  font-weight: 800;
-  color: #0284c7;
-  text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 800;
+    color: #0284c7;
+    letter-spacing: 1px;
 }
 
 .modalTitle {
-  margin: 2px 0 0 0;
-  color: #0f172a;
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 0 0;
 }
 
 .modalControlsBox {
-  display: grid;
-  grid-template-columns: 1fr 200px;
-  gap: 16px;
-  margin-bottom: 16px;
-  background-color: #f0f9ff;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1px solid #bae6fd;
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 16px;
+    background-color: #f8fafc;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
 }
 
-.modalLabelWithIcon {
-  font-size: 12px;
-  font-weight: 700;
-  color: #0369a1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
+.modalLabelWithIcon, .modalLabelBlock {
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
 }
 
-.modalLabelBlock {
-  font-size: 12px;
-  font-weight: 700;
-  color: #0369a1;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.modalSelect {
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #7dd3fc;
-  font-size: 13px;
-  font-weight: bold;
-  background-color: #ffffff;
-  color: #0f172a;
-}
-
-.modalInputCargaHoraria {
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #7dd3fc;
-  font-size: 13px;
-  font-weight: bold;
-  background-color: #ffffff;
-  box-sizing: border-box;
+.modalSelect, .modalInputCargaHoraria {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    background-color: #ffffff;
+    box-sizing: border-box;
 }
 
 .modalSelectionBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  background-color: #f8fafc;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.flexRowCenterGap10 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .toggleAllBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  color: #334155;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0369a1;
+    cursor: pointer;
 }
 
 .selectedCountText {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0284c7;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
 }
 
 .tableScrollWrapper {
-  overflow-y: auto;
-  flex-grow: 1;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  margin-bottom: 16px;
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    max-height: 380px;
 }
 
 .inscritosTable {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 13.5px;
-}
-
-.inscritosTable thead tr {
-  background-color: #f1f5f9;
-  border-bottom: 1px solid #cbd5e1;
-  color: #475569;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
 }
 
 .inscritosTable th {
-  padding: 10px 14px;
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
-.inscritosTable tr {
-  border-bottom: 1px solid #f1f5f9;
+.inscritosTable td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
 }
 
 .selectedRow {
-  background-color: #f0f9ff;
+    background-color: #f0f9ff;
 }
 
-.colIndex {
-  width: 40px;
+.colIndex { width: 40px; }
+.colIndexText { color: #94a3b8; font-weight: 600; }
+.nomeParticipanteText { font-weight: 700; color: #0f172a; }
+.cpfText, .codigoText { font-family: monospace; color: #475569; }
+.textCenter { text-align: center; }
+
+.checkboxInputLarge {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
-.colIndexText {
-  padding: 10px 14px;
-  color: #64748b;
+.loadingInscritosBox, .emptyInscritosBox {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+    font-size: 14px;
 }
 
-.nomeParticipanteText {
-  padding: 10px 14px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.cpfText {
-  padding: 10px 14px;
-  color: #334155;
-}
-
-.codigoText {
-  padding: 10px 14px;
-  color: #0284c7;
-  font-weight: bold;
-}
-
-.textCenter {
-  text-align: center;
-}
-
-.loadingInscritosBox,
-.emptyInscritosBox {
-  text-align: center;
-  padding: 40px;
-  color: #64748b;
-}
-
-.loadingInscritosBox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.flexRowGap12 {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
 }
 
 .downloadCertificatesBtn {
-  flex: 1;
-  background-color: #0284c7;
-  color: #ffffff;
-  border: none;
-  padding: 14px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+    background-color: #0284c7;
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.downloadCertificatesBtn:hover {
+    background-color: #0369a1;
 }
 
 .downloadCertificatesBtn:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
+    background-color: #cbd5e1;
+    cursor: not-allowed;
 }
 
 .closeModalSecondaryBtn {
-  background-color: #e2e8f0;
-  color: #334155;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 15px;
-  cursor: pointer;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
 }
 
-/* ÁREA DE IMPRESSÃO (CARREGADA FORA DA TELA) */
+/* ==========================================================
+   ESTILOS DE IMPRESSÃO DO CERTIFICADO (A4 PAISAGEM)
+   ========================================================== */
 .hiddenPrintContainer {
-  position: absolute;
-  left: -9999px;
-  top: -9999px;
-  width: 297mm;
+    display: none;
 }
 
-.certificadoPageSingle {
-  width: 297mm;
-  height: 210mm;
-  position: relative;
-  page-break-after: always;
-  break-after: page;
-  box-sizing: border-box;
-  overflow: hidden;
-  background-color: #ffffff;
-}
-
-.certificadoBgImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  z-index: 1;
-}
-
-.certificadoNomeWrapper {
-  position: absolute;
-  top: 32.5%;
-  left: 8%;
-  width: 84%;
-  text-align: center;
-  z-index: 2;
-}
-
-.certificadoNomeText {
-  font-size: 30px;
-  font-weight: 900;
-  color: #000000;
-  font-family: 'Montserrat', sans-serif;
-  margin: 0;
-  padding: 0;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.certificadoTextoWrapper {
-  position: absolute;
-  top: 43%;
-  left: 8%;
-  width: 84%;
-  z-index: 2;
-}
-
-.certificadoTextoParagraph {
-  font-size: 17px;
-  color: #000000;
-  line-height: 1.75;
-  text-align: justify;
-  font-family: 'Montserrat', sans-serif;
-  margin: 0;
-  padding: 0;
-  font-weight: 400;
-  display: block;
-  width: 100%;
-}
-
-.certificadoAutenticidadeText {
-  position: absolute;
-  bottom: 12px;
-  right: 25px;
-  font-size: 9px;
-  font-weight: 700;
-  color: #475569;
-  z-index: 2;
-  font-family: 'Montserrat', sans-serif;
-}
-
-/* RESPONSIVIDADE PARA DISPOSITIVOS MÓVEIS */
-@media (max-width: 900px) {
-  .formGrid,
-  .rowTwoCols,
-  .modalControlsBox {
-    grid-template-columns: 1fr;
-  }
-
-  .headerBar {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .newsItemRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .actionButtonsGroup {
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-/* ==========================================================================
-   --- REGRA DE IMPRESSÃO A4 PAISAGEM (CORRIGIDO PROBLEMA DE QUEBRA DE LINHAS) ---
-   ========================================================================== */
 @media print {
-  @page {
-    size: A4 landscape !important;
-    margin: 0 !important;
-  }
+    body * {
+        visibility: hidden;
+    }
 
-  /* 1. Força a exibição de cores e fundo no navegador */
-  :global(html),
-  :global(body) {
-    width: 297mm !important;
-    height: 210mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background-color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+    .hiddenPrintContainer, .hiddenPrintContainer * {
+        visibility: visible;
+    }
 
-  /* 2. Oculta toda a interface do painel */
-  :global(body) * {
-    visibility: hidden !important;
-  }
+    .hiddenPrintContainer {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
 
-  /* 3. Exibe apenas a área dos certificados */
-  :global(#certificados-em-lote-print),
-  :global(#certificados-em-lote-print) * {
-    visibility: visible !important;
-  }
+    .certificadoPageSingle {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        page-break-after: always;
+        overflow: hidden;
+    }
 
-  :global(#certificados-em-lote-print) {
-    display: block !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    z-index: 999999 !important;
-    background-color: #ffffff !important;
-  }
+    .certificadoBgImage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        z-index: 1;
+    }
 
-  /* 4. Força tags inline como <strong> a não quebrarem linha */
-  :global(#certificados-em-lote-print) strong,
-  :global(#certificados-em-lote-print) span {
-    display: inline !important;
-  }
+    .certificadoNomeWrapper {
+        position: absolute;
+        top: 42%;
+        left: 10%;
+        width: 80%;
+        text-align: center;
+        z-index: 2;
+    }
 
-  :global(#certificados-em-lote-print) p {
-    display: block !important;
-    text-align: justify !important;
-  }
+    .certificadoNomeText {
+        font-size: 32pt;
+        font-weight: bold;
+        color: #000000;
+        margin: 0;
+    }
 
-  .certificadoPageSingle {
-    width: 297mm !important;
-    height: 210mm !important;
-    position: relative !important;
-    page-break-after: always !important;
-    break-after: page !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    box-sizing: border-box !important;
-  }
+    .certificadoTextoWrapper {
+        position: absolute;
+        top: 55%;
+        left: 15%;
+        width: 70%;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .certificadoTextoParagraph {
+        font-size: 14pt;
+        line-height: 1.6;
+        color: #333333;
+    }
+
+    .boldText {
+        font-weight: bold;
+    }
+
+    .certificadoAutenticidadeText {
+        position: absolute;
+        bottom: 5%;
+        right: 8%;
+        font-size: 9pt;
+        color: #666666;
+        font-family: monospace;
+        z-index: 2;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+}
+
+/* ==========================================================
+   RESPONSIVIDADE
+   ========================================================== */
+@media (max-width: 1024px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .fieldGridRow {
+        grid-template-columns: 1fr 140px 70px 38px;
+    }
+}
+
+@media (max-width: 640px) {
+    .rowTwoCols {
+        grid-template-columns: 1fr;
+    }
+
+    .fieldGridRow {
+        grid-template-columns: 1fr;
+    }
+
+    .modalControlsBox {
+        grid-template-columns: 1fr;
+    }
 }

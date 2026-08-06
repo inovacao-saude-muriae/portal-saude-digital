@@ -10,6 +10,28 @@ import styles from './EventosDetail.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
+// --- FUNÇÕES DE MÁSCARA E FORMATAÇÃO DE CAMPOS ---
+function aplicarMascaraCPF(value) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+    .slice(0, 14);
+}
+
+function aplicarMascaraTelefone(value) {
+  const nums = value.replace(/\D/g, '').slice(0, 11);
+  if (nums.length <= 10) {
+    return nums
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+  }
+  return nums
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2');
+}
+
 function limparHora(horaBruta) {
   if (!horaBruta) return '';
   const str = String(horaBruta).trim();
@@ -26,7 +48,6 @@ function formatarDataBR(dataBruta) {
   if (!dataBruta) return 'A definir';
   let str = String(dataBruta).trim();
 
-  // Remove lixo de fuso horário vindo do Google Sheets
   if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec')) {
     return 'A definir';
   }
@@ -138,13 +159,37 @@ export default function EventoDetailPage() {
   const camposFormulario = Array.isArray(evento.formFields) && evento.formFields.length > 0 
     ? evento.formFields 
     : [
-        { id: 1, label: 'Nome Completo', type: 'text', required: true },
-        { id: 2, label: 'CPF', type: 'text', required: true },
-        { id: 3, label: 'E-mail', type: 'email', required: true }
+        { id: 1, label: 'Nome Completo', type: 'text', required: true, options: [] },
+        { id: 2, label: 'CPF', type: 'cpf', required: true, options: [] },
+        { id: 3, label: 'E-mail', type: 'email', required: true, options: [] },
+        { id: 4, label: 'Telefone Celular', type: 'tel', required: true, options: [] }
       ];
 
-  const handleInputChange = (label, valor) => {
-    setRespostas((prev) => ({ ...prev, [label]: valor }));
+  // GERENCIADOR DE MUDANÇA DE INPUTS E MÁSCARAS
+  const handleInputChange = (campo, valorBruto) => {
+    let valorFinal = valorBruto;
+
+    if (campo.type === 'cpf') {
+      valorFinal = aplicarMascaraCPF(valorBruto);
+    } else if (campo.type === 'tel') {
+      valorFinal = aplicarMascaraTelefone(valorBruto);
+    }
+
+    setRespostas((prev) => ({ ...prev, [campo.label]: valorFinal }));
+  };
+
+  // GERENCIADOR PARA CAIXAS DE SELEÇÃO (CHECKBOXES MÚLTIPLOS)
+  const handleCheckboxMultiChange = (label, opcao, checked) => {
+    setRespostas((prev) => {
+      const selecaoAtual = Array.isArray(prev[label]) ? prev[label] : [];
+      let novaSelecao = [];
+      if (checked) {
+        novaSelecao = [...selecaoAtual, opcao];
+      } else {
+        novaSelecao = selecaoAtual.filter((o) => o !== opcao);
+      }
+      return { ...prev, [label]: novaSelecao };
+    });
   };
 
   const handleAbrirModal = () => {
@@ -164,10 +209,47 @@ export default function EventoDetailPage() {
     setEnviando(true);
     setMensagemErro(null);
 
-    const listaRespostas = camposFormulario.map((c) => ({
-      label: c.label,
-      valor: respostas[c.label] || ''
-    }));
+    // VALIDAÇÕES ESPECÍFICAS ANTES DE ENVIAR
+    for (const campo of camposFormulario) {
+      const val = respostas[campo.label];
+
+      if (campo.required) {
+        if (!val || (Array.isArray(val) && val.length === 0)) {
+          setMensagemErro(`O campo "${campo.label}" é de preenchimento obrigatório.`);
+          setEnviando(false);
+          return;
+        }
+      }
+
+      if (campo.type === 'cpf' && val) {
+        const digitos = val.replace(/\D/g, '');
+        if (digitos.length !== 11) {
+          setMensagemErro(`Informe um CPF válido com 11 dígitos no campo "${campo.label}".`);
+          setEnviando(false);
+          return;
+        }
+      }
+
+      if (campo.type === 'email' && val) {
+        if (!val.includes('@') || !val.includes('.')) {
+          setMensagemErro(`Informe um endereço de e-mail válido no campo "${campo.label}".`);
+          setEnviando(false);
+          return;
+        }
+      }
+    }
+
+    const listaRespostas = camposFormulario.map((c) => {
+      const resp = respostas[c.label];
+      let valorTratado = resp || '';
+      if (Array.isArray(resp)) {
+        valorTratado = resp.join(', ');
+      }
+      return {
+        label: c.label,
+        valor: valorTratado
+      };
+    });
 
     try {
       const payload = {
@@ -239,7 +321,7 @@ export default function EventoDetailPage() {
         <div className={styles.container}>
           <article className={styles.articleCard}>
             
-            {/* CABEÇALHO COM DATA E HORA DEVIDAMENTE SANITIZADAS */}
+            {/* CABEÇALHO */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
                 Data: {formatarDataBR(evento.data)} {horaExibicao ? `• ${horaExibicao}` : ''}
@@ -348,7 +430,7 @@ export default function EventoDetailPage() {
       </main>
 
       {/* ========================================================================== */}
-      {/* MODAL DE INSCRIÇÃO FLUTUANTE E COMPROVANTE */}
+      {/* MODAL DE INSCRIÇÃO FLUTUANTE DURA DEDICADA                               */}
       {/* ========================================================================== */}
       {modalAberto && (
         <div className={styles.modalBackdrop}>
@@ -370,21 +452,89 @@ export default function EventoDetailPage() {
                 )}
 
                 <div className={styles.modalFormBodyFields}>
-                  {camposFormulario.map((campo, idx) => (
-                    <div key={idx} className={styles.modalFieldGroup}>
-                      <label className={styles.modalFieldLabel}>
-                        {campo.label} {campo.required && <span className={styles.fieldRequiredMark}>*</span>}
-                      </label>
-                      <input 
-                        type={campo.type || 'text'} 
-                        required={campo.required} 
-                        value={respostas[campo.label] || ''} 
-                        onChange={(e) => handleInputChange(campo.label, e.target.value)} 
-                        placeholder={`Informe seu ${campo.label.toLowerCase()}`}
-                        className={styles.modalFieldInput}
-                      />
-                    </div>
-                  ))}
+                  {camposFormulario.map((campo, idx) => {
+                    const opcoesArray = Array.isArray(campo.options) 
+                      ? campo.options.filter((o) => typeof o === 'string' && o.trim() !== '') 
+                      : (typeof campo.options === 'string' ? campo.options.split(',').map(o => o.trim()).filter(Boolean) : []);
+
+                    return (
+                      <div key={idx} className={styles.modalFieldGroup}>
+                        <label className={styles.modalFieldLabel}>
+                          {campo.label} {campo.required && <span className={styles.fieldRequiredMark}>*</span>}
+                        </label>
+
+                        {/* 1. RENDERIZAÇÃO PARA CAMPO SELECT (LISTA SUSPENSA) */}
+                        {campo.type === 'select' ? (
+                          <select
+                            required={campo.required}
+                            value={respostas[campo.label] || ''}
+                            onChange={(e) => handleInputChange(campo, e.target.value)}
+                            className={styles.modalFieldSelect}
+                          >
+                            <option value="">Selecione uma opção...</option>
+                            {opcoesArray.map((opcaoText, oIdx) => (
+                              <option key={oIdx} value={opcaoText}>
+                                {opcaoText}
+                              </option>
+                            ))}
+                          </select>
+                        ) : 
+
+                        /* 2. RENDERIZAÇÃO PARA CAMPO CHECKBOX (CAIXAS DE SELEÇÃO) */
+                        campo.type === 'checkbox' ? (
+                          opcoesArray.length > 0 ? (
+                            <div className={styles.checkboxGroupWrapper}>
+                              {opcoesArray.map((opcaoText, oIdx) => {
+                                const marcado = Array.isArray(respostas[campo.label]) && respostas[campo.label].includes(opcaoText);
+                                return (
+                                  <label key={oIdx} className={styles.checkboxOptionLabel}>
+                                    <input
+                                      type="checkbox"
+                                      checked={marcado}
+                                      onChange={(e) => handleCheckboxMultiChange(campo.label, opcaoText, e.target.checked)}
+                                      className={styles.modalCheckboxInput}
+                                    />
+                                    <span>{opcaoText}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <label className={styles.checkboxOptionLabel}>
+                              <input
+                                type="checkbox"
+                                required={campo.required}
+                                checked={!!respostas[campo.label]}
+                                onChange={(e) => handleInputChange(campo, e.target.checked ? 'Sim' : '')}
+                                className={styles.modalCheckboxInput}
+                              />
+                              <span>Concordo e confirmo minha participação</span>
+                            </label>
+                          )
+                        ) : 
+
+                        /* 3. INPUTS DEMAIS TIPOS (TEXT, CPF, TEL, EMAIL, NUMBER, DATE) */
+                        (
+                          <input 
+                            type={
+                              campo.type === 'number' ? 'number' : 
+                              campo.type === 'date' ? 'date' : 
+                              campo.type === 'email' ? 'email' : 'text'
+                            } 
+                            required={campo.required} 
+                            value={respostas[campo.label] || ''} 
+                            onChange={(e) => handleInputChange(campo, e.target.value)} 
+                            placeholder={
+                              campo.type === 'cpf' ? '000.000.000-00' :
+                              campo.type === 'tel' ? '(00) 00000-0000' :
+                              `Informe seu ${campo.label.toLowerCase()}`
+                            }
+                            className={styles.modalFieldInput}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <button type="submit" disabled={enviando} className={styles.btnConfirmarInscricao}>
