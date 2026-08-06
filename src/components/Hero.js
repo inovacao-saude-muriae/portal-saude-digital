@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ export default function Hero() {
                     </div>
                     
                     <h1 className={styles.title}>
-                        Você conhece o Saúde Digital Muriaé? <br />
+                        Você conhece o Saúde Digital Muriaé?
                     </h1>
                     
                     <p className={styles.description}>
@@ -24,7 +24,7 @@ export default function Hero() {
                     </p>
                     
                     <div className={styles.buttonGroup}>
-                        <Link href="servicos/aplicativos" className={styles.btnPrimary}>
+                        <Link href="/servicos/aplicativos" className={styles.btnPrimary}>
                             Conheça <span>→</span>
                         </Link>
                         <Link href="/servicos" className={styles.btnSecondary}>
@@ -33,7 +33,7 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* LADO DIREITO: CARDS COM EFEITO DE VIDRO (GLASSMORPHISM) */}
+                {/* LADO DIREITO: CARDS GLASSMORPHISM */}
                 <div className={styles.heroRight}>
                     <div className={styles.glassGrid}>
                         <div className={styles.glassCard}>
@@ -54,6 +54,7 @@ export default function Hero() {
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     );
