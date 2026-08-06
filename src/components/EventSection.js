@@ -71,6 +71,25 @@ function extrairDiaEMes(dataBruta) {
   return { dia: '01', mes: 'JAN' };
 }
 
+// CONVERTE FORMATOS DD/MM/YYYY OU YYYY-MM-DD EM TIMESTAMP PARA ORDENAÇÃO
+function converterParaTimestamp(dataBruta) {
+  if (!dataBruta) return 0;
+  const str = String(dataBruta).trim().split('T')[0];
+
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
+    const [dia, mes, ano] = str.split('/');
+    return new Date(parseInt(ano, 10), parseInt(mes, 10) - 1, parseInt(dia, 10)).getTime();
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const [ano, mes, dia] = str.split('-');
+    return new Date(parseInt(ano, 10), parseInt(mes, 10) - 1, parseInt(dia, 10)).getTime();
+  }
+
+  const d = new Date(str);
+  return !isNaN(d.getTime()) ? d.getTime() : 0;
+}
+
 export default function EventSection() {
   const [eventos, setEventos] = useState([]);
 
@@ -122,10 +141,11 @@ export default function EventSection() {
     carregarEventos();
   }, []);
 
+  // ORDENAÇÃO DO MAIS RECENTE PARA O MAIS ANTIGO
   const eventosOrdenados = [...eventos].sort((a, b) => {
-    const dataA = new Date(a.data || '2026-01-01').getTime();
-    const dataB = new Date(b.data || '2026-01-01').getTime();
-    return dataB - dataA;
+    const timeA = converterParaTimestamp(a.data);
+    const timeB = converterParaTimestamp(b.data);
+    return timeB - timeA;
   });
 
   const ultimosEventos = eventosOrdenados.slice(0, 3);
