@@ -1,0 +1,307 @@
+/* ==========================================================
+   ESTILOS DO MÓDULO: GESTÃO CCZ (ADOÇÃO)
+   ========================================================== */
+
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f1f5f9 !important;
+  padding: 40px 0 80px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b !important;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.badgeHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ccfbf1;
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.mainTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.subTitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8fafc;
+  color: #008a83;
+  border: 1px solid #cbd5e1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background-color: #008a83;
+  color: #ffffff;
+  border-color: #008a83;
+}
+
+.alertSuccess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #dcfce7;
+  color: #15803d;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 20px;
+}
+
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.cardForm, .cardLista {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.cardHeader h2 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputGroup label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+/* CORREÇÃO DO TEXTO E FUNDO DOS INPUTS, SELECTS E TEXTAREAS */
+.inputGroup input, 
+.inputGroup select, 
+.inputGroup textarea {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13.5px;
+  outline: none;
+  background-color: #ffffff !important;
+  color: #0f172a !important; /* COR DO TEXTO ESCURA */
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* CORREÇÃO DAS OPÇÕES DO SELECT DROPDOWN */
+.inputGroup select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.inputGroup input::placeholder,
+.inputGroup textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.inputGroup input:focus, 
+.inputGroup select:focus, 
+.inputGroup textarea:focus {
+  border-color: #008a83;
+  box-shadow: 0 0 0 3px rgba(0, 138, 131, 0.12);
+}
+
+.fileBox {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #008a83;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.fileBox:hover {
+  border-color: #008a83;
+  background-color: #f0fdf4;
+}
+
+.previewBox {
+  display: flex;
+  justify-content: center;
+}
+
+.previewImg {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.btnSalvar {
+  background-color: #008a83;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.btnSalvar:hover {
+  background-color: #006863;
+}
+
+/* LISTA DIREITA */
+.animaisList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.animalRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.thumbImg {
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.animalInfo {
+  flex: 1;
+}
+
+.animalInfo h3 {
+  font-size: 15px;
+  margin: 0 0 2px 0;
+  color: #0f172a !important;
+}
+
+.animalInfo p {
+  font-size: 12px;
+  color: #64748b !important;
+  margin: 0;
+}
+
+.btnDelete {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnDelete:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.loadingBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.emptyMsg {
+  text-align: center;
+  color: #64748b;
+  font-size: 13.5px;
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .layoutGrid {
+    grid-template-columns: 1fr;
+  }
+}

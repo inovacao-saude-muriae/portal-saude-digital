@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -11,14 +11,15 @@ import {
   ArrowLeft,
   LogOut,
   Images,
-  Sparkles
+  Sparkles,
+  PawPrint
 } from 'lucide-react';
 import styles from './AdminHub.module.css';
 
 export default function AdminHubPage() {
   const router = useRouter();
 
-  // Leitura síncrona inicial do usuário para não precisar rodar setUserInfo no useEffect (sem sublinhado)
+  // Leitura síncrona inicial do usuário (sem sublinhados/alertas do ESLint)
   const [userInfo] = useState(() => {
     if (typeof window === 'undefined') return null;
     try {
@@ -91,7 +92,43 @@ export default function AdminHubPage() {
         {/* CARDS DE NAVEGAÇÃO DOS MÓDULOS */}
         <div className={styles.cardsGrid}>
           
-          {/* CARD 1: CARROSSEL */}
+          {/* CARD 1: CCZ / ADOÇÃO DE ANIMAIS */}
+          <div className={styles.moduleCard}>
+            <div className={styles.iconWrapperGreen} style={{ backgroundColor: '#e6f4f1', color: '#008a83' }}>
+              <PawPrint size={32} />
+            </div>
+            <div className={styles.cardContent}>
+              <span className={styles.cardBadgeGreen} style={{ backgroundColor: '#e6f4f1', color: '#008a83' }}>
+                Zoonoses
+              </span>
+              <h2 className={styles.cardTitle}>Gerenciar Adoção (CCZ)</h2>
+              <p className={styles.cardDescription}>
+                Cadastre novos animais com fotos, edite históricos e remova os peludinhos adotados.
+              </p>
+            </div>
+            <Link href="/admin/adocao" className={styles.actionBtnGreen} style={{ backgroundColor: '#008a83' }}>
+              Acessar CCZ <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          {/* CARD 2: BANNER PRINCIPAL (HERO) */}
+          <div className={styles.moduleCard}>
+            <div className={styles.iconWrapperBlue}>
+              <Sparkles size={32} />
+            </div>
+            <div className={styles.cardContent}>
+              <span className={styles.cardBadge}>Página Inicial</span>
+              <h2 className={styles.cardTitle}>Indicadores da Home</h2>
+              <p className={styles.cardDescription}>
+                Altere os números e rótulos dos 4 cartões de estatísticas do banner principal.
+              </p>
+            </div>
+            <Link href="/admin/hero" className={styles.actionBtnBlue}>
+              Acessar Indicadores <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          {/* CARD 3: CARROSSEL */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperPurple}>
               <Images size={32} />
@@ -108,24 +145,7 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-          {/* CARD 2: ESTATÍSTICAS DO HERO (GLASSMORPHISM) */}
-          <div className={styles.moduleCard}>
-            <div className={styles.iconWrapperBlue}>
-              <Sparkles size={32} />
-            </div>
-            <div className={styles.cardContent}>
-              <span className={styles.cardBadge}>Página Inicial</span>
-              <h2 className={styles.cardTitle}>Gerenciar Indicadores do Banner Principal</h2>
-              <p className={styles.cardDescription}>
-                Altere os números e rótulos dos 4 cartões Glassmorphism exibidos no banner inicial.
-              </p>
-            </div>
-            <Link href="/admin/hero" className={styles.actionBtnBlue}>
-              Acessar Indicadores <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          {/* CARD 3: NOTÍCIAS */}
+          {/* CARD 4: NOTÍCIAS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperBlue}>
               <Newspaper size={32} />
@@ -142,7 +162,7 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-          {/* CARD 4: EVENTOS */}
+          {/* CARD 5: EVENTOS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperGreen}>
               <Calendar size={32} />
