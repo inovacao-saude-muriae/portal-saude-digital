@@ -17,6 +17,11 @@ export default function Header() {
         setMenuAberto(!menuAberto);
     };
 
+    // Fecha o menu ao clicar em qualquer link
+    const fecharMenu = () => {
+        setMenuAberto(false);
+    };
+
     // Ativo para o menu principal
     const isActive = (path) => {
         return pathname === path ? styles.activeLink : "";
@@ -29,7 +34,7 @@ export default function Header() {
 
     return (
         <header className={styles.header}>
-            {/* BARRA SUPERIOR */}
+            {/* BARRA SUPERIOR (DESKTOP) */}
             <div className={styles.topBar}>
                 <div className={`${styles.container} ${styles.topBarContainer}`}>
                     <div className={styles.topBarLeft}>
@@ -45,7 +50,6 @@ export default function Header() {
                             Transparência
                         </Link>
                         <span className={styles.divider}>|</span> 
-                        {/* LINK APONTANDO PARA /admin/login */}
                         <Link href="/admin/login" className={`${isTopBarActive('/admin/login')} ${styles.areaRestritaBtn}`}>
                             <Lock size={12} style={{ marginRight: '4px' }} />
                             Área Restrita
@@ -83,12 +87,27 @@ export default function Header() {
 
                     {/* LINKS DE NAVEGAÇÃO */}
                     <nav className={`${styles.navMenu} ${menuAberto ? styles.active : ""}`}>
-                        <Link href="/" className={`${styles.navItem} ${isActive('/')}`}>Início</Link>
-                        <Link href="/secretaria" className={`${styles.navItem} ${isActive('/secretaria')}`}>A Secretaria</Link>
-                        <Link href="/servicos" className={`${styles.navItem} ${isActive('/servicos')}`}>Serviços</Link>
-                        <Link href="/noticias" className={`${styles.navItem} ${isActive('/noticias')}`}>Notícias</Link>
-                        <Link href="/eventos" className={`${styles.navItem} ${isActive('/eventos')}`}>Eventos</Link>
-                        <Link href="/contatos" className={`${styles.navItem} ${isActive('/contatos')}`}>Contatos</Link>
+                        <Link href="/" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/')}`}>Início</Link>
+                        <Link href="/secretaria" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/secretaria')}`}>A Secretaria</Link>
+                        <Link href="/servicos" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/servicos')}`}>Serviços</Link>
+                        <Link href="/noticias" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/noticias')}`}>Notícias</Link>
+                        <Link href="/eventos" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/eventos')}`}>Eventos</Link>
+                        <Link href="/contatos" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/contatos')}`}>Contatos</Link>
+
+                        {/* DIVISOR + LINKS DA BARRA SUPERIOR QUE APARECEM APENAS NO MENU HAMBÚRGUER */}
+                        <div className={styles.mobileOnlyLinks}>
+                            <div className={styles.mobileDivider}></div>
+                            <Link href="/ouvidoria" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/ouvidoria')}`}>
+                                Ouvidoria
+                            </Link>
+                            <Link href="/transparencia" onClick={fecharMenu} className={`${styles.navItem} ${isActive('/transparencia')}`}>
+                                Transparência
+                            </Link>
+                            <Link href="/admin/login" onClick={fecharMenu} className={`${styles.navItem} ${styles.mobileAreaRestrita} ${isActive('/admin/login')}`}>
+                                <Lock size={14} style={{ marginRight: '6px' }} />
+                                Área Restrita
+                            </Link>
+                        </div>
                     </nav>
                 </div>
             </div>

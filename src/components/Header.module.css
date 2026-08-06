@@ -1,12 +1,12 @@
-.header{
+.header {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position:relative;
+    position: relative;
     background-color: #f8f9fa;
 }
 
-.container{
+.container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,43 +18,42 @@
 /* ==========================================================================
    BARRA SUPERIOR AZUL
    ========================================================================== */
-.topBar{
+.topBar {
     width: 100%;
     background-color: #004066;
     color: #FFFFFF;
     font-size: 13px;
     padding: 8px 0;
     text-align: center;
-    font-size: 14px;
 }
 
-.topBarLeft{
-    display:flex;
+.topBarLeft {
+    display: flex;
     gap: 20px;
 }
 
-.topBarLeft span{
-    display:flex;
-    align-items:center;
+.topBarLeft span {
+    display: flex;
+    align-items: center;
     gap: 5px;
 }
 
-.topBarRight{
-    display:flex;
-    align-items:center;
+.topBarRight {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-.topBarRight a{
-    color:#FFFFFF;
-    text-decoration:none;
+.topBarRight a {
+    color: #FFFFFF;
+    text-decoration: none;
     transition: opacity 0.2s ease;
 }
 
-.topBarRight a:hover{
-    opacity:0.7;
+.topBarRight a:hover {
+    opacity: 0.7;
 }
-/* Estilo ativo específico para os links da Barra Superior */
+
 .topBarActiveLink {
     color: #ffffff !important;
     font-weight: 700 !important;
@@ -63,32 +62,24 @@
     border-radius: 20px;
 }
 
-.topBarActiveLink:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    opacity: 1 !important;
-}
-.divider{
+.divider {
     margin: 0 10px;
     opacity: 0.5;
 }
 
-
-.mainHeader{
+.mainHeader {
     background-color: #FFFFFF;
     padding: 15px 0;
     width: 100%;
 }
 
-/* ==========================================================================
-   BLOCO DA LOGO E TITULOS
-   ========================================================================== */
-.brand{
+.brand {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.logoBox{
+.logoBox {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -99,13 +90,14 @@
     padding: 5px;
 }
 
-.iconLogo{
+.iconLogo {
     width: auto;
     height: auto;
     max-height: 100%;
     max-width: 100%;
     object-fit: contain;
 }
+
 .brandText {
     display: flex;
     flex-direction: column;
@@ -149,16 +141,15 @@
     background-color: #f5f5f5;
 }
 
-/* Estado Ativo */
 .activeLink {
     background-color: #e6f2f8;
     color: #004066;
     font-weight: 600;
 }
 
-.activeLink:hover {
-  background-color: #d0e8f5;
-  color: #004066;
+/* Oculta os links adicionais do mobile no Desktop */
+.mobileOnlyLinks {
+    display: none;
 }
 
 /* ==========================================================================
@@ -218,8 +209,8 @@
         background-color: #ffffff;
         flex-direction: column;
         gap: 0;
-        padding: 10px 0;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 10px 0 20px 0;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
         border-top: 1px solid #eee;
         
         opacity: 0;
@@ -238,8 +229,11 @@
     .navItem {
         width: 100%;
         text-align: center;
-        padding: 14px 0;
+        padding: 12px 0;
         border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .navItem:hover {
@@ -249,5 +243,23 @@
     .activeLink {
         background-color: #e6f2f8;
     }
-}
 
+    /* Exibe os links extras dentro do hambúrguer no Celular */
+    .mobileOnlyLinks {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .mobileDivider {
+        height: 1px;
+        background-color: #e2e8f0;
+        margin: 8px 20px;
+    }
+
+    .mobileAreaRestrita {
+        color: #004066;
+        font-weight: 700;
+        background-color: #f0f7fc;
+    }
+}
