@@ -9,30 +9,30 @@ import {
   ArrowRight, 
   ShieldCheck, 
   ArrowLeft,
-  Activity,
   LogOut,
-  Images
+  Images,
+  Sparkles
 } from 'lucide-react';
 import styles from './AdminHub.module.css';
 
 export default function AdminHubPage() {
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState(null);
+
+  // Leitura síncrona inicial do usuário para não precisar rodar setUserInfo no useEffect (sem sublinhado)
+  const [userInfo] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const savedUser = localStorage.getItem('user_info');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
       router.push('/admin/login');
-      return;
-    }
-
-    const savedUser = localStorage.getItem('user_info');
-    if (savedUser) {
-      try {
-        setUserInfo(JSON.parse(savedUser));
-      } catch (err) {
-        console.error('Erro ao ler informações do usuário:', err);
-      }
     }
   }, [router]);
 
@@ -108,7 +108,24 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-          {/* CARD 2: NOTÍCIAS */}
+          {/* CARD 2: ESTATÍSTICAS DO HERO (GLASSMORPHISM) */}
+          <div className={styles.moduleCard}>
+            <div className={styles.iconWrapperBlue}>
+              <Sparkles size={32} />
+            </div>
+            <div className={styles.cardContent}>
+              <span className={styles.cardBadge}>Página Inicial</span>
+              <h2 className={styles.cardTitle}>Gerenciar Indicadores do Banner Principal</h2>
+              <p className={styles.cardDescription}>
+                Altere os números e rótulos dos 4 cartões Glassmorphism exibidos no banner inicial.
+              </p>
+            </div>
+            <Link href="/admin/hero" className={styles.actionBtnBlue}>
+              Acessar Indicadores <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          {/* CARD 3: NOTÍCIAS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperBlue}>
               <Newspaper size={32} />
@@ -125,7 +142,7 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-          {/* CARD 3: EVENTOS */}
+          {/* CARD 4: EVENTOS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperGreen}>
               <Calendar size={32} />

@@ -10,6 +10,7 @@
     box-sizing: border-box;
     overflow: hidden;
 
+    /* SEU GRADIENTE + SUA IMAGEM */
     background-image: 
         linear-gradient(
             135deg, 
@@ -186,10 +187,7 @@
     line-height: 1.3;
 }
 
-/* ==========================================================
-   ADAPTAÇÃO RESPONSIVA
-   ========================================================== */
-
+/* ADAPTAÇÃO RESPONSIVA */
 @media (max-width: 1024px) {
     .heroSection {
         min-height: 420px;
@@ -225,7 +223,8 @@
         max-width: 440px;
         justify-content: center;
     }
-     .glassCard {    
+    
+    .glassCard {    
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -243,6 +242,7 @@
         width: 100%;
         justify-content: center;
     }
+
     .glassCard {    
         display: flex;
         flex-direction: column;
