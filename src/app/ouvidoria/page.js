@@ -33,14 +33,16 @@ export default function OuvidoriaPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      {/* BANNER PRINCIPAL DE TOPO */}
+      {/* 1. BANNER DE TOPO COM GRADIENTE E BARRA COLORIDA */}
       <section className={styles.heroBanner}>
-        <div className={styles.container}>
-          <span className={styles.heroBadge}>📣 Participação Social</span>
-          <h1 className={styles.heroTitle}>Ouvidoria da Saúde</h1>
-          <p className={styles.heroSubtitle}>
-            Canal Direto de Diálogo com o Cidadão
-          </p>
+        <div className={styles.overlay}>
+          <div className={styles.container}>
+            <span className={styles.heroBadge}>📣 Participação Social</span>
+            <h1 className={styles.heroTitle}>Ouvidoria da Saúde</h1>
+            <p className={styles.heroSubtitle}>
+              Canal Direto de Diálogo com o Cidadão
+            </p>
+            </div>
         </div>
       </section>
 

@@ -5,7 +5,7 @@
   width: 100%;
   min-height: 100vh;
   background-color: #eaf3f8;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
@@ -21,12 +21,12 @@
 .heroBanner {
   position: relative;
   width: 100%;
-  aspect-ratio: 1920 / 355; 
+  aspect-ratio: 1920 / 355;
   min-height: 220px;
   background: linear-gradient(
-    135deg, 
-    rgba(0, 82, 133, 0.88) 0%, 
-    rgba(1, 97, 156, 0.88) 80%, 
+    135deg,
+    rgba(0, 82, 133, 0.88) 0%,
+    rgba(1, 97, 156, 0.88) 80%,
     rgba(0, 72, 119, 0.92) 100%
   );
   overflow: hidden;
@@ -36,7 +36,7 @@
 
 /* --- BARRA COLORIDA NO RODAPÉ DO BANNER --- */
 .heroBanner::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -44,10 +44,14 @@
   height: 8px;
   background: linear-gradient(
     to right,
-    #005a8c 0%, #005a8c 35%,
-    #fee100 35%, #fee100 60%,
-    #52c41a 60%, #52c41a 80%,
-    #e53935 80%, #e53935 100%
+    #005a8c 0%,
+    #005a8c 35%,
+    #fee100 35%,
+    #fee100 60%,
+    #52c41a 60%,
+    #52c41a 80%,
+    #e53935 80%,
+    #e53935 100%
   );
   z-index: 3;
 }
@@ -58,7 +62,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 40px 0; 
+  padding: 40px 0;
   background: transparent;
 }
 
@@ -130,7 +134,9 @@
   max-width: 600px;
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .searchBox:focus-within {
@@ -238,7 +244,9 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0, 59, 92, 0.01);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .card:hover {
@@ -391,12 +399,12 @@
 }
 
 @media (max-width: 768px) {
-  .heroBanner { 
-    aspect-ratio: auto; 
-    min-height: 240px; 
+  .heroBanner {
+    aspect-ratio: auto;
+    min-height: 240px;
   }
-  .heroTitle { 
-    font-size: 32px; 
+  .heroTitle {
+    font-size: 32px;
   }
   .contactsGrid {
     grid-template-columns: 1fr;

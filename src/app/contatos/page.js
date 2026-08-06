@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Search } from 'lucide-react';
-import { listaContatos, categoriasContatos } from '@/data/contatosData';
-import styles from './Contatos.module.css';
+import { useState } from "react";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import { listaContatos, categoriasContatos } from "@/data/contatosData";
+import styles from "./Contatos.module.css";
 
 function normalizarTexto(texto) {
-  if (!texto) return '';
+  if (!texto) return "";
   return texto
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 export default function ContatosPage() {
@@ -26,17 +26,17 @@ export default function ContatosPage() {
   const termo = normalizarTexto(busca.trim());
 
   const contatosFiltrados = listaContatos.filter((item) => {
-    const bateCategoria = categoriaAtiva === "Todos" || item.categoria === categoriaAtiva;
+    const bateCategoria =
+      categoriaAtiva === "Todos" || item.categoria === categoriaAtiva;
     const bateNome = normalizarTexto(item.nome).includes(termo);
     const bateEndereco = normalizarTexto(item.endereco).includes(termo);
-    
+
     return bateCategoria && (bateNome || bateEndereco);
   });
 
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER */}
       {/* 1. BANNER DE TOPO COM GRADIENTE E BARRA COLORIDA */}
       <section className={styles.heroBanner}>
         <div className={styles.overlay}>
@@ -44,7 +44,8 @@ export default function ContatosPage() {
             <span className={styles.heroSubtitle}>INSTITUCIONAL</span>
             <h1 className={styles.heroTitle}>Guia de Contatos da Saúde</h1>
             <p className={styles.heroDesc}>
-              Encontre telefones, endereços, e-mails e localizações das Unidades Básicas, Policlínicas e Centros Especializados de Muriaé.
+              Encontre telefones, endereços, e-mails e localizações das Unidades
+              Básicas, Policlínicas e Centros Especializados de Muriaé.
             </p>
           </div>
         </div>
@@ -61,29 +62,30 @@ export default function ContatosPage() {
 
       {/* 3. CONTEÚDO PRINCIPAL */}
       <main className={styles.mainContainer}>
-        <div className={styles.container}> 
-          
+        <div className={styles.container}>
           {/* CAMPO DE PESQUISA COMPACTO E PADRONIZADO */}
           <form onSubmit={handleSubmeterBusca} className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
-            <input 
-              type="text" 
-              placeholder="Buscar unidade pelo nome ou endereço..." 
+            <input
+              type="text"
+              placeholder="Buscar unidade pelo nome ou endereço..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               className={styles.searchInput}
             />
             {busca && (
-              <button 
-                type="button" 
-                className={styles.clearBtn} 
-                onClick={() => setBusca('')}
+              <button
+                type="button"
+                className={styles.clearBtn}
+                onClick={() => setBusca("")}
                 title="Limpar busca"
               >
                 ✕
               </button>
             )}
-            <button type="submit" className={styles.searchBtn}>Buscar</button>
+            <button type="submit" className={styles.searchBtn}>
+              Buscar
+            </button>
           </form>
 
           {/* FILTROS POR TEMA (ABAS / BOTÕES) */}
@@ -91,7 +93,7 @@ export default function ContatosPage() {
             {categoriasContatos.map((cat) => (
               <button
                 key={cat}
-                className={`${styles.filterBtn} ${categoriaAtiva === cat ? styles.filterBtnActive : ''}`}
+                className={`${styles.filterBtn} ${categoriaAtiva === cat ? styles.filterBtnActive : ""}`}
                 onClick={() => setCategoriaAtiva(cat)}
               >
                 {cat}
@@ -105,7 +107,9 @@ export default function ContatosPage() {
               {contatosFiltrados.map((contato) => (
                 <div key={contato.id} className={styles.card}>
                   <div className={styles.cardHeader}>
-                    <span className={styles.categoryBadge}>{contato.categoria}</span>
+                    <span className={styles.categoryBadge}>
+                      {contato.categoria}
+                    </span>
                     <h3 className={styles.cardTitle}>{contato.nome}</h3>
                   </div>
 
@@ -146,9 +150,18 @@ export default function ContatosPage() {
                       rel="noopener noreferrer"
                       className={styles.mapsBtn}
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                        <circle cx="12" cy="10" r="3" />
                       </svg>
                       Ver localização no Google Maps ↗
                     </a>
@@ -160,19 +173,23 @@ export default function ContatosPage() {
             <div className={styles.emptyState}>
               <Search size={40} className={styles.emptyIcon} />
               <h3>Nenhum contato encontrado</h3>
-              <p>Não encontramos nenhuma unidade correspondente aos critérios da sua busca.</p>
-              <button 
+              <p>
+                Não encontramos nenhuma unidade correspondente aos critérios da
+                sua busca.
+              </p>
+              <button
                 className={styles.resetSearchBtn}
-                onClick={() => { setBusca(''); setCategoriaAtiva('Todos'); }}
+                onClick={() => {
+                  setBusca("");
+                  setCategoriaAtiva("Todos");
+                }}
               >
                 Limpar Filtros
               </button>
             </div>
           )}
-
         </div>
       </main>
-
     </div>
   );
 }
