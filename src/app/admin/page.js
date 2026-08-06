@@ -11,7 +11,7 @@ import {
   ArrowLeft,
   Activity,
   LogOut,
-  User
+  Images
 } from 'lucide-react';
 import styles from './AdminHub.module.css';
 
@@ -91,7 +91,24 @@ export default function AdminHubPage() {
         {/* CARDS DE NAVEGAÇÃO DOS MÓDULOS */}
         <div className={styles.cardsGrid}>
           
-          {/* CARD 1: NOTÍCIAS */}
+          {/* CARD 1: CARROSSEL */}
+          <div className={styles.moduleCard}>
+            <div className={styles.iconWrapperPurple}>
+              <Images size={32} />
+            </div>
+            <div className={styles.cardContent}>
+              <span className={styles.cardBadgePurple}>Destaques</span>
+              <h2 className={styles.cardTitle}>Gerenciar Carrossel</h2>
+              <p className={styles.cardDescription}>
+                Cadastre e edite as imagens e campanhas em destaque exibidas na página inicial.
+              </p>
+            </div>
+            <Link href="/admin/carousel" className={styles.actionBtnPurple}>
+              Acessar Carrossel <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          {/* CARD 2: NOTÍCIAS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperBlue}>
               <Newspaper size={32} />
@@ -108,7 +125,7 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-          {/* CARD 2: EVENTOS */}
+          {/* CARD 3: EVENTOS */}
           <div className={styles.moduleCard}>
             <div className={styles.iconWrapperGreen}>
               <Calendar size={32} />
@@ -125,14 +142,6 @@ export default function AdminHubPage() {
             </Link>
           </div>
 
-        </div>
-
-        {/* MENSAGEM / INFORMAÇÕES DO SISTEMA */}
-        <div className={styles.systemInfoBox}>
-          <Activity size={20} color="#0065a4" />
-          <span>
-            Todas as alterações realizadas no painel são sincronizadas em tempo real com a planilha oficial do Google Sheets.
-          </span>
         </div>
 
       </div>

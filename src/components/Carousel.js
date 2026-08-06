@@ -1,141 +1,214 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useKeenSlider } from 'keen-slider/react'; 
 import 'keen-slider/keen-slider.min.css'; 
 import styles from './Carousel.module.css'; 
 import Image from 'next/image'; 
+import { Images } from 'lucide-react';
+
+const SCRIPT_CARROSSEL_URL = 'https://script.google.com/macros/s/AKfycbxXCjv22fJcKIuwYV9ml5B6d99pQIX2rT0WBKkbz2JpjV78zADBCCQoGcFvjkt9DuJs3A/exec';
+
+function tratarUrlImagem(url) {
+  if (!url || typeof url !== 'string') return '';
+  let cleanUrl = url.trim();
+
+  if (cleanUrl.includes('drive.google.com') || cleanUrl.includes('googleusercontent.com')) {
+    let fileId = '';
+    if (cleanUrl.includes('/d/')) {
+      fileId = cleanUrl.split('/d/')[1].split('/')[0].split('?')[0];
+    } else if (cleanUrl.includes('id=')) {
+      fileId = cleanUrl.split('id=')[1].split('&')[0];
+    }
+    if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}`;
+  }
+
+  return cleanUrl;
+}
 
 export default function Carousel() {
-    const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [slides, setSlides] = useState([]);
+  const [carregando, setCarregando] = useState(true);
 
-    const slidesData = [
-        {
-            id: 1,
-            imgDesktop: "/img/carousel/1.png",
-            alt: "Campanha Julho Amarelo - Julho é o mês de combater o silêncio das hepatites virais"
-        },
-        {
-            id: 2,
-            imgDesktop: "/img/carousel/2.png",
-            alt: "Vacina contra a gripe, vacinas liberadas para toda população"
-        },
-        {
-            id: 3,
-            imgDesktop: "/img/carousel/3.png",
-            alt: "Saúde Digital Muriaé aplicativo. O aplicativo da Secretaria de Saúde de Muriaé, feito para você"
-        },
-        {
-            id: 4,
-            imgDesktop: "/img/carousel/4.png",
-            alt: "Seu coração dá sinais. Aprenda a reconhecê-los! Falta de ar, inchaço nas pernas ou pés, cansaço excessivo"
+  const [sliderRef, instanceRef] = useKeenSlider(
+    {
+      initial: 0,
+      loop: slides.length > 1,
+      created() {
+        setLoaded(true);
+      },
+    },
+    [
+      (slider) => {
+        let timeout;
+        let mouseOver = false;
+
+        function clearNextTimeout() {
+          clearTimeout(timeout);
         }
-    ];
 
-    /* ==========================================================================
-       PLUGIN DE AUTOPLAY (DESLIZAMENTO AUTOMÁTICO COM PAUSA NO HOVER)
-       ========================================================================== */
-    const [sliderRef, instanceRef] = useKeenSlider(
-        {
-            initial: 0,
-            loop: true,
-            created() {
-                setLoaded(true);
-            },
-        },
-        [
-            (slider) => {
-                let timeout;
-                let mouseOver = false;
+        function nextTimeout() {
+          clearTimeout(timeout);
+          if (mouseOver || slider.track.details?.slides.length <= 1) return;
+          timeout = setTimeout(() => {
+            slider.next();
+          }, 4000);
+        }
 
-                function clearNextTimeout() {
-                    clearTimeout(timeout);
-                }
+        slider.on("created", () => {
+          slider.container.addEventListener("mouseover", () => {
+            mouseOver = true;
+            clearNextTimeout();
+          });
+          slider.container.addEventListener("mouseout", () => {
+            mouseOver = false;
+            nextTimeout();
+          });
+          nextTimeout();
+        });
+        slider.on("dragStarted", clearNextTimeout);
+        slider.on("animationEnded", nextTimeout);
+        slider.on("updated", nextTimeout);
+      },
+    ]
+  );
 
-                function nextTimeout() {
-                    clearTimeout(timeout);
-                    if (mouseOver) return; // Se o mouse estiver por cima, interrompe a transição
-                    timeout = setTimeout(() => {
-                        slider.next();
-                    }, 4000); // TEMPO EM MILISSEGUNDOS (4000ms = 4 segundos)
-                }
+  useEffect(() => {
+    async function carregarSlides() {
+      const cache = localStorage.getItem('cache_portal_carrossel');
+      if (cache) {
+        try {
+          const parsedCache = JSON.parse(cache);
+          if (Array.isArray(parsedCache) && parsedCache.length > 0) {
+            setSlides(parsedCache);
+            setCarregando(false);
+          }
+        } catch (e) {
+          console.error("Erro ao ler cache do carrossel:", e);
+        }
+      }
 
-                slider.on("created", () => {
-                    slider.container.addEventListener("mouseover", () => {
-                        mouseOver = true;
-                        clearNextTimeout();
-                    });
-                    slider.container.addEventListener("mouseout", () => {
-                        mouseOver = false;
-                        nextTimeout();
-                    });
-                    nextTimeout();
-                });
-                slider.on("dragStarted", clearNextTimeout);
-                slider.on("animationEnded", nextTimeout);
-                slider.on("updated", nextTimeout);
-            },
-        ]
-    );
+      try {
+        const response = await fetch(`${SCRIPT_CARROSSEL_URL}?_t=${Date.now()}`, {
+          method: 'GET',
+          redirect: 'follow',
+          cache: 'no-store'
+        });
+        const resData = await response.json();
 
-    const handlePrev = (e) => {
-        e.stopPropagation();
-        if (instanceRef.current) instanceRef.current.prev();
-    };
+        if (resData.status === 'success' && Array.isArray(resData.slides)) {
+          const slidesFormatados = resData.slides
+            .map(item => ({
+              id: item.id || String(Date.now()),
+              imgDesktop: tratarUrlImagem(item.imagem),
+              alt: item.alt || 'Banner institucional',
+              link: item.link || '' 
+            }))
+            .filter(item => item.imgDesktop !== '');
 
-    const handleNext = (e) => {
-        e.stopPropagation(); 
-        if (instanceRef.current) instanceRef.current.next();
-    };
+          setSlides(slidesFormatados);
+          localStorage.setItem('cache_portal_carrossel', JSON.stringify(slidesFormatados));
+        }
+      } catch (err) {
+        console.error("Erro ao buscar banners dinâmicos:", err);
+      } finally {
+        setCarregando(false);
+      }
+    }
 
-    return (
-        <section className={styles.carouselSection}>
-            <div className={styles.container}>                
-                {/* CABEÇALHO DO BLOCO */}
-                <div className={styles.headerArea}>
-                    <span className={styles.subtitle}>DESTAQUES</span>
-                    <h2 className={styles.title}>Campanhas e iniciativas</h2>
-                </div>
+    carregarSlides();
+  }, []);
 
-                {/* CONTAINER DO CARROSSEL */}
-                <div className={styles.carouselWrapper}>
-                    <div ref={sliderRef} className="keen-slider">
-                        {slidesData.map((slide) => (
-                            <div key={slide.id} className={`keen-slider__slide ${styles.slide}`}>                                
-                                <Image 
-                                    src={slide.imgDesktop} 
-                                    alt={slide.alt} 
-                                    width={1920} 
-                                    height={555} 
-                                    priority={slide.id === 1} 
-                                    className={styles.bannerImg} 
-                                />
-                            </div>
-                        ))}
-                    </div>
+  return (
+    <section className={styles.carouselSection}>
+      <div className={styles.container}>                
+        
+        <div className={styles.headerArea}>
+          <span className={styles.subtitle}>DESTAQUES</span>
+          <h2 className={styles.title}>Campanhas e iniciativas</h2>
+        </div>
 
-                    {/* SETAS DE NAVEGAÇÃO */}
-                    {loaded && (
-                        <>
-                            <button
-                                className={`${styles.arrow} ${styles.arrowLeft}`}
-                                onClick={handlePrev}
-                                aria-label="Slide anterior"
-                            >
-                                ←
-                            </button>
+        {slides.length > 0 ? (
+          <div className={styles.carouselWrapper}>
+            <div key={slides.length} ref={sliderRef} className="keen-slider">
+              {slides.map((slide, index) => {
+                const linkStr = (typeof slide.link === 'string') ? slide.link.trim() : '';
+                const isExternal = linkStr.startsWith('http');
 
-                            <button
-                                className={`${styles.arrow} ${styles.arrowRight}`}
-                                onClick={handleNext} 
-                                aria-label="Próximo slide" 
-                            >
-                                →
-                            </button>
-                        </>
+                const content = (
+                  <Image 
+                    src={slide.imgDesktop} 
+                    alt={slide.alt} 
+                    width={1920} 
+                    height={555} 
+                    priority={index === 0} 
+                    className={styles.bannerImg}
+                    unoptimized
+                  />
+                );
+
+                return (
+                  <div key={slide.id} className={`keen-slider__slide ${styles.slide}`}>
+                    {linkStr ? (
+                      <a 
+                        href={linkStr} 
+                        target={isExternal ? "_blank" : "_self"}
+                        rel={isExternal ? "noopener noreferrer" : ""}
+                        style={{ display: 'block', width: '100%' }}
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      content
                     )}
-                </div>
+                  </div>
+                );
+              })}
             </div>
-        </section>
-    );
+
+            {loaded && slides.length > 1 && (
+              <>
+                <button
+                  className={`${styles.arrow} ${styles.arrowLeft}`}
+                  onClick={(e) => { e.stopPropagation(); instanceRef.current?.prev(); }}
+                  aria-label="Slide anterior"
+                >
+                  ←
+                </button>
+
+                <button
+                  className={`${styles.arrow} ${styles.arrowRight}`}
+                  onClick={(e) => { e.stopPropagation(); instanceRef.current?.next(); }}
+                  aria-label="Próximo slide" 
+                >
+                  →
+                </button>
+              </>
+            )}
+          </div>
+        ) : (
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            padding: '40px 20px',
+            textAlign: 'center',
+            border: '1px dashed #cbd5e1',
+            color: '#64748b'
+          }}>
+            <Images size={40} color="#0284c7" style={{ marginBottom: '12px' }} />
+            <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '18px' }}>
+              {carregando ? 'Carregando destaques...' : 'Nenhum banner cadastrado'}
+            </h3>
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              {carregando 
+                ? 'Buscando informações...' 
+                : 'Acesse o Painel Administrativo para publicar o primeiro banner do carrossel.'}
+            </p>
+          </div>
+        )}
+
+      </div>
+    </section>
+  );
 }

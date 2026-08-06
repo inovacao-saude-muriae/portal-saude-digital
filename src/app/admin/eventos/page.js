@@ -779,7 +779,7 @@ function formatarCaminhoImagemModelo(caminho) {
                     </div>
 
                     <button type="submit" disabled={loadingForm} className={styles.submitBtn}>
-                        {loadingForm ? 'Salvando na planilha...' : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar Evento</>}
+                        {loadingForm ? 'Enviando' : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar</>}
                     </button>
                     </div>
                 </div>

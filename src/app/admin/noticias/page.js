@@ -516,7 +516,7 @@ export default function AdminNoticiasPage() {
 
                 <div className={styles.cardSection}>
                   <button type="submit" disabled={loadingForm} className={styles.submitBtn}>
-                    {loadingForm ? 'Salvando na planilha...' : noticiaEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar Notícia</>}
+                    {loadingForm ? 'Enviando' : noticiaEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar</>}
                   </button>
                 </div>
               </div>
