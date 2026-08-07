@@ -1,5 +1,38 @@
 /* ==========================================================
-   ESTILOS DO MÓDULO: GESTÃO CCZ (ADOÇÃO)
+   ESTILIZAÇÃO MODERNA DA BARRA DE ROLAGEM (GLOBAL VIA MODULE)
+   ========================================================== */
+
+/* Suporte para Firefox */
+:global(*) {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+/* Suporte para Navegadores WebKit (Chrome, Edge, Safari) */
+:global(::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+
+:global(::-webkit-scrollbar-track) {
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+:global(::-webkit-scrollbar-thumb) {
+  background-color: #cbd5e1;
+  border-radius: 8px;
+  border: 2px solid #f8fafc;
+  transition: background-color 0.2s ease;
+}
+
+:global(::-webkit-scrollbar-thumb:hover) {
+  background-color: #008a83;
+}
+
+
+/* ==========================================================
+   ESTILOS DO MÓDULO ADMINISTRATIVO - GESTÃO CCZ / ADOÇÃO
    ========================================================== */
 
 .pageWrapper {
@@ -34,8 +67,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: #ccfbf1;
-  color: #0f766e;
+  background-color: #e6f4f1;
+  color: #008a83;
   font-size: 11px;
   font-weight: 800;
   padding: 4px 12px;
@@ -98,7 +131,8 @@
   gap: 24px;
 }
 
-.cardForm, .cardLista {
+.cardForm, 
+.cardLista {
   background: #ffffff;
   border-radius: 12px;
   padding: 24px;
@@ -115,11 +149,46 @@
   padding-bottom: 12px;
 }
 
-.cardHeader h2 {
+.cardHeaderFlex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.cardTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardHeader h2,
+.cardTitleGroup h2 {
   font-size: 17px;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
+}
+
+.cancelEditBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.cancelEditBtn:hover {
+  background-color: #fef2f2;
 }
 
 .formContainer {
@@ -146,7 +215,6 @@
   color: #334155;
 }
 
-/* CORREÇÃO DO TEXTO E FUNDO DOS INPUTS, SELECTS E TEXTAREAS */
 .inputGroup input, 
 .inputGroup select, 
 .inputGroup textarea {
@@ -156,20 +224,9 @@
   font-size: 13.5px;
   outline: none;
   background-color: #ffffff !important;
-  color: #0f172a !important; /* COR DO TEXTO ESCURA */
+  color: #0f172a !important;
   box-sizing: border-box;
   width: 100%;
-}
-
-/* CORREÇÃO DAS OPÇÕES DO SELECT DROPDOWN */
-.inputGroup select option {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-}
-
-.inputGroup input::placeholder,
-.inputGroup textarea::placeholder {
-  color: #94a3b8 !important;
 }
 
 .inputGroup input:focus, 
@@ -193,12 +250,12 @@
   font-size: 13px;
   font-weight: 600;
   background-color: #f8fafc;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .fileBox:hover {
   border-color: #008a83;
-  background-color: #f0fdf4;
+  background-color: #f0fdfa;
 }
 
 .previewBox {
@@ -209,6 +266,7 @@
 .previewImg {
   border-radius: 8px;
   object-fit: cover;
+  border: 1px solid #e2e8f0;
 }
 
 .btnSalvar {
@@ -221,20 +279,29 @@
   cursor: pointer;
   margin-top: 8px;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s ease;
 }
 
-.btnSalvar:hover {
+.btnSalvar:hover:not(:disabled) {
   background-color: #006863;
 }
 
-/* LISTA DIREITA */
+.btnSalvar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .animaisList {
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-height: 520px;
   overflow-y: auto;
+  padding-right: 6px;
+  scroll-behavior: smooth;
 }
 
 .animalRow {
@@ -242,7 +309,7 @@
   align-items: center;
   gap: 14px;
   background-color: #f8fafc;
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
@@ -250,6 +317,7 @@
 .thumbImg {
   border-radius: 6px;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .animalInfo {
@@ -257,15 +325,38 @@
 }
 
 .animalInfo h3 {
-  font-size: 15px;
+  font-size: 14px;
   margin: 0 0 2px 0;
   color: #0f172a !important;
+  font-weight: 700;
 }
 
 .animalInfo p {
   font-size: 12px;
   color: #64748b !important;
   margin: 0;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 6px;
+}
+
+.btnEdit {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.btnEdit:hover {
+  background-color: #bae6fd;
 }
 
 .btnDelete {
@@ -275,29 +366,22 @@
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btnDelete:hover {
-  background-color: #dc2626;
-  color: #ffffff;
-}
-
-.loadingBox {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 40px;
-  color: #64748b;
-  font-size: 14px;
+  transition: background-color 0.2s ease;
 }
 
+.btnDelete:hover {
+  background-color: #fecaca;
+}
+
+.loadingBox, 
 .emptyMsg {
   text-align: center;
   color: #64748b;
   font-size: 13.5px;
-  padding: 40px;
+  padding: 40px 20px;
 }
 
 @media (max-width: 768px) {

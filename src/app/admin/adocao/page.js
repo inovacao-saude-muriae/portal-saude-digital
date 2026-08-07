@@ -12,7 +12,9 @@ import {
   CheckCircle2, 
   ArrowLeft, 
   ShieldCheck, 
-  PawPrint 
+  PawPrint,
+  Pencil,
+  XCircle
 } from 'lucide-react';
 import styles from './AdminAdocao.module.css';
 
@@ -25,6 +27,9 @@ export default function AdminAdocaoPage() {
   const [carregando, setCarregando] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [msgSucesso, setMsgSucesso] = useState('');
+
+  // ESTADO PARA CONTROLAR A EDICÃO DE UM ANIMAL
+  const [animalEmEdicao, setAnimalEmEdicao] = useState(null);
 
   const [novoAnimal, setNovoAnimal] = useState({
     nome: '',
@@ -51,8 +56,7 @@ export default function AdminAdocaoPage() {
         const user = JSON.parse(savedUser);
         const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
         
-        // Cargos com acesso permitido a esta rota
-        const cargosPermitidos = ['admin', 'ccz'];
+        const cargosPermitidos = ['admin', 'master', 'gestor', 'ccz', 'zoonoses', 'veterinario'];
         
         if (!cargosPermitidos.includes(cargo)) {
           alert('Acesso negado: Você não possui permissão para acessar o módulo do CCZ.');
@@ -64,7 +68,7 @@ export default function AdminAdocaoPage() {
     }
   }, [router]);
 
-  // 2. FUNÇÃO MANUAL DE RECARREGAMENTO
+  // 2. FUNÇÃO PARA BUSCAR ANIMAIS
   const buscarAnimais = useCallback(async () => {
     setCarregando(true);
     try {
@@ -120,7 +124,38 @@ export default function AdminAdocaoPage() {
     }
   };
 
-  const handleCadastrar = async (e) => {
+  // INICIAR EDICÃO DE UM ANIMAL
+  const handleIniciarEdicao = (animal) => {
+    setAnimalEmEdicao(animal);
+    setNovoAnimal({
+      nome: animal.nome || '',
+      especie: animal.especie || 'Cachorro',
+      sexo: animal.sexo || 'macho',
+      filhote: String(animal.filhote) === 'true' ? 'true' : 'false',
+      descricao: animal.descricao || ''
+    });
+    setPreviewFoto(animal.foto || '');
+    setArquivoFoto(null);
+    setMsgSucesso('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // CANCELAR EDICÃO E LIMPAR FORMULÁRIO
+  const handleCancelarEdicao = () => {
+    setAnimalEmEdicao(null);
+    setNovoAnimal({
+      nome: '',
+      especie: 'Cachorro',
+      sexo: 'macho',
+      filhote: 'false',
+      descricao: ''
+    });
+    setArquivoFoto(null);
+    setPreviewFoto('');
+  };
+
+  // CADASTRAR OU ATUALIZAR ANIMAL
+  const handleCadastrarOuEditar = async (e) => {
     e.preventDefault();
     setEnviando(true);
 
@@ -139,22 +174,27 @@ export default function AdminAdocaoPage() {
         });
       }
 
+      const isEditing = !!animalEmEdicao;
+
+      const payload = {
+        action: isEditing ? 'UPDATE_ANIMAL' : 'ADD_ANIMAL',
+        id: isEditing ? animalEmEdicao.id : undefined,
+        ...novoAnimal,
+        imagemBase64,
+        imagemNome,
+        imagemType,
+        fotoAntiga: isEditing ? animalEmEdicao.foto : undefined
+      };
+
       await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'ADD_ANIMAL',
-          ...novoAnimal,
-          imagemBase64,
-          imagemNome,
-          imagemType
-        })
+        body: JSON.stringify(payload)
       });
 
-      setMsgSucesso('Animal cadastrado com sucesso!');
-      setNovoAnimal({ nome: '', especie: 'Cachorro', sexo: 'macho', filhote: 'false', descricao: '' });
-      setArquivoFoto(null);
-      setPreviewFoto('');
+      setMsgSucesso(isEditing ? 'Animal atualizado com sucesso!' : 'Animal cadastrado com sucesso!');
+      
+      handleCancelarEdicao();
 
       setTimeout(() => {
         buscarAnimais();
@@ -163,7 +203,7 @@ export default function AdminAdocaoPage() {
 
     } catch (err) {
       console.error(err);
-      alert('Erro ao cadastrar animal.');
+      alert('Erro ao salvar informações do animal.');
     } finally {
       setEnviando(false);
     }
@@ -183,6 +223,7 @@ export default function AdminAdocaoPage() {
       });
 
       setAnimais((prev) => prev.filter((a) => a.id !== id));
+      if (animalEmEdicao?.id === id) handleCancelarEdicao();
     } catch (err) {
       console.error(err);
       alert('Erro ao excluir animal.');
@@ -200,7 +241,7 @@ export default function AdminAdocaoPage() {
               <ShieldCheck size={14} /> Gestão CCZ
             </span>
             <h1 className={styles.mainTitle}>Controle de Animais para Adoção</h1>
-            <p className={styles.subTitle}>Cadastre e remova os peludinhos protegidos pelo CCZ.</p>
+            <p className={styles.subTitle}>Cadastre, edite e remova os peludinhos protegidos pelo CCZ.</p>
           </div>
           <Link href="/admin" className={styles.backBtn}>
             <ArrowLeft size={16} /> Voltar ao Painel
@@ -215,14 +256,26 @@ export default function AdminAdocaoPage() {
         )}
 
         <div className={styles.layoutGrid}>
-          {/* COLUNA ESQUERDA: FORMULÁRIO DE CADASTRO */}
+          {/* COLUNA ESQUERDA: FORMULÁRIO DE CADASTRO / EDICÃO */}
           <div className={styles.cardForm}>
-            <div className={styles.cardHeader}>
-              <Plus size={18} color="#008a83" />
-              <h2>Cadastrar Novo Animal</h2>
+            <div className={styles.cardHeaderFlex}>
+              <div className={styles.cardTitleGroup}>
+                {animalEmEdicao ? <Pencil size={18} color="#008a83" /> : <Plus size={18} color="#008a83" />}
+                <h2>{animalEmEdicao ? `Editar: ${animalEmEdicao.nome}` : 'Cadastrar Novo Animal'}</h2>
+              </div>
+
+              {animalEmEdicao && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelarEdicao}
+                  className={styles.cancelEditBtn}
+                >
+                  <XCircle size={15} /> Cancelar Edição
+                </button>
+              )}
             </div>
 
-            <form onSubmit={handleCadastrar} className={styles.formContainer}>
+            <form onSubmit={handleCadastrarOuEditar} className={styles.formContainer}>
               <div className={styles.inputGroup}>
                 <label>Nome do Animal *</label>
                 <input 
@@ -282,22 +335,43 @@ export default function AdminAdocaoPage() {
 
               {/* UPLOAD DA FOTO */}
               <div className={styles.inputGroup}>
-                <label>Foto do Animal *</label>
+                <label>
+                  Foto do Animal {animalEmEdicao ? '(Deixe em branco para manter a atual)' : '*'}
+                </label>
                 <label className={styles.fileBox}>
                   <Upload size={20} color="#008a83" />
                   <span>{arquivoFoto ? arquivoFoto.name : 'Clique para selecionar a foto'}</span>
-                  <input type="file" accept="image/*" onChange={handleFotoChange} hidden required />
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFotoChange} 
+                    hidden 
+                    required={!animalEmEdicao} 
+                  />
                 </label>
               </div>
 
               {previewFoto && (
                 <div className={styles.previewBox}>
-                  <Image src={previewFoto} alt="Preview" width={100} height={130} unoptimized className={styles.previewImg} />
+                  <Image 
+                    src={previewFoto} 
+                    alt="Preview" 
+                    width={100} 
+                    height={130} 
+                    unoptimized 
+                    className={styles.previewImg} 
+                  />
                 </div>
               )}
 
               <button type="submit" disabled={enviando} className={styles.btnSalvar}>
-                {enviando ? <Loader2 size={18} className="animate-spin" /> : 'Cadastrar Animal'}
+                {enviando ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : animalEmEdicao ? (
+                  'Salvar Alterações'
+                ) : (
+                  'Cadastrar Animal'
+                )}
               </button>
             </form>
           </div>
@@ -333,13 +407,24 @@ export default function AdminAdocaoPage() {
                         {animal.especie} • {animal.sexo === 'macho' ? 'Macho' : 'Fêmea'} • {animal.filhote === 'true' ? 'Filhote' : 'Adulto'}
                       </p>
                     </div>
-                    <button 
-                      onClick={() => handleExcluir(animal.id, animal.nome)} 
-                      className={styles.btnDelete} 
-                      title="Excluir animal"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+
+                    <div className={styles.actionGroup}>
+                      <button 
+                        onClick={() => handleIniciarEdicao(animal)} 
+                        className={styles.btnEdit} 
+                        title="Editar animal"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button 
+                        onClick={() => handleExcluir(animal.id, animal.nome)} 
+                        className={styles.btnDelete} 
+                        title="Excluir animal"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
