@@ -28,6 +28,12 @@ export const servicos = [
     icon: <Home size={24} />
   },
   {
+    id: 'carteira-servicos',
+    title: 'Carteira de Serviços',
+    desc: '',
+    icon: <FlaskConical size={24} />
+  },
+  {
     id: 'camara-tecnica',
     title: 'Câmara Técnica',
     desc: 'Avaliação especializada para apoio às decisões em tratamentos e medicamentos.',
@@ -62,7 +68,7 @@ export const servicos = [
     title: 'Laboratório Municipal',
     desc: 'Exames laboratoriais gratuitos com precisão e agilidade.',
     icon: <FlaskConical size={24} />
-  },
+  },  
   {
     id: 'vacina',
     title: 'Vacina',
