@@ -80,7 +80,13 @@ export const servicos = [
     title: 'Vigilância Sanitária',
     desc: 'Fiscalização e orientação para segurança alimentar, ambiental e sanitária.',
     icon: <ShieldCheck size={24} />
-  }
+  },
+  {
+    id: 'transparencia',
+    title: 'Transparência',
+    desc: 'Cuidado em saúde diretamente no aconchego do seu lar para acamados ou com mobilidade reduzida.',
+    icon: <Home size={24} />
+  },
 ];
 
 /* ==========================================================================

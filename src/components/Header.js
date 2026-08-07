@@ -46,7 +46,7 @@ export default function Header() {
                             Ouvidoria
                         </Link>
                         <span className={styles.divider}>|</span> 
-                        <Link href="/transparencia" className={isTopBarActive('/transparencia')}>
+                        <Link href="/servicos/transparencia" className={isTopBarActive('/servicos/transparencia')}>
                             Transparência
                         </Link>
                         <span className={styles.divider}>|</span> 

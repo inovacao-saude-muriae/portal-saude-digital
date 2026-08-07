@@ -1,72 +1,74 @@
+/* ==========================================================
+   ESTILOS DOS FLUXOS ASSISTENCIAIS (PADRÃO INSTITUCIONAL)
+   ========================================================== */
+
 .pageWrapper {
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
   color: #1e293b;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: 80px;
 }
 
 .mainContent {
-  padding: 40px 20px 80px 20px;
+  margin-top: 32px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* --- HERO BANNER --- */
+/* HERO BANNER INSTITUCIONAL */
 .heroBanner {
-  background-color: #003b5c;
+  background: linear-gradient(135deg, #008a83 0%, #005a56 100%);
   color: #ffffff;
-  padding: 48px 20px;
-  position: relative;
-  overflow: hidden;
+  padding: 60px 0 50px 0;
+  text-align: left;
 }
 
 .badgeHeader {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.15);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .heroTitle {
-  font-size: 38px;
+  font-size: 32px;
   font-weight: 800;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   letter-spacing: -0.5px;
-  line-height: 1.2;
 }
 
 .heroDesc {
-  font-size: 16px;
+  font-size: 15.5px;
   color: #e2e8f0;
   max-width: 750px;
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-/* --- BARRA DE NAVEGAÇÃO DE RETORNO --- */
+/* BARRA DE NAVEGAÇÃO DE RETORNO */
 .navigationBar {
   background-color: #ffffff;
   border-bottom: 1px solid #e2e8f0;
-  padding: 14px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  padding: 12px 0;
 }
 
 .navContainer {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -75,38 +77,38 @@
 .backLink {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #005c8a;
+  gap: 6px;
+  color: #008a83;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13.5px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .backLink:hover {
-  color: #003b5c;
+  color: #005a56;
 }
 
 .navTag {
   font-size: 13px;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* --- SELETOR DE CATEGORIAS (ABAS SUPERIORES) --- */
+/* SELETOR DE CATEGORIAS (ABAS SUPERIORES - NÍVEL 1) */
 .categoryCard {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 20px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  margin-bottom: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
 }
 
 .categoryLabel {
   display: block;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -117,91 +119,96 @@
 .categoryGrid {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .categoryButton {
-  background-color: #f1f5f9;
-  color: #334155;
+  background-color: #ffffff;
+  color: #0f172a;
   border: 1px solid #cbd5e1;
   padding: 10px 22px;
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: 10px;
+  font-size: 14.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .categoryButton:hover {
-  border-color: #2b943d;
-  color: #2b943d;
+  border-color: #008a83;
+  color: #008a83;
 }
 
 .categoryButtonActive {
-  background-color: #2b943d !important;
+  background-color: #008a83 !important;
   color: #ffffff !important;
-  border-color: #2b943d !important;
-  box-shadow: 0 4px 12px rgba(0, 138, 131, 0.25);
+  border-color: #008a83 !important;
+  box-shadow: 0 4px 10px rgba(0, 138, 131, 0.25);
 }
 
-/* --- SUB-ABAS (SUB-CATEGORIAS DO PROCEDIMENTO) --- */
-.subTabGrid {
+/* SUB-ABAS (EM UMA ÚNICA LINHA COM SCROLL - NÍVEL 2) */
+.subTabContainer {
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 6px;
   margin-bottom: 28px;
   background-color: #f1f5f9;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
+  padding: 6px;
+  border-radius: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.subTabContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .subTabButton {
-  background-color: #ffffff;
-  color: #475569;
-  border: 1.5px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  color: #334155;
+  border: none;
   padding: 8px 18px;
   border-radius: 20px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .subTabButton:hover {
-  border-color: #005c8a;
-  color: #005c8a;
-  transform: translateY(-1px);
+  color: #008a83;
 }
 
 .subTabButtonActive {
-  background-color: #003b5c !important;
-  color: #ffffff !important;
-  border-color: #00273d !important;
-  box-shadow: 0 4px 10px rgba(0, 59, 92, 0.25) !important;
+  background-color: #ffffff !important;
+  color: #008a83 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* --- CARD DE DETALHES E TEXTOS --- */
+/* CARD DE DETALHES E TEXTOS */
 .detailCard {
   background-color: #ffffff;
-  border-radius: 20px;
+  border-radius: 16px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px rgba(0, 59, 92, 0.04);
-  padding: 36px;
-  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 32px;
 }
 
 .cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
   padding-bottom: 16px;
   margin-bottom: 24px;
 }
@@ -213,33 +220,34 @@
 }
 
 .headerIconCircle {
-  background-color: #e6f4f2;
-  width: 42px;
-  height: 42px;
+  background-color: #e6f4f1;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2b943d;
+  color: #008a83;
 }
 
 .headerTag {
   font-size: 12px;
-  font-weight: 700;
-  color: #2b943d;
+  font-weight: 800;
+  color: #008a83;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .headerTitle {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
-  color: #003b5c;
-  margin: 0;
+  color: #0f172a;
+  margin: 2px 0 0 0;
 }
 
 .flowTextContent {
   color: #334155;
-  font-size: 15.5px;
+  font-size: 15px;
   line-height: 1.7;
   margin-bottom: 32px;
 }
@@ -248,11 +256,11 @@
   margin-bottom: 16px;
 }
 
-/* --- FLUXOGRAMAS E IMAGENS --- */
+/* FLUXOGRAMAS E IMAGENS */
 .diagramsSection {
-  margin-top: 40px;
-  padding-top: 28px;
-  border-top: 2px dashed #e2e8f0;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px dashed #cbd5e1;
 }
 
 .diagramsHeader {
@@ -262,7 +270,7 @@
 .diagramsTitle {
   font-size: 18px;
   font-weight: 800;
-  color: #003b5c;
+  color: #0f172a;
   margin: 0 0 4px 0;
 }
 
@@ -274,25 +282,25 @@
 
 .diagramsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .diagramCard {
   position: relative;
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
 .diagramCard:hover {
-  transform: translateY(-3px);
-  border-color: #2b943d;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: #008a83;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .diagramImageWrapper {
@@ -305,7 +313,7 @@
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 8px;
+  border-radius: 6px;
   object-fit: contain;
 }
 
@@ -315,7 +323,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #2b943d;
+  color: #008a83;
   font-size: 13.5px;
   font-weight: 700;
 }
@@ -324,12 +332,14 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: #f0fdfa;
+  background-color: #e6f4f1;
+  color: #008a83;
   padding: 4px 10px;
   border-radius: 20px;
+  font-size: 12px;
 }
 
-/* --- LIGHTBOX MODAL COM FUNDO CLARO --- */
+/* LIGHTBOX MODAL */
 .lightboxModal {
   position: fixed;
   inset: 0;
@@ -349,7 +359,7 @@
   align-items: center;
   background-color: #ffffff;
   padding: 12px 24px;
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
   z-index: 10000;
@@ -363,16 +373,16 @@
 
 .lightboxTitle {
   font-size: 15px;
-  font-weight: 700;
-  color: #003b5c;
+  font-weight: 800;
+  color: #0f172a;
 }
 
 .dragHintPill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: #e6f4f2;
-  color: #2b943d;
+  background-color: #e6f4f1;
+  color: #008a83;
   font-size: 12px;
   font-weight: 700;
   padding: 4px 10px;
@@ -387,11 +397,11 @@
 
 .controlBtn {
   background-color: #f1f5f9;
-  color: #003b5c;
+  color: #008a83;
   border: 1px solid #cbd5e1;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -400,19 +410,19 @@
 }
 
 .controlBtn:hover {
-  background-color: #e2e8f0;
+  background-color: #e6f4f1;
 }
 
 .closeBtn {
   background-color: #ef4444;
   color: #ffffff;
   border: none;
-  padding: 0 18px;
-  height: 40px;
-  border-radius: 10px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13.5px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -465,10 +475,13 @@
   text-align: center;
   color: #64748b;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+  .heroTitle {
+    font-size: 26px;
+  }
   .detailCard {
     padding: 20px;
   }

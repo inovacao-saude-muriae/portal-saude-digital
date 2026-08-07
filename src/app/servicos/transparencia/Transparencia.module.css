@@ -1,0 +1,298 @@
+/* ==========================================================
+   ESTILOS DA PÁGINA DE TRANSPARÊNCIA (PADRÃO INSTITUCIONAL)
+   ========================================================== */
+
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+  padding-bottom: 80px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* HERO BANNER */
+.heroBanner {
+  background: linear-gradient(135deg, #008a83 0%, #005a56 100%);
+  color: #ffffff;
+  padding: 60px 0 50px 0;
+  text-align: left;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.heroTitle {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
+}
+
+.heroSubtitle {
+  font-size: 15.5px;
+  color: #e2e8f0;
+  max-width: 750px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* NAVEGAÇÃO SUPERIOR */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 0;
+}
+
+.backLink {
+  color: #008a83;
+  font-weight: 700;
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #005a56;
+}
+
+/* MAIN CONTENT */
+.mainContainer {
+  margin-top: 32px;
+}
+
+/* ==========================================================
+   BOTÕES NÍVEL 1: CATEGORIAS (Fidelidade exata com a Imagem)
+   ========================================================== */
+.categoryTrack {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.categoryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoryBtn:hover {
+  border-color: #005a56;
+  color: #008a83;
+}
+
+/* Botão Selecionado Verde */
+.categoryBtnActive {
+  background-color: #008a83 !important;
+  color: #ffffff !important;
+  border-color: #008a83 !important;
+  box-shadow: 0 4px 10px rgba(43, 148, 61, 0.25);
+}
+
+/* ==========================================================
+   BOTÕES NÍVEL 2: SUB-ABAS EM UMA ÚNICA LINHA (PÍLULA)
+   ========================================================== */
+.subTabContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap; /* Garante tudo em uma linha só */
+  gap: 6px;
+  margin-bottom: 28px;
+  background-color: #f1f5f9;
+  padding: 6px;
+  border-radius: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto; /* Permite deslizar no mobile/telas menores */
+  scrollbar-width: none; /* Oculta scroll no Firefox */
+}
+
+.subTabContainer::-webkit-scrollbar {
+  display: none; /* Oculta scroll no Chrome, Safari e Edge */
+}
+
+.subTabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  color: #334155;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap; /* Evita quebra de texto interna */
+  flex-shrink: 0; /* Impede encolhimento do botão */
+  transition: all 0.2s ease;
+}
+
+.subTabBtn:hover {
+  color: #008a83;
+}
+
+/* Sub-aba Selecionada em Branco com Texto Verde */
+.subTabBtnActive {
+  background-color: #ffffff !important;
+  color: #008a83 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================
+   CARD CONTAINER DO POWER BI
+   ========================================================== */
+.dashboardCard {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badgeLive {
+  display: inline-block;
+  color: #008a83;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.dashboardTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.openExternalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #008a83;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.openExternalBtn:hover {
+  background-color: #008a83;
+  color: #ffffff;
+  border-color: #008a83;
+}
+
+/* IFRAME RESPONSIVO DO POWER BI */
+.iframeWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.powerBiIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ESTADO VAZIO */
+.emptyDashboardState {
+  padding: 80px 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.emptyIcon {
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.emptyDashboardState h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.emptyDashboardState p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 992px) {
+  .dashboardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .iframeWrapper {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroTitle { 
+    font-size: 26px; 
+  }
+
+  .iframeWrapper {
+    min-height: 400px;
+    aspect-ratio: 4 / 3;
+  }
+}

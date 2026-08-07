@@ -11,7 +11,7 @@ import {
   Search, 
   Move, 
   ArrowLeft, 
-  Hospital, 
+  BookOpen, 
   FileText 
 } from 'lucide-react';
 import styles from './FluxosAssistenciais.module.css';
@@ -19,7 +19,7 @@ import styles from './FluxosAssistenciais.module.css';
 // IMPORTAÇÃO DOS DADOS DO SEU ARQUIVO
 import { fluxosAssistenciaisData } from '@/data/fluxosAssistenciaisData';
 
-export default function Page() {
+export default function FluxosAssistenciaisPage() {
   const servico = fluxosAssistenciaisData;
 
   const [categoriaAtivaId, setCategoriaAtivaId] = useState('cardiologia');
@@ -125,11 +125,11 @@ export default function Page() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER */}
+      {/* 1. HERO BANNER INSTITUCIONAL */}
       <section className={styles.heroBanner}>
         <div className={styles.container}>
           <div className={styles.badgeHeader}>
-            <Hospital size={14} /> Rede Pública de Saúde de Muriaé
+            <BookOpen size={14} /> Transparência SUS
           </div>
           <h1 className={styles.heroTitle}>{servico.title}</h1>
           <p className={styles.heroDesc}>{servico.desc}</p>
@@ -139,8 +139,8 @@ export default function Page() {
       {/* 2. BARRA DE NAVEGAÇÃO DE RETORNO */}
       <nav className={styles.navigationBar}>
         <div className={styles.navContainer}>
-          <Link href="/servicos" className={styles.backLink}>
-            <ArrowLeft size={16} /> Voltar para Serviços
+          <Link href="/" className={styles.backLink}>
+            <ArrowLeft size={16} /> Voltar ao Início
           </Link>
           <span className={styles.navTag}>Regulação & Pactuações do SUS</span>
         </div>
@@ -150,7 +150,7 @@ export default function Page() {
       <main className={styles.mainContent}>
         <div className={styles.container}>
           
-          {/* SELETOR DE ESPECIALIDADES */}
+          {/* SELETOR DE ESPECIALIDADES (CATEGORIAS - NÍVEL 1) */}
           <div className={styles.categoryCard}>
             <span className={styles.categoryLabel}>
               Selecione a Especialidade Desejada:
@@ -171,9 +171,9 @@ export default function Page() {
             </div>
           </div>
 
-          {/* SUB-ABAS DE PROCEDIMENTOS */}
+          {/* SUB-ABAS DE PROCEDIMENTOS (NÍVEL 2) */}
           {submodulosDisponiveis.length > 1 && (
-            <div className={styles.subTabGrid}>
+            <div className={styles.subTabContainer}>
               {submodulosDisponiveis.map((sub) => {
                 const isSubSelected = submoduloAtivoId === sub.id;
                 return (
@@ -259,7 +259,7 @@ export default function Page() {
         </div>
       </main>
 
-      {/* MODAL LIGHTBOX COM FUNDO BRANCO E MOVIMENTO LIVRE */}
+      {/* MODAL LIGHTBOX COM MOVIMENTO LIVRE */}
       {imagemModal && (
         <div 
           onClick={fecharModal}
@@ -300,7 +300,7 @@ export default function Page() {
               <button 
                 onClick={handleResetZoom} 
                 className={styles.controlBtn}
-                title="Resetar Zoom e Posição"
+                title="Resetar Zoom"
               >
                 <RotateCcw size={18} />
               </button>

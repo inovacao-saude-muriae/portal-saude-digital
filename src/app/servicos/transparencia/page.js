@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, BarChart3, ListFilter, Hospital, Pill } from 'lucide-react';
+import { 
+  ExternalLink, 
+  BarChart3, 
+  ListFilter, 
+  Hospital, 
+  Pill, 
+  BookOpen 
+} from 'lucide-react';
 import styles from './Transparencia.module.css';
 
 // ESTRUTURA CATEGORIZADA DOS DASHBOARDS
@@ -59,7 +66,7 @@ const categoriasTransparencia = [
         id: 'producao-geral',
         titulo: 'Relatório Hospitalar',
         subtitulo: 'Indicadores de Atendimentos, Internações e Cirurgias Hospitalares',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiMDY2ZGFjODctNDVhYi00NTY0LWJkN2QtNDNlNWE1YTE2NmNmIiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9' // Adicione a URL do PowerBI de Produção Hospitalar aqui assim que tiver
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiMDY2ZGFjODctNDVhYi00NTY0LWJkN2QtNDNlNWE1YTE2NmNmIiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
       }
     ]
   },
@@ -71,8 +78,8 @@ const categoriasTransparencia = [
       {
         id: 'estoque-medicamentos',
         titulo: 'Estoque de Medicamentos',
-        subtitulo: 'Acompanhamento do Estoque',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiYTUxNGNiMTYtYTVlYy00YjY0LWE3M2YtYjAyMzEzYTk5YjY0IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9' // Adicione a URL do PowerBI da Farmácia Municipal aqui assim que tiver
+        subtitulo: 'Acompanhamento do Estoque e Disponibilidade de Insumos',
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiYTUxNGNiMTYtYTVlYy00YjY0LWE3M2YtYjAyMzEzYTk5YjY0IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
       }
     ]
   }
@@ -98,28 +105,24 @@ export default function TransparenciaPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* BANNER INSTITUCIONAL */}
-      <section 
-        className={styles.heroBanner}
-        style={{ backgroundImage: "url('/img/banner-paginas.png')" }}
-      >
-        <div className={styles.overlay}>
-          <div className={styles.container}>
-            
-            <span className={styles.heroSubtitle}>GESTÃO PÚBLICA & ACESSO À INFORMAÇÃO</span>
-            <h1 className={styles.heroTitle}>Portal da Transparência</h1>
-            <p className={styles.heroDesc}>
-              Consulte dados da saúde municipal organizados por Lista de Espera, Produção Hospitalar e Farmácia Municipal.
-            </p>
-          </div>
+      {/* BANNER HERO INSTITUCIONAL */}
+      <section className={styles.heroBanner}>
+        <div className={styles.container}>
+          <span className={styles.heroBadge}>
+            <BookOpen size={14} /> Transparência SUS
+          </span>
+          <h1 className={styles.heroTitle}>Portal da Transparência</h1>
+          <p className={styles.heroSubtitle}>
+            Consulte os dados indicadores da saúde municipal organizados por Lista de Espera, Produção Hospitalar e Estoque da Farmácia Municipal em tempo real.
+          </p>
         </div>
       </section>
 
-      {/* BARRA DE NAVEGAÇÃO */}
+      {/* BARRA DE NAVEGAÇÃO DE VOLTA */}
       <div className={styles.navigationBar}>
         <div className={styles.container}>
           <Link href="/" className={styles.backLink}>
-            ← Voltar para a Página Principal
+            ← Voltar ao Início
           </Link>
         </div>
       </div>
@@ -128,7 +131,7 @@ export default function TransparenciaPage() {
       <main className={styles.mainContainer}>
         <div className={styles.container}>
           
-          {/* 1º NÍVEL: CATEGORIAS PRINCIPAIS (Lista de Espera / Produção Hospitalar / Farmácia) */}
+          {/* 1º NÍVEL: CATEGORIAS PRINCIPAIS */}
           <div className={styles.categoryTrack}>
             {categoriasTransparencia.map((cat) => (
               <button
@@ -142,7 +145,7 @@ export default function TransparenciaPage() {
             ))}
           </div>
 
-          {/* 2º NÍVEL: SUB-OPÇÕES DA CATEGORIA (Ex: Catarata, Cirurgias, etc.) */}
+          {/* 2º NÍVEL: SUB-OPÇÕES DA CATEGORIA */}
           {categoriaAtual.dashboards.length > 1 && (
             <div className={styles.subTabContainer}>
               {categoriaAtual.dashboards.map((item) => (
@@ -179,7 +182,7 @@ export default function TransparenciaPage() {
               )}
             </div>
 
-            {/* IFRAME RESPONSIVO OU MENSAGEM SE AINDA NÃO HOUVER URL */}
+            {/* IFRAME RESPONSIVO OU ESTADO VAZIO */}
             {dashboardAtual.url ? (
               <div className={styles.iframeWrapper}>
                 <iframe
