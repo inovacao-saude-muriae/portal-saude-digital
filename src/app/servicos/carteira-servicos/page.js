@@ -229,7 +229,7 @@ export default function CarteiraServicosPage() {
             <div>
               <h3>Guia do Cidadão e Prestador</h3>
               <p>
-                Abaixo você encontra a padronização oficial dos procedimentos faturáveis do município. Utilize a barra de busca para pesquisar diretamente pelo código SIGTAP ou pelo nome da cirurgia.
+                 Consulte abaixo a listagem completa de procedimentos realizados, organizados por Linhas de Cuidado e Especialidades Médicas do município. Utilize os painéis para expandir os códigos de faturamento (padrão SUS) e descrições oficiais. Utilize a barra de busca para pesquisar diretamente pelo código SIGTAP ou pelo nome da cirurgia.
               </p>
             </div>
           </div>

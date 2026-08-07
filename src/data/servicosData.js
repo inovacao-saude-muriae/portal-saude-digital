@@ -30,7 +30,7 @@ export const servicos = [
   {
     id: 'carteira-servicos',
     title: 'Carteira de Serviços',
-    desc: '',
+    desc: ' Consulte a listagem completa de procedimentos realizados, organizados por Linhas de Cuidado e Especialidades Médicas do município.',
     icon: <FlaskConical size={24} />
   },
   {
