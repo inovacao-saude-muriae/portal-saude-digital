@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search } from 'lucide-react';
-import { animaisDisponiveis as animaisIniciais } from '@/data/animaisData';
+import { Search, Loader2 } from 'lucide-react';
 import styles from './Adocao.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || 'https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec';
@@ -18,7 +17,8 @@ function normalizarTexto(texto) {
 }
 
 export default function AdocaoPage() {
-  const [animais, setAnimais] = useState(animaisIniciais);
+  const [animais, setAnimais] = useState([]);
+  const [carregando, setCarregando] = useState(true);
   const [filtroEspecie, setFiltroEspecie] = useState('todos');
   const [filtroSexo, setFiltroSexo] = useState('todos');
   const [filtroIdade, setFiltroIdade] = useState('todos');
@@ -40,20 +40,23 @@ export default function AdocaoPage() {
   const [enviando, setEnviando] = useState(false);
   const [enviadoSucesso, setEnviadoSucesso] = useState(false);
 
-  // BUSCA DINÂMICA DA LISTA DA PLANILHA DO CCZ
+  // BUSCA EXCLUSIVAMENTE DINÂMICA DA PLANILHA DO CCZ
   useEffect(() => {
     let ativo = true;
 
     async function carregarAnimaisOnline() {
+      setCarregando(true);
       try {
         const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`);
         const data = await res.json();
         
-        if (ativo && data && data.status === 'success' && data.animais && data.animais.length > 0) {
-          setAnimais(data.animais);
+        if (ativo && data && data.status === 'success') {
+          setAnimais(data.animais || []);
         }
       } catch (err) {
-        console.warn('Usando lista local de apoio:', err);
+        console.error('Erro ao buscar animais cadastrados:', err);
+      } finally {
+        if (ativo) setCarregando(false);
       }
     }
 
@@ -71,7 +74,7 @@ export default function AdocaoPage() {
 
   const termoBusca = normalizarTexto(buscaNome.trim());
 
-  // FILTRAGEM UTILIZANDO A LISTA DINÂMICA 'animais'
+  // FILTRAGEM UTILIZANDO APENAS A LISTA DE ANIMAIS CADASTRADOS
   const animaisFiltrados = animais.filter(animal => {
     const bateEspecie = filtroEspecie === 'todos' || String(animal.especie).toLowerCase() === filtroEspecie.toLowerCase();
     const bateSexo = filtroSexo === 'todos' || String(animal.sexo).toLowerCase() === filtroSexo.toLowerCase();
@@ -198,7 +201,13 @@ export default function AdocaoPage() {
             </div>
           </div>
 
-          {animaisPagina.length > 0 ? (
+          {carregando ? (
+            <div className={styles.emptyState}>
+              <Loader2 size={36} className="animate-spin" style={{ color: '#008a83', marginBottom: '12px' }} />
+              <h3>Carregando animais para adoção...</h3>
+              <p>Buscando lista atualizada do Centro de Controle de Zoonoses.</p>
+            </div>
+          ) : animaisPagina.length > 0 ? (
             <>
               <div className={styles.animaisGrid}>
                 {animaisPagina.map((animal) => {
@@ -249,10 +258,16 @@ export default function AdocaoPage() {
             <div className={styles.emptyState}>
               <Search size={40} className={styles.emptyIcon} />
               <h3>Nenhum animal encontrado</h3>
-              <p>Não encontramos nenhum amiguinho correspondente a {`"${buscaNome}"`}.</p>
-              <button className={styles.resetBtn} onClick={() => { setBuscaNome(''); handleFiltroSexo('todos'); handleFiltroEspecie('todos'); handleFiltroIdade('todos'); }}>
-                Limpar Todos os Filtros
-              </button>
+              <p>
+                {buscaNome 
+                  ? `Não encontramos nenhum amiguinho correspondente a "${buscaNome}".` 
+                  : 'Nenhum animal cadastrado no momento. Tente novamente mais tarde.'}
+              </p>
+              {buscaNome && (
+                <button className={styles.resetBtn} onClick={() => { setBuscaNome(''); handleFiltroSexo('todos'); handleFiltroEspecie('todos'); handleFiltroIdade('todos'); }}>
+                  Limpar Todos os Filtros
+                </button>
+              )}
             </div>
           )}
 
