@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -15,10 +16,11 @@ import {
 } from 'lucide-react';
 import styles from './AdminAdocao.module.css';
 
-// URL DIRETA DE FALLBACK CASO A VARIÁVEL DE AMBIENTE NÃO SEJA LIDA
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || 'https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec';
 
 export default function AdminAdocaoPage() {
+  const router = useRouter();
+
   const [animais, setAnimais] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [enviando, setEnviando] = useState(false);
@@ -35,11 +37,38 @@ export default function AdminAdocaoPage() {
   const [arquivoFoto, setArquivoFoto] = useState(null);
   const [previewFoto, setPreviewFoto] = useState('');
 
-  // FUNÇÃO MANUAL PARA RECARREGAR
+  // 1. VERIFICAÇÃO DE PERMISSÃO / SEGURANÇA DA ROTA
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+
+    const savedUser = localStorage.getItem('user_info');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
+        
+        // Cargos com acesso permitido a esta rota
+        const cargosPermitidos = ['admin', 'ccz'];
+        
+        if (!cargosPermitidos.includes(cargo)) {
+          alert('Acesso negado: Você não possui permissão para acessar o módulo do CCZ.');
+          router.push('/admin');
+        }
+      } catch (e) {
+        console.error('Erro ao validar permissões:', e);
+      }
+    }
+  }, [router]);
+
+  // 2. FUNÇÃO MANUAL DE RECARREGAMENTO
   const buscarAnimais = useCallback(async () => {
     setCarregando(true);
     try {
-      const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS`, {
+      const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`, {
         method: 'GET',
         redirect: 'follow',
       });
@@ -54,14 +83,14 @@ export default function AdminAdocaoPage() {
     }
   }, []);
 
-  // CARREGAMENTO INICIAL
+  // 3. CARREGAMENTO INICIAL
   useEffect(() => {
     let ativo = true;
 
     async function carregarIniciais() {
       setCarregando(true);
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS`, {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`, {
           method: 'GET',
           redirect: 'follow',
         });
@@ -110,7 +139,7 @@ export default function AdminAdocaoPage() {
         });
       }
 
-      const res = await fetch(SCRIPT_URL, {
+      await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
@@ -122,16 +151,18 @@ export default function AdminAdocaoPage() {
         })
       });
 
-      const resData = await res.json();
-      if (resData.status === 'success') {
-        setMsgSucesso('Animal cadastrado com sucesso!');
-        setNovoAnimal({ nome: '', especie: 'Cachorro', sexo: 'macho', filhote: 'false', descricao: '' });
-        setArquivoFoto(null);
-        setPreviewFoto('');
-        await buscarAnimais();
-        setTimeout(() => setMsgSucesso(''), 4000);
-      }
+      setMsgSucesso('Animal cadastrado com sucesso!');
+      setNovoAnimal({ nome: '', especie: 'Cachorro', sexo: 'macho', filhote: 'false', descricao: '' });
+      setArquivoFoto(null);
+      setPreviewFoto('');
+
+      setTimeout(() => {
+        buscarAnimais();
+        setMsgSucesso('');
+      }, 1200);
+
     } catch (err) {
+      console.error(err);
       alert('Erro ao cadastrar animal.');
     } finally {
       setEnviando(false);
@@ -142,7 +173,7 @@ export default function AdminAdocaoPage() {
     if (!confirm(`Tem certeza que deseja remover o animal "${nome}" da lista de adoção?`)) return;
 
     try {
-      const res = await fetch(SCRIPT_URL, {
+      await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
@@ -151,11 +182,9 @@ export default function AdminAdocaoPage() {
         })
       });
 
-      const resData = await res.json();
-      if (resData.status === 'success') {
-        setAnimais((prev) => prev.filter((a) => a.id !== id));
-      }
+      setAnimais((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {
+      console.error(err);
       alert('Erro ao excluir animal.');
     }
   };

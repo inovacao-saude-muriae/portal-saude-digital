@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -30,7 +31,8 @@ import {
   Loader2,
   FileText,
   Printer,
-  Ticket
+  Ticket,
+  ShieldCheck
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
@@ -147,7 +149,7 @@ function formatarDataParaExibicao(valor) {
         const ano = d.getFullYear();
         return `${dia}/${mes}/${ano}`;
       }
-    } catch (e) {}
+    } catch {}
   }
 
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
@@ -189,6 +191,8 @@ function numeroParaExtenso(numero) {
 }
 
 export default function AdminEventosPage() {
+  const router = useRouter();
+
   const [abaSub, setAbaSub] = useState('cadastrar');
 
   const [loadingForm, setLoadingForm] = useState(false);
@@ -225,6 +229,33 @@ export default function AdminEventosPage() {
 
   // MODAL DE COMPROVANTE INDIVIDUAL (ADMIN)
   const [comprovanteAdmin, setComprovanteAdmin] = useState(null);
+
+  // VERIFICAÇÃO DE PERMISSÃO DE ACESSO À ROTA
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+
+    const savedUser = localStorage.getItem('user_info');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
+        
+        // Permite acesso para admin, master, gestor, comunicacao e imprensa
+        const cargosPermitidos = ['admin', 'master', 'gestor', 'comunicacao', 'imprensa'];
+        
+        if (!cargosPermitidos.includes(cargo)) {
+          alert('Acesso negado: Você não possui permissão para gerenciar Eventos.');
+          router.push('/admin');
+        }
+      } catch (e) {
+        console.error('Erro ao validar permissões:', e);
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     async function carregarEventos() {
@@ -656,7 +687,7 @@ export default function AdminEventosPage() {
         <div className={styles.headerBar}>
           <div>
             <span className={styles.badgeHeader}>
-              <Calendar size={14} /> Módulo Exclusivo de Eventos
+              <ShieldCheck size={14} /> Comunicação & Agendamento
             </span>
             <h1 className={styles.mainTitle}>Gerenciador de Eventos</h1>
             <p className={styles.subTitle}>Cadastre, acompanhe e emita comprovantes e certificados para participantes.</p>

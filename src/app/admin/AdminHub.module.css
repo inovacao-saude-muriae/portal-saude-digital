@@ -64,24 +64,28 @@
   color: #0f172a;
 }
 
-/* CARDS GRID ADAPTÁVEL PARA 3 MÓDULOS */
+/* AJUSTE DO GRID PARA MANTER LARGURA FIXA MESMO COM APENAS 1 CARD */
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* Mantém até 3 colunas por linha */
   gap: 24px;
   margin-bottom: 30px;
 }
 
+/* LIMITA A LARGURA DO CARD PARA NÃO ESTICAR QUANDO HOUVER APENAS 1 */
 .moduleCard {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 32px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 360px; /* Impede que 1 único card ocupe a linha toda */
+  box-sizing: border-box;
 }
 
 .moduleCard:hover {
@@ -198,10 +202,18 @@
   font-size: 14px;
   color: #475569;
 }
+/* RESPONSIVIDADE PARA CELULAR E TABLET */
+@media (max-width: 992px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
-@media (max-width: 768px) {
-  .headerBar {
-    flex-direction: column;
-    gap: 16px;
+@media (max-width: 640px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+  .moduleCard {
+    max-width: 100%;
   }
 }
