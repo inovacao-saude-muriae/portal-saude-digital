@@ -105,6 +105,7 @@ export default function TransparenciaPage() {
       >
         <div className={styles.overlay}>
           <div className={styles.container}>
+            
             <span className={styles.heroSubtitle}>GESTÃO PÚBLICA & ACESSO À INFORMAÇÃO</span>
             <h1 className={styles.heroTitle}>Portal da Transparência</h1>
             <p className={styles.heroDesc}>

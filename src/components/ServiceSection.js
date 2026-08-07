@@ -16,10 +16,10 @@ export default function ServiceSection() {
     const servicos = [
         {
             id: 1,
-            title: "Atendimento Domiciliar",
-            description: "Consultas, exames e acompanhamento no conforto do lar.",
-            icon: <Home size={22} className={styles.icon} />,
-            link: "/servicos/atendimento-domiciliar"
+            title: "Carteira de serviços",
+            description: "Consulte a listagem completa de procedimentos cirúrgicos e ambulatoriais realizados pelo município, organizados por linhas de cuidado e código oficial SUS.",
+            icon: <ChartNoAxesCombined size={22} className={styles.icon} />,
+            link: "/servicos/carteira-servicos"
         },
         {
             id: 2,
@@ -39,7 +39,7 @@ export default function ServiceSection() {
             id: 4,
             title: "Fluxos Assistenciais",
             description: "Diretrizes, itinerários terapêuticos e pactuações.",
-            icon: <Ambulance size={22} className={styles.icon} />,
+           icon: <ChartNoAxesCombined size={22} className={styles.icon} />,
             link: "/servicos/fluxos-assistenciais"
         },
         {
