@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 import styles from './ServicesPage.module.css';
 
-// LISTA COMPLETA DE SERVIÇOS DO MUNICÍPIO
-const servicos = [
+// LISTA COMPLETA DE SERVIÇOS DO MUNICÍPIO (Exportada para reuso na página de busca)
+export const servicos = [
   {
     id: 'aplicativos',
     title: 'Aplicativos da Saúde',

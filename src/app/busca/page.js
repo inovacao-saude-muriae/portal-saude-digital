@@ -16,11 +16,13 @@ import {
 
 import { dbEventos } from '@/data/eventosData';
 import { getDbNoticias } from '@/data/noticiasData'; 
-import { animaisDisponiveis } from '@/data/animaisData';
 import { listaContatos } from '@/data/contatosData';
 import { servicos } from '@/data/servicosData';
 
 import styles from './Busca.module.css';
+
+// URL DO GOOGLE APPS SCRIPT DO CCZ (Para busca de animais em tempo real)
+const CCZ_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec"; // Caso use variável de ambiente, use: process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL
 
 // FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
 function normalizarTexto(texto) {
@@ -58,17 +60,35 @@ function SearchResultsContent() {
   
   const [inputBusca, setInputBusca] = useState(query);
   const [noticiasState, setNoticiasState] = useState({});
-  const [loadingNoticias, setLoadingNoticias] = useState(true);
+  const [animaisState, setAnimaisState] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Busca as notícias atualizadas do Google Sheets ao carregar
+  // Busca Notícias e Animais atualizados em tempo real via Google Sheets
   useEffect(() => {
-    async function carregarNoticias() {
-      setLoadingNoticias(true);
-      const dbNoticiasAtualizado = await getDbNoticias();
-      setNoticiasState(dbNoticiasAtualizado);
-      setLoadingNoticias(false);
+    async function carregarDadosDinamicos() {
+      setLoading(true);
+      try {
+        // 1. Busca Notícias
+        const dbNoticiasAtualizado = await getDbNoticias();
+        setNoticiasState(dbNoticiasAtualizado || {});
+
+        // 2. Busca Animais do CCZ (Google Sheets)
+        const urlScript = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || CCZ_SCRIPT_URL;
+        if (urlScript) {
+          const resAnimais = await fetch(urlScript);
+          const jsonAnimais = await resAnimais.json();
+          if (jsonAnimais && jsonAnimais.status === 'success') {
+            setAnimaisState(jsonAnimais.animais || []);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar dados dinâmicos para a busca:", err);
+      } finally {
+        setLoading(false);
+      }
     }
-    carregarNoticias();
+
+    carregarDadosDinamicos();
   }, []);
 
   const handleRefazerBusca = (e) => {
@@ -83,21 +103,13 @@ function SearchResultsContent() {
   // --- VARREDURA NAS BASES DE DADOS ---
 
   // 1. CARTA DE SERVIÇOS 
-  const baseServicos = servicos || {};
-  const servicosEncontrados = termo ? Object.keys(baseServicos).map(key => ({
-    id: key,
-    ...baseServicos[key]
-  })).filter(s => {
+  const baseServicos = Array.isArray(servicos) ? servicos : Object.values(servicos || {});
+  const servicosEncontrados = termo ? baseServicos.filter(s => {
     const bateId = normalizarTexto(s.id).includes(termo);
     const bateTitulo = normalizarTexto(s.title || s.titulo).includes(termo);
     const bateDesc = normalizarTexto(s.desc || s.descricao).includes(termo);
-    
-    const bateSecoes = s.secoesTexto && s.secoesTexto.some(secao => 
-      normalizarTexto(secao.titulo).includes(termo) ||
-      normalizarTexto(secao.paragrafo).includes(termo)
-    );
 
-    return bateId || bateTitulo || bateDesc || bateSecoes;
+    return bateId || bateTitulo || bateDesc;
   }).map(s => ({
     id: `srv-${s.id}`,
     categoria: 'Serviço',
@@ -119,7 +131,7 @@ function SearchResultsContent() {
     url: '/contatos'
   })) : [];
 
-  // 3. NOTÍCIAS (Buscando dinamicamente do Sheets)
+  // 3. NOTÍCIAS (Google Sheets)
   const noticiasEncontradas = termo ? Object.keys(noticiasState).map(id => ({
     id,
     ...noticiasState[id]
@@ -148,8 +160,8 @@ function SearchResultsContent() {
     url: `/eventos/${e.id}`
   })) : [];
 
-  // 5. ANIMAIS PARA ADOÇÃO (CCZ)
-  const animaisEncontrados = termo ? (animaisDisponiveis || []).filter(a =>
+  // 5. ANIMAIS PARA ADOÇÃO (Google Sheets / CCZ)
+  const animaisEncontrados = termo ? (animaisState || []).filter(a =>
     normalizarTexto(a.nome).includes(termo) ||
     normalizarTexto(a.especie).includes(termo) ||
     normalizarTexto(a.descricao).includes(termo)
@@ -157,7 +169,7 @@ function SearchResultsContent() {
     id: `ani-${a.id}`,
     categoria: 'Adoção',
     titulo: `Animal para Adoção: ${a.nome} (${a.especie})`,
-    resumo: a.descricao,
+    resumo: a.descricao || 'Animal cadastrado para adoção responsável no CCZ.',
     url: '/adocao'
   })) : [];
 
@@ -208,7 +220,7 @@ function SearchResultsContent() {
 
           {/* MENSAGEM COM RESULTADOS */}
           <div className={styles.headerInfo}>
-            {loadingNoticias ? (
+            {loading ? (
               <p>Carregando informações do portal...</p>
             ) : query ? (
               <p>Encontramos <strong>{todosResultados.length}</strong> resultado(s) para: <strong>{`"${query}"`}</strong></p>
@@ -234,7 +246,7 @@ function SearchResultsContent() {
               ))}
             </div>
           ) : (
-            query && !loadingNoticias && (
+            query && !loading && (
               <div className={styles.emptyState}>
                 <Search size={48} className={styles.emptyIcon} />
                 <h2>Nenhum resultado encontrado</h2>
