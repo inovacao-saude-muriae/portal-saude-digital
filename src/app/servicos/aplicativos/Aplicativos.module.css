@@ -1,21 +1,23 @@
+/* ==========================================================
+   ESTILOS DOS APLICATIVOS DIGITAIS DE SAÚDE (PALETA AZUL CCZ)
+   ========================================================== */
+
 .pageWrapper {
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
   color: #1e293b;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.mainContent {
-  padding: 40px 20px 80px 20px;
+  padding-bottom: 80px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* --- HERO BANNER --- */
+/* --- HERO BANNER AZUL ESCURO --- */
 .heroBanner {
   background-color: #003b5c;
   color: #ffffff;
@@ -29,13 +31,14 @@
   align-items: center;
   gap: 6px;
   background-color: rgba(255, 255, 255, 0.12);
-  padding: 6px 14px;
-  border-radius: 20px;
+  color: #ffffff;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
   margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .heroTitle {
@@ -93,7 +96,129 @@
   font-weight: 500;
 }
 
-/* --- BLOCO INFORMATIVO PRINCIPAL --- */
+.mainContent {
+  padding: 40px 0 80px 0;
+}
+
+/* --- SELETOR DE ABAS --- */
+.tabHeader {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.tabButton {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover {
+  border-color: #005c8a;
+  color: #005c8a;
+}
+
+.tabButtonActive {
+  background-color: #003b5c !important;
+  color: #ffffff !important;
+  border-color: #003b5c !important;
+  box-shadow: 0 4px 12px rgba(0, 59, 92, 0.2);
+}
+
+/* --- HERO BANNER DESTAQUE (GRADIENTE AZUL) --- */
+.heroFeatureCard {
+  background: linear-gradient(135deg, #003b5c 0%, #005c8a 100%);
+  border-radius: 20px;
+  padding: 32px 36px;
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 24px rgba(0, 59, 92, 0.15);
+}
+
+.featureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.featureTitle {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  line-height: 1.25;
+}
+
+.featureText {
+  font-size: 15.5px;
+  color: #f1f5f9;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.quickHighlights {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.highlightItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* --- MOCKUP VERTICAL DO APLICATIVO (TAMANHO REDUZIDO) --- */
+.featureImageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.appScreenCard {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.appScreenCard:hover {
+  transform: translateY(-4px);
+}
+
+.featureImage {
+  width: 100%;
+  max-width: 170px;
+  height: auto;
+  border-radius: 14px;
+  display: block;
+}
+
+/* --- CARDS INFORMATIVOS --- */
 .infoBlock {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
@@ -103,15 +228,21 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-.infoBlock h2, .infoBlock h3 {
+.infoBlock h3 {
   font-size: 20px;
+  font-weight: 800;
   color: #003b5c;
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 12px;
+}
+
+.subtituloApp {
+  font-size: 14px;
+  color: #005c8a;
+  font-weight: 700;
+  margin-bottom: 14px;
 }
 
 .infoBlock p {
@@ -121,141 +252,98 @@
   margin: 0 0 12px 0;
 }
 
-.subtituloApp {
-  font-weight: 700;
-  color: #2b943d;
-  margin-bottom: 12px;
-  font-size: 15px;
-}
-
-/* --- NAVEGAÇÃO ENTRE APPS (ABAS) --- */
-.tabHeader {
-  display: flex;
+/* --- LISTA DE FUNCIONALIDADES --- */
+.docGrid {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
 }
 
-.tabButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: 1px solid #cbd5e1;
-  background-color: #ffffff;
-  color: #334155;
-  font-weight: 700;
-  font-size: 14.5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-}
-
-.tabButtonActive {
-  background-color: #2b943d;
-  color: #ffffff;
-  border-color: #2b943d;
-  box-shadow: 0 4px 12px rgba(0, 138, 131, 0.2);
-}
-
-.docList {
-  margin: 0;
-  padding-left: 20px;
-  color: #334155;
-  line-height: 1.7;
-  font-size: 15px;
-}
-
-.docList li {
-  margin-bottom: 8px;
-}
-/* ==========================================================================
-   --- BLOCO DE DOWNLOAD E BOTÕES OFICIAIS ---
-   ========================================================================== */
-.downloadBox {
+.docItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   background-color: #f8fafc;
-  border-left: 4px solid #2b943d;
-  border-radius: 16px;
-  padding: 28px;
-  margin-top: 24px;
+  border: 1px solid #e2e8f0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
 }
 
-.downloadBox h3 {
-  border-bottom: none;
-  padding-bottom: 0;
-  margin-bottom: 6px;
+.itemIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.downloadBox p {
-  color: #64748b;
-  font-size: 14.5px;
-  margin-bottom: 24px;
+/* --- SEÇÃO DE DOWNLOAD --- */
+.downloadBox {
+  background-color: #f0f9ff;
+  border: 1px solid #e0f2fe;
 }
 
 .downloadContainer {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
+  margin-top: 18px;
 }
 
-/* Base Comum dos Botões */
 .badgeBtn {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 20px;
+  background-color: #003b5c;
+  color: #ffffff;
+  padding: 12px 22px;
   border-radius: 12px;
   text-decoration: none;
-  color: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-  min-width: 180px;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .badgeBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  background-color: #00273d;
+  box-shadow: 0 6px 16px rgba(0, 59, 92, 0.25);
 }
 
 .btnTextGroup {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.1;
+  text-align: left;
 }
 
 .btnSubtext {
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
+  color: #cbd5e1;
   letter-spacing: 0.5px;
-  opacity: 0.85;
 }
 
 .btnMaintext {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  margin-top: 2px;
+  line-height: 1.1;
 }
 
-/* Estilo App Store */
-.btnAppStore {
-  background-color: #000000;
+/* RESPONSIVIDADE */
+@media (max-width: 850px) {
+  .heroFeatureCard {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
 }
 
-.btnAppStore:hover {
-  background-color: #1a1a1a;
-}
-
-/* Estilo Google Play */
-.btnGooglePlay {
-  background-color: #010101;
-  border: 1px solid #222222;
-}
-
-.btnGooglePlay:hover {
-  background-color: #121212;
-}
-
-.brandIcon {
-  flex-shrink: 0;
+@media (max-width: 640px) {
+  .heroTitle {
+    font-size: 28px;
+  }
+  
+  .featureTitle {
+    font-size: 22px;
+  }
 }
