@@ -294,6 +294,64 @@
   cursor: not-allowed;
 }
 
+/* ==========================================================
+   CAMPO DE PESQUISA DENTRO DA LISTA DE ANIMAIS
+   ========================================================== */
+
+.searchBoxList {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchBoxList:focus-within {
+  border-color: #008a83;
+  box-shadow: 0 0 0 3px rgba(0, 138, 131, 0.12);
+}
+
+.searchIcon {
+  color: #94a3b8;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.searchInputList {
+  width: 100%;
+  border: none !important;
+  outline: none !important;
+  padding: 10px 0 !important;
+  font-size: 13px !important;
+  color: #0f172a !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.clearSearchBtn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.clearSearchBtn:hover {
+  color: #dc2626;
+}
+
+/* ==========================================================
+   LISTAGEM DE ANIMAIS & TRATAMENTO "SEM FOTO"
+   ========================================================== */
+
 .animaisList {
   display: flex;
   flex-direction: column;
@@ -318,6 +376,31 @@
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.noPhotoBox {
+  width: 60px;
+  height: 80px;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #94a3b8;
+  text-align: center;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.noPhotoBox span {
+  font-size: 9.5px;
+  font-weight: 700;
+  margin-top: 4px;
+  line-height: 1;
+  color: #64748b;
 }
 
 .animalInfo {

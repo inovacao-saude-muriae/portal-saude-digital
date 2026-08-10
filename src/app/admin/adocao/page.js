@@ -14,7 +14,9 @@ import {
   ShieldCheck, 
   PawPrint,
   Pencil,
-  XCircle
+  XCircle,
+  Search,
+  ImageOff
 } from 'lucide-react';
 import styles from './AdminAdocao.module.css';
 
@@ -28,7 +30,10 @@ export default function AdminAdocaoPage() {
   const [enviando, setEnviando] = useState(false);
   const [msgSucesso, setMsgSucesso] = useState('');
 
-  // ESTADO PARA CONTROLAR A EDICÃO DE UM ANIMAL
+  // ESTADO PARA PESQUISA NA LISTA
+  const [buscaAnimal, setBuscaAnimal] = useState('');
+
+  // ESTADO PARA CONTROLAR A EDIÇÃO DE UM ANIMAL
   const [animalEmEdicao, setAnimalEmEdicao] = useState(null);
 
   const [novoAnimal, setNovoAnimal] = useState({
@@ -42,7 +47,7 @@ export default function AdminAdocaoPage() {
   const [arquivoFoto, setArquivoFoto] = useState(null);
   const [previewFoto, setPreviewFoto] = useState('');
 
-  // 1. VERIFICAÇÃO DE PERMISSÃO / SEGURANÇA DA ROTA
+  // 1. VERIFICAÇÃO DE PERMISSÃO
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -55,7 +60,6 @@ export default function AdminAdocaoPage() {
       try {
         const user = JSON.parse(savedUser);
         const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
-        
         const cargosPermitidos = ['admin', 'master', 'gestor', 'ccz', 'zoonoses', 'veterinario'];
         
         if (!cargosPermitidos.includes(cargo)) {
@@ -68,7 +72,7 @@ export default function AdminAdocaoPage() {
     }
   }, [router]);
 
-  // 2. FUNÇÃO PARA BUSCAR ANIMAIS
+  // 2. BUSCAR ANIMAIS
   const buscarAnimais = useCallback(async () => {
     setCarregando(true);
     try {
@@ -124,7 +128,7 @@ export default function AdminAdocaoPage() {
     }
   };
 
-  // INICIAR EDICÃO DE UM ANIMAL
+  // INICIAR EDIÇÃO
   const handleIniciarEdicao = (animal) => {
     setAnimalEmEdicao(animal);
     setNovoAnimal({
@@ -134,13 +138,16 @@ export default function AdminAdocaoPage() {
       filhote: String(animal.filhote) === 'true' ? 'true' : 'false',
       descricao: animal.descricao || ''
     });
-    setPreviewFoto(animal.foto || '');
+    
+    // Se foto for "SEM_FOTO", limpa o preview para indicar que está sem foto
+    const fotoExistente = animal.foto || animal.imagemUrl || animal.imagem || '';
+    setPreviewFoto(fotoExistente === 'SEM_FOTO' ? '' : fotoExistente);
     setArquivoFoto(null);
     setMsgSucesso('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // CANCELAR EDICÃO E LIMPAR FORMULÁRIO
+  // CANCELAR EDIÇÃO
   const handleCancelarEdicao = () => {
     setAnimalEmEdicao(null);
     setNovoAnimal({
@@ -176,6 +183,9 @@ export default function AdminAdocaoPage() {
 
       const isEditing = !!animalEmEdicao;
 
+      // Se não enviou arquivo nem tinha foto anterior, marca como SEM_FOTO
+      const fotoFinalAntiga = isEditing ? (animalEmEdicao.foto || 'SEM_FOTO') : 'SEM_FOTO';
+
       const payload = {
         action: isEditing ? 'UPDATE_ANIMAL' : 'ADD_ANIMAL',
         id: isEditing ? animalEmEdicao.id : undefined,
@@ -183,7 +193,8 @@ export default function AdminAdocaoPage() {
         imagemBase64,
         imagemNome,
         imagemType,
-        fotoAntiga: isEditing ? animalEmEdicao.foto : undefined
+        fotoAntiga: fotoFinalAntiga,
+        semFoto: !arquivoFoto && (!isEditing || animalEmEdicao.foto === 'SEM_FOTO')
       };
 
       await fetch(SCRIPT_URL, {
@@ -230,6 +241,26 @@ export default function AdminAdocaoPage() {
     }
   };
 
+  // FILTRAGEM DINÂMICA DA LISTA
+  const animaisFiltrados = animais.filter((animal) => {
+    const termo = buscaAnimal.toLowerCase().trim();
+    if (!termo) return true;
+
+    const nome = (animal.nome || '').toLowerCase();
+    const especie = (animal.especie || '').toLowerCase();
+    const sexo = (animal.sexo || '').toLowerCase();
+    const descricao = (animal.descricao || '').toLowerCase();
+    const idade = animal.filhote === 'true' ? 'filhote' : 'adulto';
+
+    return (
+      nome.includes(termo) ||
+      especie.includes(termo) ||
+      sexo.includes(termo) ||
+      descricao.includes(termo) ||
+      idade.includes(termo)
+    );
+  });
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -256,7 +287,7 @@ export default function AdminAdocaoPage() {
         )}
 
         <div className={styles.layoutGrid}>
-          {/* COLUNA ESQUERDA: FORMULÁRIO DE CADASTRO / EDICÃO */}
+          {/* COLUNA ESQUERDA: FORMULÁRIO DE CADASTRO / EDIÇÃO */}
           <div className={styles.cardForm}>
             <div className={styles.cardHeaderFlex}>
               <div className={styles.cardTitleGroup}>
@@ -333,10 +364,10 @@ export default function AdminAdocaoPage() {
                 />
               </div>
 
-              {/* UPLOAD DA FOTO */}
+              {/* UPLOAD DA FOTO (OPCIONAL) */}
               <div className={styles.inputGroup}>
                 <label>
-                  Foto do Animal {animalEmEdicao ? '(Deixe em branco para manter a atual)' : '*'}
+                  Foto do Animal (Opcional)
                 </label>
                 <label className={styles.fileBox}>
                   <Upload size={20} color="#008a83" />
@@ -346,12 +377,11 @@ export default function AdminAdocaoPage() {
                     accept="image/*" 
                     onChange={handleFotoChange} 
                     hidden 
-                    required={!animalEmEdicao} 
                   />
                 </label>
               </div>
 
-              {previewFoto && (
+              {previewFoto && previewFoto !== 'SEM_FOTO' && (
                 <div className={styles.previewBox}>
                   <Image 
                     src={previewFoto} 
@@ -378,55 +408,97 @@ export default function AdminAdocaoPage() {
 
           {/* COLUNA DIREITA: LISTA DE ANIMAIS JÁ CADASTRADOS */}
           <div className={styles.cardLista}>
-            <div className={styles.cardHeader}>
-              <PawPrint size={18} color="#008a83" />
-              <h2>Animais Cadastrados ({animais.length})</h2>
+            <div className={styles.cardHeaderFlex}>
+              <div className={styles.cardTitleGroup}>
+                <PawPrint size={18} color="#008a83" />
+                <h2>Animais Cadastrados ({animaisFiltrados.length})</h2>
+              </div>
+            </div>
+
+            {/* BARRA DE PESQUISA EM TEMPO REAL */}
+            <div className={styles.searchBoxList}>
+              <Search size={18} className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Pesquisar por nome, espécie, sexo..."
+                value={buscaAnimal}
+                onChange={(e) => setBuscaAnimal(e.target.value)}
+                className={styles.searchInputList}
+              />
+              {buscaAnimal && (
+                <button
+                  type="button"
+                  className={styles.clearSearchBtn}
+                  onClick={() => setBuscaAnimal('')}
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             {carregando ? (
               <div className={styles.loadingBox}>
                 <Loader2 size={24} className="animate-spin" /> Carregando lista de animais...
               </div>
-            ) : animais.length === 0 ? (
-              <p className={styles.emptyMsg}>Nenhum animal cadastrado na planilha ainda.</p>
+            ) : animaisFiltrados.length === 0 ? (
+              <p className={styles.emptyMsg}>
+                {buscaAnimal 
+                  ? `Nenhum animal encontrado para "${buscaAnimal}".`
+                  : 'Nenhum animal cadastrado na planilha ainda.'}
+              </p>
             ) : (
               <div className={styles.animaisList}>
-                {animais.map((animal) => (
-                  <div key={animal.id} className={styles.animalRow}>
-                    <Image 
-                      src={animal.foto} 
-                      alt={animal.nome} 
-                      width={60} 
-                      height={80} 
-                      unoptimized 
-                      className={styles.thumbImg} 
-                    />
-                    <div className={styles.animalInfo}>
-                      <h3>{animal.nome}</h3>
-                      <p>
-                        {animal.especie} • {animal.sexo === 'macho' ? 'Macho' : 'Fêmea'} • {animal.filhote === 'true' ? 'Filhote' : 'Adulto'}
-                      </p>
-                    </div>
+                {animaisFiltrados.map((animal) => {
+                  const urlFoto = animal.foto || animal.imagemUrl || animal.imagem || '';
+                  const temFotoValida = urlFoto && urlFoto !== 'SEM_FOTO' && urlFoto !== 'undefined' && urlFoto !== 'null';
 
-                    <div className={styles.actionGroup}>
-                      <button 
-                        onClick={() => handleIniciarEdicao(animal)} 
-                        className={styles.btnEdit} 
-                        title="Editar animal"
-                      >
-                        <Pencil size={16} />
-                      </button>
+                  return (
+                    <div key={animal.id} className={styles.animalRow}>
+                      
+                      {/* EXIBIÇÃO DE FOTO OU BOX "SEM FOTO" */}
+                      {temFotoValida ? (
+                        <Image 
+                          src={urlFoto} 
+                          alt={animal.nome} 
+                          width={60} 
+                          height={80} 
+                          unoptimized 
+                          className={styles.thumbImg} 
+                        />
+                      ) : (
+                        <div className={styles.noPhotoBox}>
+                          <ImageOff size={20} />
+                          <span>Sem foto</span>
+                        </div>
+                      )}
 
-                      <button 
-                        onClick={() => handleExcluir(animal.id, animal.nome)} 
-                        className={styles.btnDelete} 
-                        title="Excluir animal"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className={styles.animalInfo}>
+                        <h3>{animal.nome}</h3>
+                        <p>
+                          {animal.especie} • {animal.sexo === 'macho' ? 'Macho' : 'Fêmea'} • {animal.filhote === 'true' ? 'Filhote' : 'Adulto'}
+                        </p>
+                      </div>
+
+                      <div className={styles.actionGroup}>
+                        <button 
+                          onClick={() => handleIniciarEdicao(animal)} 
+                          className={styles.btnEdit} 
+                          title="Editar animal"
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        <button 
+                          onClick={() => handleExcluir(animal.id, animal.nome)} 
+                          className={styles.btnDelete} 
+                          title="Excluir animal"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
