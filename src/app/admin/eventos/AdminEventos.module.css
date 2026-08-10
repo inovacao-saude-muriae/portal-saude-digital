@@ -1166,7 +1166,58 @@
 .hiddenPrintContainer {
     display: none;
 }
+/* ==========================================================
+   MELHORIAS DE LAYOUT E DESIGN DA BARRA DE ROLAGEM (SCROLLBAR)
+   ========================================================== */
 
+/* Suporte Padrão Moderno (Firefox) */
+.tableScrollWrapper,
+.modalContent {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Suporte a Navegadores WebKit (Chrome, Edge, Safari, Opera) */
+
+/* 1. Largura/Espessura da Barra de Rolagem */
+.tableScrollWrapper::-webkit-scrollbar,
+.modalContent::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* 2. Trilho / Fundo da Barra */
+.tableScrollWrapper::-webkit-scrollbar-track,
+.modalContent::-webkit-scrollbar-track {
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+
+/* 3. Indicador de Rolagem (Thumb) */
+.tableScrollWrapper::-webkit-scrollbar-thumb,
+.modalContent::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 8px;
+  border: 2px solid #f1f5f9; /* Cria um espaçamento interno elegante */
+  transition: background-color 0.2s ease;
+}
+
+/* 4. Estado Hover no Indicador de Rolagem */
+.tableScrollWrapper::-webkit-scrollbar-thumb:hover,
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background-color: #0284c7; /* Destaca com o azul institucional no hover */
+}
+
+/* Ajuste no container do modal para rolagem suave */
+.tableScrollWrapper {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  max-height: 380px;
+  scroll-behavior: smooth;
+}
 /* ==========================================================
    REGRA DE IMPRESSÃO DO CERTIFICADO (ENQUADRAMENTO A4 TOTAL)
    ========================================================== */
