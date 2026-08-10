@@ -10,7 +10,13 @@ import {
   MapPin, 
   ShieldAlert, 
   HeartHandshake,
-  Syringe
+  Syringe,
+  Activity,
+  GraduationCap,
+  Heart,
+  FileCheck2,
+  Ambulance,
+  BookOpen
 } from 'lucide-react';
 import styles from './CCZ.module.css';
 
@@ -21,12 +27,36 @@ export default function CCZPage() {
     desc: "O Centro de Controle de Zoonoses Manuela Pereira da Marta, vinculado à Secretaria Municipal de Saúde de Muriaé, é uma unidade fundamental para a promoção da saúde pública e para o controle de doenças que podem ser transmitidas entre animais e seres humanos.\n\nLocalizado na BR-356, no sentido Muriaé–Ervália, o CCZ atua diretamente ligado à vigilância e à prevenção dessas patologias, por meio de ações estratégicas voltadas à proteção e melhoria da qualidade de vida da população.",
     
     atividades: [
-      "Monitoramento e controle ativo de doenças zoonóticas, como raiva, leishmaniose, escabiose e esporotricose;",
-      "Educação em saúde, com campanhas contínuas sobre prevenção de zoonoses e posse responsável de animais de estimação;",
-      "Campanhas estratégicas de adoção responsável, incentivando o bem-estar animal e o estreitamento de vínculos com a comunidade;",
-      "Vacinação antirrábica de cães e gatos durante os períodos de mobilização nacional promovidos pelo Governo de Minas Gerais;",
-      "Parcerias técnicas com o Instituto Mineiro de Agropecuária (IMA) para o controle da raiva, com foco no monitoramento de morcegos hematófagos;",
-      "Acolhimento e resgate direcionado de animais com suspeita clínica de zoonoses ou em estrito risco à saúde pública."
+      {
+        icone: <Activity size={22} />,
+        titulo: "Monitoramento de Zoonoses",
+        desc: "Controle ativo e contínuo de doenças como raiva, leishmaniose, escabiose e esporotricose."
+      },
+      {
+        icone: <GraduationCap size={22} />,
+        titulo: "Educação em Saúde",
+        desc: "Campanhas contínuas sobre prevenção de zoonoses e conscientização sobre posse responsável de animais."
+      },
+      {
+        icone: <Heart size={22} />,
+        titulo: "Adoção Responsável",
+        desc: "Ações estratégicas para o incentivo ao bem-estar animal e estreitamento de vínculos com a comunidade."
+      },
+      {
+        icone: <Syringe size={22} />,
+        titulo: "Vacinação Antirrábica",
+        desc: "Imunização anual de cães e gatos alinhada com as diretrizes e mobilizações estaduais de Minas Gerais."
+      },
+      {
+        icone: <FileCheck2 size={22} />,
+        titulo: "Parceria com o IMA",
+        desc: "Cooperação técnica para controle da raiva com foco especial no monitoramento de morcegos hematófagos."
+      },
+      {
+        icone: <Ambulance size={22} />,
+        titulo: "Resgate Direcionado",
+        desc: "Acolhimento de animais com suspeita clínica de zoonoses ou em situação de estrito risco à saúde pública."
+      }
     ],
 
     adocao: {
@@ -43,7 +73,7 @@ export default function CCZPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      {/* 1. HERO BANNER */}
+      {/* 1. HERO BANNER EM TOM AZUL */}
       <section className={styles.heroBanner}>
         <div className={styles.container}>
           <div className={styles.badgeHeader}>
@@ -77,23 +107,32 @@ export default function CCZPage() {
               {/* SOBRE O CCZ */}
               <div className={styles.infoBlock}>
                 <h2>
-                  <Dog size={22} color="#008a83" /> Sobre o Centro de Controle de Zoonoses
+                  <Dog size={22} color="#005c8a" /> Sobre o Centro de Controle de Zoonoses
                 </h2>
                 {dados.desc.split('\n\n').map((p, idx) => (
                   <p key={idx}>{p}</p>
                 ))}
               </div>
 
-              {/* PRINCIPAIS ATIVIDADES */}
+              {/* PRINCIPAIS ATIVIDADES (CARDS EM TONS AZUIS) */}
               <div className={styles.infoBlock}>
-                <h3>
-                  <ShieldAlert size={22} color="#008a83" /> Principais Atividades Desenvolvidas
-                </h3>
-                <ul className={styles.docList}>
-                  {dados.atividades.map((item, idx) => (
-                    <li key={idx}>{item}</li>
+                <h2>
+                  <ShieldAlert size={22} color="#005c8a" /> Principais Atividades Desenvolvidas
+                </h2>
+                
+                <div className={styles.atividadesGrid}>
+                  {dados.atividades.map((act, idx) => (
+                    <div key={idx} className={styles.atividadeCard}>
+                      <div className={styles.atividadeIconBox}>
+                        {act.icone}
+                      </div>
+                      <div className={styles.atividadeInfo}>
+                        <h3>{act.titulo}</h3>
+                        <p>{act.desc}</p>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
               {/* BANNER DE ADOÇÃO RESPONSÁVEL */}
