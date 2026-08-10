@@ -8,7 +8,6 @@ import {
   Syringe, 
   Calendar, 
   Megaphone, 
-  MapPin, 
   AlertTriangle 
 } from 'lucide-react';
 import styles from './Vacina.module.css';
@@ -22,7 +21,7 @@ const servico = {
   desc: 'Imunização para todas as faixas etárias segundo o calendário oficial.'
 };
 
-const tiposVacinas = [
+export const tiposVacinas = [
   {
     id: 1,
     titulo: "Vacinação de Rotina (Caderneta)",
