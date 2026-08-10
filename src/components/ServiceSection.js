@@ -54,7 +54,7 @@ export default function ServiceSection() {
             title: "Transparência",
             description: "Prestação de contas, relatórios e dados da saúde.",
             icon: <ChartNoAxesCombined size={22} className={styles.icon} />,
-            link: "/transparencia"
+            link: "/servicos/transparencia"
         }
     ];
 
