@@ -22,13 +22,16 @@ export default function AplicativosPage() {
       "saude-digital": {
         nome: "Saúde Digital Muriaé",
         subtitulo: "A plataforma oficial de saúde do município de Muriaé",
-        desc: "Permite consultar agendamentos de consultas, posição na fila de exames e históricos de atendimento.",
+        desc: "A Prefeitura Municipal de Muriaé, por meio da Secretaria Municipal de Saúde, lança oficialmente o Saúde Digital Muriaé, uma nova plataforma que amplia o acesso da população às informações e aos serviços da rede pública de saúde do município.\n\nA iniciativa representa mais um avanço no processo de modernização da gestão, fortalecendo a transparência, a organização dos atendimentos e a aproximação entre o cidadão e o Sistema Único de Saúde.",
         funcionalidades: [
-          "Acompanhamento de consultas agendadas;",
-          "Confirmação digital de presença;",
-          "Consulta da posição na fila de espera;"
+          "Acompanhamento de consultas agendadas (data, horário, local e profissional);",
+          "Ferramenta de confirmação de consultas;",
+          "Consulta à posição na fila de espera para procedimentos;",
+          "Lista atualizada de médicos, hospitais e unidades de saúde;",
+          "Acesso seguro a dados pessoais e familiares cadastrados;",
+          "Divulgação de notícias, campanhas e comunicados oficiais."
         ],
-        comoAcessar: "Cadastre-se na sua UBS de referência munido de CPF e documento com foto.",
+        comoAcessar: "O acesso à plataforma será realizado mediante CPF e senha disponibilizada pela Unidade Básica de Saúde (UBS), garantindo a proteção das informações e o uso responsável dos dados.",
         linksDownload: {
           appStore: "https://apps.apple.com/br/app/vivver-sa%C3%BAde-cidad%C3%A3o/id6466105436",
           googlePlay: "https://play.google.com/store/apps/details?id=io.vivver.cidadao.app"
