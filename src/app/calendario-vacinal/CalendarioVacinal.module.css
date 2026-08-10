@@ -1,61 +1,115 @@
-/* ==========================================================================
-   --- CONFIGURAÇÕES GERAIS DA PÁGINA (ESTILO BEGE PREMIUM) --- 
-   ========================================================================== */
+/* ==========================================================
+   ESTILOS DO CALENDÁRIO VACINAL (AZUL INSTITUCIONAL)
+   ========================================================== */
+
 .pageWrapper {
   width: 100%;
   min-height: 100vh;
-  background-color: #f7f4eb; /* Cor bege claro de fundo idêntica ao print */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 80px;
 }
 
-.topContainer {
+.container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 24px 30px 24px;
-  text-align: center;
+  padding: 0 20px;
 }
 
-.badgeTop {
+/* --- HERO BANNER AZUL ESCURO --- */
+.heroBanner {
+  background-color: #003b5c;
+  color: #ffffff;
+  padding: 48px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badgeHeader {
   display: inline-flex;
   align-items: center;
-  background-color: #d1eae5;
-  color: #2b943d;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 13px;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: 24px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.mainTitle {
-  font-size: 44px;
-  font-weight: 700;
-  color: #0f172a;
+.heroTitle {
+  font-size: 38px;
+  font-weight: 800;
   margin: 0 0 12px 0;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
-.mainSubtitle {
-  font-size: 15px;
-  color: #475569;
-  max-width: 600px;
-  margin: 0 auto 40px auto;
+.heroDesc {
+  font-size: 16px;
+  color: #e2e8f0;
+  max-width: 750px;
+  margin: 0;
   line-height: 1.6;
 }
 
-/* ==========================================================================
-   --- SELEÇÃO DOS GRUPOS (QUATRO COLUNAS DO TOPO) --- 
-   ========================================================================== */
+/* --- BARRA DE NAVEGAÇÃO DE RETORNO --- */
+.navigationBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #005c8a;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #003b5c;
+}
+
+.navTag {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.mainContent {
+  padding: 36px 0 80px 0;
+}
+
+/* --- LINHA DO TEMPO (FASES DA VIDA) --- */
 .timelineTrackContainer {
   position: relative;
   max-width: 1100px;
-  margin: 40px auto 20px auto; /* Espaço ideal para o topo */
+  margin: 0 auto 36px auto;
 }
 
-/* Linha horizontal cinza calibrada para passar exatamente no centro dos círculos */
 .timelineLine {
   position: absolute;
-  top: 59px; /* Centralização perfeita na metade dos botões de 114px */
+  top: 59px;
   left: 12%;
   right: 12%;
   height: 2px;
@@ -78,7 +132,6 @@
   text-align: center;
 }
 
-/* Botões Circulares Principais Ajustados */
 .circleBtn {
   width: 114px; 
   height: 114px;
@@ -89,25 +142,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   overflow: hidden;
   padding: 0;
   position: relative;
 }
 
 .circleBtn:hover {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
-/* Estado ativo do círculo (Borda verde-água perfeita) */
 .circleActive {
-  border-color: #008a83 !important;
-  box-shadow: 0 0 0 4px rgba(0, 138, 131, 0.15);
+  border-color: #005c8a !important;
+  box-shadow: 0 0 0 4px rgba(0, 92, 138, 0.2);
 }
 
-/* Imagens dentro dos botões superiores preenchendo sem distorcer ou vazar */
 .circleImageSrc {
   width: 100% !important;
   height: 100% !important;
@@ -115,77 +166,64 @@
   border-radius: 50%;
 }
 
-/* --- ESTILO BASE DINÂMICO DAS TAGS/PÍLULAS --- */
 .grupoBaseTag {
-  font-size: 13px;
-  font-weight: 600;
-  padding: 4px 16px;
-  border-radius: 50px;
-  margin-bottom: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  line-height: 1;
-  transition: all 0.25s ease; /* Transição de cor suave ao alternar cliques */
 }
 
-/* Alinhamento fino para centralizar o mini ícone vetorial SVG */
-.tagIconWrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* --- ESTADO INATIVO DEFAULT (Fundo cinza-creme sutil) --- */
 .tagInativa {
-  background-color: #edeae4;
+  background-color: #e2e8f0;
   color: #64748b;
 }
 
-/* --- ESTADOS ATIVOS COLORIDOS INTERATIVOS (Apenas quando clicados) --- */
-.tagGravidasAtiva {
-  background-color: #fce4e4; /* Vermelho/Rosa suave */
-  color: #c24141;
+.tagGestante {
+  background-color: #fce7f3;
+  color: #be185d;
 }
 
-.tagCriancasAtiva {
-  background-color: #d1eae5; /* Azul esmaecido do print */
-  color: #2b943d;
+.tagCrianca {
+  background-color: #e0f2fe;
+  color: #0369a1;
 }
 
-.tagAdolescentesAtiva {
-  background-color: #e7f2eb; /* Verde menta */
-  color: #1e5a3e;
+.tagAdolescente {
+  background-color: #dcfce7;
+  color: #15803d;
 }
 
-.tagIdososAtiva {
-  background-color: #fef3c7; /* Amarelo/Dourado suave */
+.tagIdoso {
+  background-color: #fef3c7;
   color: #b45309;
 }
 
 .grupoTitle {
-  font-size: 19px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #003b5c;
+  margin: 0 0 6px 0;
 }
 
 .grupoDesc {
-  font-size: 13.5px;
+  font-size: 13px;
   color: #64748b;
   line-height: 1.4;
-  margin: 0 0 14px 0;
+  margin: 0 0 12px 0;
   max-width: 220px;
-  min-height: 40px; /* Previne desalinhamentos na quebra de linha de texto */
+  min-height: 38px;
 }
 
-/* Links Dinâmicos de Ação */
 .actionLink {
   background: none;
   border: none;
   font-size: 13.5px;
-  font-weight: 700; /* Negrito visível como no print */
-  color: #008a83;
+  font-weight: 700;
+  color: #005c8a;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -195,58 +233,41 @@
 }
 
 .actionLink:hover {
-  color: #2b943d;
+  color: #003b5c;
 }
 
 .actionLinkActive {
-  color: #2b943d;
+  color: #003b5c;
 }
 
-/* ==========================================================================
-   --- O QUADRADO/CARD GIGANTE BRANCO DO CONTEÚDO --- 
-   ========================================================================== */
-.containerLayoutBase {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 24px 80px 24px;
-}
-
+/* --- PAINEL PRINCIPAL DE VACINAS --- */
 .quadradoPainelPrincipal {
   width: 100%;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 24px; /* Bordas idênticas às do painel do print */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
-/* Cabeçalho Superior com Linha Divisória de Ponta a Ponta */
 .groupHeader {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 32px 40px;
+  padding: 28px 36px;
   background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0; /* Linha cinza divisória interna */
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* Área de Conteúdo abaixo da Linha Divisória */
-.quadradoConteudoInterno {
-  padding: 32px 40px 40px 40px;
-}
-
-/* Avatar em miniatura circular com borda verde-água fina */
 .groupAvatarCircle {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  border: 1.5px solid #008a83;
+  border: 2px solid #005c8a;
   background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -259,9 +280,9 @@
 }
 
 .groupHeaderTitle {
-  font-size: 26px;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 24px;
+  font-weight: 800;
+  color: #003b5c;
   margin: 0 0 2px 0;
 }
 
@@ -271,33 +292,40 @@
   margin: 0;
 }
 
+.quadradoConteudoInterno {
+  padding: 32px 36px 40px 36px;
+}
+
 .sectionSubtitle {
-  font-size: 15px;
-  color: #008a83;
-  font-weight: 600;
+  font-size: 16px;
+  color: #003b5c;
+  font-weight: 800;
   margin: 0 0 24px 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* ==========================================================================
-   --- GRID INTERNO DOS CARDS DE VACINA --- 
-   ========================================================================== */
+/* --- GRID DOS CARDS --- */
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 colunas exatas do print */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
 .vacinaCard {
-  background-color: #fcfbfa; /* Tom marfim interno */
+  background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 24px;
-  min-height: 120px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.vacinaCard:hover {
+  transform: translateY(-2px);
+  border-color: #005c8a;
 }
 
 .cardHeaderRow {
@@ -307,19 +335,20 @@
   margin-bottom: 16px;
 }
 
-/* Badges em formato de Pílula Arredondada */
 .idadeBadge {
-  background-color: #d1eae5;
-  color: #2b943d;
+  background-color: #f0f9ff;
+  color: #005c8a;
+  border: 1px solid #e0f2fe;
   padding: 4px 14px;
-  border-radius: 50px; /* Pílula perfeita */
+  border-radius: 20px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .rotuloTexto {
-  font-size: 13px;
+  font-size: 12.5px;
   color: #64748b;
+  font-weight: 600;
 }
 
 .vacinaList {
@@ -328,26 +357,36 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
+/* --- SEPARADOR ENTRE VACINAS NO CARD --- */
 .vacinaItem {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.bulletPoint {
-  color: #008a83;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2;
+/* Remove a linha divisória do último item da lista */
+.vacinaItem:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.vacinaItem:first-child {
+  padding-top: 0;
+}
+
+.bulletIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .vacinaTexto {
   font-size: 14.5px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: #003b5c;
   line-height: 1.4;
   display: block;
 }
@@ -362,44 +401,44 @@
 .doencaTag {
   display: inline-block;
   font-size: 11.5px;
-  background-color: #e6f2f0;
-  color: #2b943d;
+  background-color: #e0f2fe;
+  color: #0369a1;
   padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
-/* ==========================================================================
-   --- PAINEL EXPANSÍVEL (LOCAL, HORÁRIO E DOCUMENTOS) --- 
-   ========================================================================== */
+/* --- SANFONA DE DETALHES --- */
 .detalhesWrapper {
-  margin-top: auto; /* Empurra a sanfona de detalhes para o rodapé do card */
+  margin-top: auto;
   padding-top: 14px;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed #cbd5e1;
 }
 
 .btnToggleInfo {
   background: none;
   border: none;
-  color: #008a83;
+  color: #005c8a;
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   padding: 0;
   display: inline-flex;
   align-items: center;
-  transition: color 0.2s;
+  gap: 6px;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .btnToggleInfo:hover {
-  color: #2b943d;
+  color: #003b5c;
 }
 
 .painelDetalhesExtra {
   margin-top: 10px;
   padding: 12px;
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #e2e8f0;
 }
 
@@ -407,16 +446,17 @@
   font-size: 12.5px;
   color: #334155;
   margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   line-height: 1.4;
 }
 
 .infoRow strong {
-  color: #0f172a;
+  color: #003b5c;
 }
 
-/* ==========================================================================
-   --- RESPONSIVIDADE ADAPTATIVA --- 
-   ========================================================================== */
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) {
   .grupoFlex { 
     grid-template-columns: repeat(2, 1fr); 
@@ -441,7 +481,7 @@
   .cardsGrid { 
     grid-template-columns: 1fr; 
   }
-  .mainTitle {
-    font-size: 32px;
+  .heroTitle {
+    font-size: 28px;
   }
 }
