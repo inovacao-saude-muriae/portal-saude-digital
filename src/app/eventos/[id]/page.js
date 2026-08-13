@@ -231,7 +231,7 @@ export default function EventoDetailPage() {
     setMensagemErro(null);
   };
 
-  // ENVIO DA NOVA INSCRIÇÃO
+  // ENVIO DA NOVA INSCRIÇÃO (UTILIZANDO A NOVA ROTA DE API INTERNA DO NEXT.JS)
   const handleInscricaoSubmit = async (e) => {
     e.preventDefault();
     setEnviando(true);
@@ -267,36 +267,29 @@ export default function EventoDetailPage() {
         respostas: listaRespostas
       };
 
-      const response = await fetch(SCRIPT_URL, {
+      // Dispara a requisição para a rota interna de API do Next.js
+      const response = await fetch('/api/inscricoes', {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      const textResponse = await response.text();
-      let resData = {};
-      try { resData = JSON.parse(textResponse); } catch (e) { resData = { status: 'success' }; }
+      const resData = await response.json();
 
       if (resData.status === 'success' || response.ok) {
         const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
         setComprovante({
           codigo: codigoFinal,
           evento: evento.titulo,
-          dataHora: new Date().toLocaleDateString('pt-BR'), // Apenas a data de hoje
+          dataHora: new Date().toLocaleDateString('pt-BR'),
           detalhes: listaRespostas
         });
       } else {
         setMensagemErro('Erro ao realizar inscrição: ' + (resData.message || 'Tente novamente.'));
       }
     } catch (err) {
-      console.error(err);
-      const codigoFallback = 'INS-' + Math.floor(100000 + Math.random() * 900000);
-      setComprovante({
-        codigo: codigoFallback,
-        evento: evento.titulo,
-        dataHora: new Date().toLocaleDateString('pt-BR'),
-        detalhes: listaRespostas
-      });
+      console.error('Erro de envio:', err);
+      setMensagemErro('Ocorreu um erro ao processar sua inscrição. Tente novamente.');
     } finally {
       setEnviando(false);
     }

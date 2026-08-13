@@ -2,996 +2,1022 @@
    ESTILOS GERAIS DA PÁGINA ADMIN DE EVENTOS
    ========================================================== */
 .pageWrapper {
-    width: 100%;
-    min-height: 100vh;
-    background-color: #f1f5f9;
-    padding: 30px 0 60px 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #1e293b;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  padding: 30px 0 60px 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1e293b;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* CABEÇALHO */
 .headerBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
-    background-color: #ffffff;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .badgeHeader {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #e0f2fe;
-    color: #0369a1;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 8px;
-    text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .mainTitle {
-    font-size: 26px;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0 0 4px 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
 }
 
 .subTitle {
-    font-size: 14px;
-    color: #64748b;
-    margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
 }
 
 .backLink {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #0065a4;
-    font-weight: 600;
-    font-size: 14px;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    background-color: #f8fafc;
-    border: 1px solid #cbd5e1;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0065a4;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  transition: all 0.2s ease;
 }
 
 .backLink:hover {
-    background-color: #e2e8f0;
-    color: #003f66;
+  background-color: #e2e8f0;
+  color: #003f66;
 }
 
 /* SUB-ABAS */
 .subTabContainer {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .subTabBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .subTabBtn:hover {
-    background-color: #f8fafc;
-    color: #0f172a;
+  background-color: #f8fafc;
+  color: #0f172a;
 }
 
 .subTabCadastrarActive, .subTabGerenciarActive {
-    background-color: #0065a4 !important;
-    color: #ffffff !important;
-    border-color: #0065a4 !important;
-    box-shadow: 0 2px 8px rgba(0, 101, 164, 0.25);
+  background-color: #0065a4 !important;
+  color: #ffffff !important;
+  border-color: #0065a4 !important;
+  box-shadow: 0 2px 8px rgba(0, 101, 164, 0.25);
 }
 
 /* ALERTAS E BANNERS DE EDIÇÃO */
 .alertMessage {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 .alertSucesso {
-    background-color: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
 }
 
 .alertErro {
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
 }
 
 .editModeBanner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fef3c7;
-    border: 1px solid #fde047;
-    color: #92400e;
-    padding: 12px 18px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fef3c7;
+  border: 1px solid #fde047;
+  color: #92400e;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
 }
 
 .cancelEditBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #ffffff;
-    border: 1px solid #f59e0b;
-    color: #b45309;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid #f59e0b;
+  color: #b45309;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* FORMULÁRIO E GRID */
 .formGrid {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
 }
 
 .cardSection {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 }
 
 .sectionTitle {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #f1f5f9;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
 .label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
 }
 
 .input, .select, .textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #0f172a;
-    background-color: #ffffff;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #0f172a;
+  background-color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input:focus, .select:focus, .textarea:focus {
-    border-color: #0065a4;
-    box-shadow: 0 0 0 3px rgba(0, 101, 164, 0.12);
+  border-color: #0065a4;
+  box-shadow: 0 0 0 3px rgba(0, 101, 164, 0.12);
 }
 
 .rowTwoCols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .sectionDivider {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #e2e8f0;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
 }
 
 .sectionDividerSpaced {
-    margin-top: 28px;
-    padding-top: 24px;
-    border-top: 1px dashed #cbd5e1;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px dashed #cbd5e1;
 }
 
 .subSectionTitle {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
 }
 
 .subSectionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
 }
 
 .flexColumnGap12 {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .checkboxLabelDark {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
 }
 
 .checkboxLabelBlue {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #0284c7;
-    background-color: #f0f9ff;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #bae6fd;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0284c7;
+  background-color: #f0f9ff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+  cursor: pointer;
 }
 
 .checkboxInput {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 /* CONSTRUTOR DE FORMULÁRIO DE INSCRIÇÃO */
 .formFieldsContainer {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 16px;
-    margin-top: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 8px;
 }
 
 .formFieldsHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
 }
 
 .formFieldsTitle {
-    font-size: 14px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 2px 0;
 }
 
 .formFieldsSubtitle {
-    font-size: 12px;
-    color: #64748b;
-    margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
 }
 
 .fieldBoxWrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .fieldGridRow {
-    display: grid;
-    grid-template-columns: 1fr 180px 80px 38px;
-    gap: 10px;
-    align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 180px 80px 38px;
+  gap: 10px;
+  align-items: center;
 }
 
 .checkboxLabelSmall {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #475569;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
 }
 
 .optionsContainer {
-    margin-top: 8px;
-    padding: 12px;
-    background-color: #f1f5f9;
-    border: 1px dashed #cbd5e1;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .optionsHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .optionsTitle {
-    font-size: 12px;
-    font-weight: 700;
-    color: #0284c7;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0284c7;
 }
 
 .optionsList {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .optionRowItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .optionNumber {
-    font-size: 12px;
-    font-weight: 700;
-    color: #64748b;
-    min-width: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  min-width: 18px;
 }
 
 .addOptionBtn {
-    align-self: flex-start;
-    background-color: #ffffff;
-    color: #0065a4;
-    border: 1px solid #cbd5e1;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.2s ease;
-    margin-top: 4px;
+  align-self: flex-start;
+  background-color: #ffffff;
+  color: #0065a4;
+  border: 1px solid #cbd5e1;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  margin-top: 4px;
 }
 
 .addOptionBtn:hover {
-    background-color: #e2e8f0;
-    color: #003f66;
+  background-color: #e2e8f0;
+  color: #003f66;
 }
 
 .deleteSquareBtnSmall {
-    background-color: #fee2e2;
-    color: #ef4444;
-    border: 1px solid #fca5a5;
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background-color 0.2s;
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
 }
 
 .deleteSquareBtnSmall:hover {
-    background-color: #fca5a5;
-    color: #991b1b;
+  background-color: #fca5a5;
+  color: #991b1b;
 }
 
 .addBtnSmall {
-    background-color: #0284c7;
-    color: #ffffff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .addBtnSmall:hover {
-    background-color: #0369a1;
+  background-color: #0369a1;
 }
 
 .addBtnMedium {
-    background-color: #f1f5f9;
-    color: #0065a4;
-    border: 1px solid #cbd5e1;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  background-color: #f1f5f9;
+  color: #0065a4;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .addBtnMedium:hover {
-    background-color: #e2e8f0;
+  background-color: #e2e8f0;
 }
 
 .deleteSquareBtn {
-    background-color: #fee2e2;
-    color: #ef4444;
-    border: 1px solid #fca5a5;
-    width: 38px;
-    height: 38px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .deleteSquareBtn:hover {
-    background-color: #fca5a5;
+  background-color: #fca5a5;
 }
 
 /* CRONOGRAMA */
 .cronogramaCard {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .cronogramaGridRow {
-    display: grid;
-    grid-template-columns: 130px 1fr 38px;
-    gap: 10px;
+  display: grid;
+  grid-template-columns: 130px 1fr 38px;
+  gap: 10px;
 }
 
 .flexRowCenterGap8 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .fontSize13 {
-    font-size: 13px !important;
+  font-size: 13px !important;
 }
 
 /* COLUNA DIREITA */
 .rightColumn {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .dropZone {
-    border: 2px dashed #cbd5e1;
-    border-radius: 10px;
-    padding: 30px 16px;
-    text-align: center;
-    background-color: #f8fafc;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s ease;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 30px 16px;
+  text-align: center;
+  background-color: #f8fafc;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .dropZone:hover {
-    border-color: #0065a4;
-    background-color: #f0f9ff;
+  border-color: #0065a4;
+  background-color: #f0f9ff;
 }
 
 .uploadIcon {
-    color: #0065a4;
-    margin-bottom: 8px;
+  color: #0065a4;
+  margin-bottom: 8px;
 }
 
 .uploadText {
-    font-size: 14px;
-    font-weight: 600;
-    color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .uploadSubtext {
-    font-size: 12px;
-    color: #64748b;
-    margin-top: 2px;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
 }
 
 .fileNameBadge {
-    display: inline-block;
-    margin-top: 10px;
-    background-color: #e0f2fe;
-    color: #0369a1;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 12px;
+  display: inline-block;
+  margin-top: 10px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
 }
 
 .fileInputHidden {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .submitBtn {
-    width: 100%;
-    background-color: #0065a4;
-    color: #ffffff;
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background-color 0.2s ease;
-    margin-top: 10px;
+  width: 100%;
+  background-color: #0065a4;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  margin-top: 10px;
 }
 
 .submitBtn:hover {
-    background-color: #004d7d;
+  background-color: #004d7d;
 }
 
 .submitBtn:disabled {
-    background-color: #94a3b8;
-    cursor: not-allowed;
+  background-color: #94a3b8;
+  cursor: not-allowed;
 }
 
 /* LISTAGEM DE EVENTOS */
 .newsListContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .newsItemRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    background-color: #ffffff;
-    gap: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  gap: 16px;
 }
 
 .newsItemContent {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .imageThumbnailWrapper {
-    position: relative;
-    width: 90px;
-    height: 60px;
-    border-radius: 6px;
-    overflow: hidden;
-    background-color: #f1f5f9;
-    flex-shrink: 0;
+  position: relative;
+  width: 90px;
+  height: 60px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
 }
 
 .thumbnailImg {
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .newsMetaText {
-    font-size: 12px;
-    font-weight: 700;
-    color: #0284c7;
-    text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0284c7;
+  text-transform: uppercase;
 }
 
 .newsItemTitle {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 2px 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 2px 0 6px 0;
 }
 
 .eventDetailsRow {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    color: #64748b;
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 .eventDetailsRow span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .actionButtonsGroup {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .editBtn, .deleteBtn, .emitCertificateBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
 }
 
 .emitCertificateBtn {
-    background-color: #f0f9ff;
-    color: #0284c7;
-    border: 1px solid #bae6fd;
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
 }
 
 .emitCertificateBtn:hover {
-    background-color: #e0f2fe;
+  background-color: #e0f2fe;
 }
 
 .editBtn {
-    background-color: #f1f5f9;
-    color: #334155;
-    border: 1px solid #cbd5e1;
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
 }
 
 .editBtn:hover {
-    background-color: #e2e8f0;
+  background-color: #e2e8f0;
 }
 
 .deleteBtn {
-    background-color: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fca5a5;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
 }
 
 .deleteBtn:hover {
-    background-color: #fca5a5;
+  background-color: #fca5a5;
 }
 
 .loadingText, .emptyText {
-    text-align: center;
-    padding: 30px;
-    color: #64748b;
-    font-size: 14px;
+  text-align: center;
+  padding: 30px;
+  color: #64748b;
+  font-size: 14px;
 }
 
 /* ==========================================================
-   MODAIS DE INSCRITOS & CERTIFICADO (CORRIGIDO)
+   MODAIS DE INSCRITOS & CERTIFICADO
    ========================================================== */
 .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    padding: 20px;
-    box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .modalContent {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 900px;
-    
-    /* --- CORREÇÃO DE ROLAGEM DO MODAL --- */
-    max-height: 90vh; /* Mantém altura máxima */
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto; /* ATIVA ROLAGEM NO CONTAINER PRINCIPAL SE NECESSÁRIO */
-    /* ----------------------------------- */
-    
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    position: relative;
-    box-sizing: border-box;
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  box-sizing: border-box;
 }
 
 .modalComprovanteBox {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 580px;
-    
-    /* --- CORREÇÃO DE ROLAGEM COMPROVANTE --- */
-    max-height: 90vh;
-    overflow-y: auto;
-    /* -------------------------------------- */
-    
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-    position: relative;
-    display: flex;
-    flex-direction: column;
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
+/* BARRA DE AÇÕES COM OS BOTÕES DE EXPORTAÇÃO */
 .adminActionsHeaderBar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-    flex-shrink: 0; /* Impede cabeçalho de sumir */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .btnExportarCsv {
-    background-color: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 12.5px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .btnExportarCsv:hover {
-    background-color: #16a34a;
-    color: #ffffff;
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
+/* ESTILO DO BOTÃO EXPORTAR COMPLETO (.XLSX) */
+.btnExportarXlsx {
+  background-color: #0284c7;
+  color: #ffffff;
+  border: 1px solid #0369a1;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+}
+
+.btnExportarXlsx:hover {
+  background-color: #0369a1;
+  box-shadow: 0 4px 8px rgba(2, 132, 199, 0.3);
+}
+
+.btnExportarCsv:disabled,
+.btnExportarXlsx:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #cbd5e1 !important;
+  border-color: #94a3b8 !important;
+  color: #64748b !important;
+  box-shadow: none !important;
 }
 
 .btnVerTicketSmall {
-    background-color: #f0f9ff;
-    color: #0369a1;
-    border: 1px solid #bae6fd;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 11.5px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.2s ease;
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
 }
 
 .btnVerTicketSmall:hover {
-    background-color: #0284c7;
-    color: #ffffff;
+  background-color: #0284c7;
+  color: #ffffff;
 }
 
 .closeModalBtn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #f1f5f9;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #64748b;
-    z-index: 10; /* Garante que fique sobre os controles */
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  z-index: 10;
 }
 
 .closeModalBtn:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .marginBottom16 {
-    margin-bottom: 16px;
-    flex-shrink: 0;
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .modalBadgeText {
-    font-size: 11px;
-    font-weight: 800;
-    color: #0284c7;
-    letter-spacing: 1px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: 1px;
 }
 
 .modalTitle {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 4px 0 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0 0;
 }
 
 /* SEÇÃO DE CONTROLES DO CERTIFICADO (MODELO E CARGA HORÁRIA) */
 .modalControlsBox {
-    display: grid;
-    grid-template-columns: 1fr 180px;
-    gap: 16px;
-    background-color: #f8fafc;
-    padding: 16px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    margin-bottom: 16px;
-    position: relative;
-    z-index: 5;
-    flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 16px;
+  background-color: #f8fafc;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
 }
 
 .modalLabelWithIcon, .modalLabelBlock {
-    font-size: 12px;
-    font-weight: 700;
-    color: #334155;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .modalSelect, .modalInputCargaHoraria {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 13.5px;
-    color: #0f172a;
-    background-color: #ffffff;
-    box-sizing: border-box;
-    cursor: pointer;
-    outline: none;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #0f172a;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
 }
 
 .modalInputCargaHoraria {
-    cursor: text;
+  cursor: text;
 }
 
 .modalSelect:focus, .modalInputCargaHoraria:focus {
-    border-color: #0284c7;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 .modalSelectionBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .flexRowCenterGap10 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .toggleAllBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    font-size: 13px;
-    font-weight: 700;
-    color: #0369a1;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0369a1;
+  cursor: pointer;
 }
 
 .selectedCountText {
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 600;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
 }
 
-/* AJUSTE NO CONTAINER DA TABELA */
+/* TABELA DE INSCRITOS */
 .tableScrollWrapper {
-    flex: 1 1 auto; /* Permite crescer e encolher */
-    overflow-y: auto; /* Rolagem vertical interna */
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    
-    /* --- CORREÇÃO MOBILE ALTURA TABELA --- */
-    min-height: 200px; /* Garante altura mínima para ver dados */
-    max-height: 380px; /* Mantém altura máxima no desktop */
-    /* ------------------------------------- */
-    
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+  flex: 1 1 auto;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  min-height: 200px;
+  max-height: 380px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .inscritosTable {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    text-align: left;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
 }
 
 .inscritosTable th {
-    background-color: #f8fafc;
-    color: #475569;
-    font-weight: 700;
-    padding: 10px 14px;
-    border-bottom: 1px solid #e2e8f0;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .inscritosTable td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
 }
 
 .selectedRow {
-    background-color: #f0f9ff;
+  background-color: #f0f9ff;
 }
 
 .colIndex { width: 40px; }
@@ -1001,58 +1027,58 @@
 .textCenter { text-align: center; }
 
 .checkboxInputLarge {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 .loadingInscritosBox, .emptyInscritosBox {
-    text-align: center;
-    padding: 40px 20px;
-    color: #64748b;
-    font-size: 14px;
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 14px;
 }
 
 .flexRowGap12 {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    flex-shrink: 0; /* BOTÕES DO RODAPÉ NÃO ENCOLHEM */
-    margin-top: auto; /* Empurra para o final se houver espaço */
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .downloadCertificatesBtn, .btnDownloadPdf {
-    background-color: #0284c7;
-    color: #ffffff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 13.5px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .downloadCertificatesBtn:hover, .btnDownloadPdf:hover {
-    background-color: #0369a1;
+  background-color: #0369a1;
 }
 
 .downloadCertificatesBtn:disabled {
-    background-color: #cbd5e1;
-    cursor: not-allowed;
+  background-color: #cbd5e1;
+  cursor: not-allowed;
 }
 
 .closeModalSecondaryBtn {
-    background-color: #f1f5f9;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 13.5px;
-    cursor: pointer;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
 }
 
 /* COMPROVANTE INDIVIDUAL */
@@ -1188,247 +1214,237 @@
   border: 1px solid #bbf7d0;
 }
 
-/* IMPRESSÃO */
 .hiddenPrintContainer {
-    display: none;
+  display: none;
 }
-/* ==========================================================
-   MELHORIAS DE LAYOUT E DESIGN DA BARRA DE ROLAGEM (SCROLLBAR)
-   ========================================================== */
 
-/* Suporte Padrão Moderno (Firefox) */
+/* DESIGN BARRA DE ROLAGEM */
 .tableScrollWrapper,
 .modalContent {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-/* Suporte a Navegadores WebKit (Chrome, Edge, Safari, Opera) */
-
-/* 1. Largura/Espessura da Barra de Rolagem */
 .tableScrollWrapper::-webkit-scrollbar,
 .modalContent::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-/* 2. Trilho / Fundo da Barra */
 .tableScrollWrapper::-webkit-scrollbar-track,
 .modalContent::-webkit-scrollbar-track {
   background-color: #f1f5f9;
   border-radius: 8px;
 }
 
-/* 3. Indicador de Rolagem (Thumb) */
 .tableScrollWrapper::-webkit-scrollbar-thumb,
 .modalContent::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
   border-radius: 8px;
-  border: 2px solid #f1f5f9; /* Cria um espaçamento interno elegante */
+  border: 2px solid #f1f5f9;
   transition: background-color 0.2s ease;
 }
 
-/* 4. Estado Hover no Indicador de Rolagem */
 .tableScrollWrapper::-webkit-scrollbar-thumb:hover,
 .modalContent::-webkit-scrollbar-thumb:hover {
-  background-color: #0284c7; /* Destaca com o azul institucional no hover */
+  background-color: #0284c7;
 }
 
 /* ==========================================================
-   REGRA DE IMPRESSÃO DO CERTIFICADO (ENQUADRAMENTO A4 TOTAL)
+   REGRA DE IMPRESSÃO DO CERTIFICADO
    ========================================================== */
 @media print {
-    /* 1. TRAVA A PÁGINA A4 PAISAGEM SEM MARGENS DO NAVEGADOR */
-    @page {
-        size: A4 landscape;
-        margin: 0 !important;
-    }
+  @page {
+    size: A4 landscape;
+    margin: 0 !important;
+  }
 
-    html, body {
-        width: 297mm !important;
-        height: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
-        overflow: hidden !important;
-    }
+  html, body {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
 
-    body * {
-        visibility: hidden !important;
-    }
+  body * {
+    visibility: hidden !important;
+  }
 
-    /* 2. OCULTA TUDO E EXIBE SOMENTE O CONTAINER DE IMPRESSÃO */
-    .hiddenPrintContainer, .hiddenPrintContainer * {
-        visibility: visible !important;
-    }
+  .hiddenPrintContainer, .hiddenPrintContainer * {
+    visibility: visible !important;
+  }
 
-    .hiddenPrintContainer {
-        display: block !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 297mm !important;
-        height: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        z-index: 99999 !important;
-    }
+  .hiddenPrintContainer {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 99999 !important;
+  }
 
-    /* 3. FOLHA ÚNICA DO CERTIFICADO COM DIMENSÕES EXATAS */
-    .certificadoPageSingle {
-        position: relative !important;
-        width: 297mm !important;
-        height: 210mm !important;
-        page-break-after: always;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        overflow: hidden !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+  .certificadoPageSingle {
+    position: relative !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    page-break-after: always;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-    /* 4. IMAGEM DE FUNDO OCUPANDO 100% DA FOLHA SEM BORDAS BRANCAS */
-    .certificadoBgImage {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 297mm !important;
-        height: 210mm !important;
-        object-fit: fill !important; /* Estica exatamente nas proporções da folha A4 */
-        z-index: 1 !important;
-    }
+  .certificadoBgImage {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    object-fit: fill !important;
+    z-index: 1 !important;
+  }
 
-    /* 5. POSICIONAMENTO DO NOME DO PARTICIPANTE */
-    .certificadoNomeWrapper {
-        position: absolute !important;
-        top: 82mm !important;
-        left: 20mm !important;
-        width: 257mm !important;
-        text-align: center !important;
-        z-index: 10 !important;
-    }
+  .certificadoNomeWrapper {
+    position: absolute !important;
+    top: 82mm !important;
+    left: 20mm !important;
+    width: 257mm !important;
+    text-align: center !important;
+    z-index: 10 !important;
+  }
 
-    .certificadoNomeText {
-        font-size: 28pt !important;
-        font-weight: 800 !important;
-        color: #0f172a !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        line-height: 1.1 !important;
-    }
+  .certificadoNomeText {
+    font-size: 28pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.1 !important;
+  }
 
-    /* 6. POSICIONAMENTO DO TEXTO EXPLICATIVO DO CERTIFICADO */
-    .certificadoTextoWrapper {
-        position: absolute !important;
-        top: 102mm !important;
-        left: 25mm !important;
-        width: 247mm !important;
-        text-align: center !important;
-        z-index: 10 !important;
-    }
+  .certificadoTextoWrapper {
+    position: absolute !important;
+    top: 102mm !important;
+    left: 25mm !important;
+    width: 247mm !important;
+    text-align: center !important;
+    z-index: 10 !important;
+  }
 
-    .certificadoTextoParagraph {
-        font-size: 11.5pt !important;
-        line-height: 1.5 !important;
-        color: #334155 !important;
-        margin: 0 !important;
-    }
+  .certificadoTextoParagraph {
+    font-size: 11.5pt !important;
+    line-height: 1.5 !important;
+    color: #334155 !important;
+    margin: 0 !important;
+  }
 
-    .boldText {
-        font-weight: 700 !important;
-        color: #0f172a !important;
-    }
+  .boldText {
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
 
-    /* 7. AUTENTICIDADE NO RODAPÉ DIREITO */
-    .certificadoAutenticidadeText {
-        position: absolute !important;
-        bottom: 8mm !important;
-        right: 12mm !important;
-        font-size: 7.5pt !important;
-        color: #64748b !important;
-        font-family: monospace !important;
-        z-index: 10 !important;
-    }
+  .certificadoAutenticidadeText {
+    position: absolute !important;
+    bottom: 8mm !important;
+    right: 12mm !important;
+    font-size: 7.5pt !important;
+    color: #64748b !important;
+    font-family: monospace !important;
+    z-index: 10 !important;
+  }
 
-    /* IMPRESSÃO DO COMPROVANTE TICKET INDIVIDUAL PELO ADMIN */
-    :global(#comprovante-admin-pdf-container),
-    :global(#comprovante-admin-pdf-container) * {
-        visibility: visible !important;
-    }
+  :global(#comprovante-admin-pdf-container),
+  :global(#comprovante-admin-pdf-container) * {
+    visibility: visible !important;
+  }
 
-    :global(#comprovante-admin-pdf-container) {
-        position: absolute !important;
-        top: 0 !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 100% !important;
-        max-width: 580px !important;
-        padding: 20px !important;
-        border: 2px solid #0065a4 !important;
-        background-color: #ffffff !important;
-        box-shadow: none !important;
-    }
+  :global(#comprovante-admin-pdf-container) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 580px !important;
+    padding: 20px !important;
+    border: 2px solid #0065a4 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+  }
 }
 
-/* ==========================================================
-   RESPONSIVIDADE MEDIA QUERIES
-   ========================================================== */
+/* MEDIA QUERIES */
 @media (max-width: 1024px) {
-    .formGrid {
-        grid-template-columns: 1fr;
-    }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
 
-    .fieldGridRow {
-        grid-template-columns: 1fr 140px 70px 38px;
-    }
-    
-    .modalContent {
-        width: 95%;
-        padding: 20px;
-    }
+  .fieldGridRow {
+    grid-template-columns: 1fr 140px 70px 38px;
+  }
+  
+  .modalContent {
+    width: 95%;
+    padding: 20px;
+  }
 }
 
 @media (max-width: 768px) {
-    /* Ajustes específicos para garantir rolagem no tablet/celular */
-    .modalOverlay {
-        padding: 10px; /* Reduz padding externo */
-    }
-    
-    .modalContent {
-        max-height: 95vh; /* Ocupa quase toda a tela */
-    }
-    
-    .tableScrollWrapper {
-        max-height: 300px; /* Reduz altura da tabela para sobrar espaço para os botões do rodapé */
-    }
+  .modalOverlay {
+    padding: 10px;
+  }
+  
+  .modalContent {
+    max-height: 95vh;
+  }
+  
+  .tableScrollWrapper {
+    max-height: 300px;
+  }
 }
 
 @media (max-width: 640px) {
-    .headerBar {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-    }
-    
-    .rowTwoCols {
-        grid-template-columns: 1fr;
-    }
+  .headerBar {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .rowTwoCols {
+    grid-template-columns: 1fr;
+  }
 
-    .fieldGridRow {
-        grid-template-columns: 1fr;
-    }
+  .fieldGridRow {
+    grid-template-columns: 1fr;
+  }
 
-    .modalControlsBox {
-        grid-template-columns: 1fr;
-    }
-    
-    .flexRowGap12 {
-        flex-direction: column; /* Botões do rodapé ficam um sobre o outro no celular */
-        gap: 8px;
-    }
-    
-    .downloadCertificatesBtn, .closeModalSecondaryBtn {
-        width: 100%;
-        justify-content: center;
-    }
+  .modalControlsBox {
+    grid-template-columns: 1fr;
+  }
+
+  .adminActionsHeaderBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnExportarCsv,
+  .btnExportarXlsx {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .flexRowGap12 {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .downloadCertificatesBtn, .closeModalSecondaryBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }

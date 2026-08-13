@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import * as XLSX from 'xlsx'; // BIBLIOTECA PARA EXCEL (.XLSX)
 
 import { 
   ArrowLeft, 
@@ -32,7 +33,8 @@ import {
   FileText,
   Printer,
   Ticket,
-  ShieldCheck
+  ShieldCheck,
+  Table
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
@@ -244,7 +246,6 @@ export default function AdminEventosPage() {
         const user = JSON.parse(savedUser);
         const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
         
-        // Permite acesso para admin, master, gestor, comunicacao e imprensa
         const cargosPermitidos = ['admin', 'master', 'gestor', 'comunicacao', 'imprensa'];
         
         if (!cargosPermitidos.includes(cargo)) {
@@ -430,7 +431,6 @@ export default function AdminEventosPage() {
     setMensagem(null);
   };
 
-  // ENVIAR EVENTO (CORRIGIDO PARA O NAVEGADOR MOBILE)
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     setLoadingForm(true);
@@ -528,7 +528,7 @@ export default function AdminEventosPage() {
       };
       reader.onerror = () => {
         setLoadingForm(false);
-        setMensagem({ tipo: 'erro', texto: 'Erro ao processar imagem selecionada.' });
+        setMensagem({ tipo: 'erro', texto: 'Erro ao carregar imagem' });
       };
     } else {
       processarEnvio();
@@ -569,7 +569,7 @@ export default function AdminEventosPage() {
     }
   };
 
-  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS (BLINDADO CONTRA TRAVAMENTOS MOBILE)
+  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
@@ -600,7 +600,7 @@ export default function AdminEventosPage() {
     }
   };
 
-  // EXPORTAR A LISTA DE INSCRITOS EM CSV
+  // EXPORTAR A LISTA DE INSCRITOS RESUMIDA EM CSV
   const handleExportarInscritosCSV = () => {
     if (inscritos.length === 0) {
       alert('Não há inscritos para exportar.');
@@ -632,10 +632,32 @@ export default function AdminEventosPage() {
     const nomeArquivoClean = (eventoCertificado?.titulo || 'Inscritos').replace(/[^a-zA-Z0-9]/g, '_');
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `Inscritos_${nomeArquivoClean}.csv`);
+    link.setAttribute('download', `Inscritos_Resumido_${nomeArquivoClean}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // FUNÇÃO PARA EXPORTAR COMPLETO EM EXCEL NATIVO (.XLSX)
+  const handleExportarInscritosXLSX = () => {
+    if (!inscritos || inscritos.length === 0) {
+      alert('Não há inscritos para exportar.');
+      return;
+    }
+
+    try {
+      const worksheet = XLSX.utils.json_to_sheet(inscritos);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Inscritos');
+
+      const nomeEventoClean = (eventoCertificado?.titulo || 'Inscritos').replace(/[^a-zA-Z0-9]/g, '_');
+      const nomeArquivo = `Inscritos_Completo_${nomeEventoClean}.xlsx`;
+
+      XLSX.writeFile(workbook, nomeArquivo);
+    } catch (error) {
+      console.error('Erro ao gerar planilha XLSX:', error);
+      alert('Ocorreu um erro ao tentar exportar o arquivo Excel.');
+    }
   };
 
   // VISUALIZAR COMPROVANTE INDIVIDUAL
@@ -1103,18 +1125,30 @@ export default function AdminEventosPage() {
               </h3>
             </div>
 
+            {/* BARRA DE AÇÕES COM OS BOTÕES DE EXPORTAÇÃO */}
             <div className={styles.adminActionsHeaderBar}>
               <button 
                 type="button" 
                 onClick={handleExportarInscritosCSV}
                 disabled={inscritos.length === 0}
                 className={styles.btnExportarCsv}
+                title="Exportar apenas código, nome e CPF em CSV"
               >
-                <Download size={16} /> Baixar Lista de Inscritos (CSV)
+                <Download size={15} /> Exportar Inscritos
+              </button>
+
+              <button 
+                type="button" 
+                onClick={handleExportarInscritosXLSX}
+                disabled={inscritos.length === 0}
+                className={styles.btnExportarXlsx}
+                title="Exportar todas as colunas da planilha em formato nativo do Excel (.xlsx)"
+              >
+                <Table size={15} /> Exportar Completo (.xlsx)
               </button>
             </div>
 
-            {/* PAINEL DE CONFIGURAÇÃO DE CERTIFICADO FIXO/SEMPRE EXIBIDO */}
+            {/* PAINEL DE CONFIGURAÇÃO DE CERTIFICADO FIXO */}
             <div className={styles.modalControlsBox}>
               <div>
                 <label className={styles.modalLabelWithIcon}>
