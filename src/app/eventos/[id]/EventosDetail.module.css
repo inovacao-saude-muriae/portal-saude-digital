@@ -5,7 +5,11 @@
   width: 100%;
   min-height: 100vh;
   background-color: #eaf3f8;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .container {
@@ -80,9 +84,15 @@
   color: #ffffff;
 }
 
-.statusAberto { background-color: #16a34a; }
-.statusAndamento { background-color: #d97706; }
-.statusEncerrado { background-color: #64748b; }
+.statusAberto {
+  background-color: #16a34a;
+}
+.statusAndamento {
+  background-color: #d97706;
+}
+.statusEncerrado {
+  background-color: #64748b;
+}
 
 /* TÍTULO E RESUMO */
 .titulo {
@@ -160,7 +170,9 @@
   align-items: center;
   gap: 10px;
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .btnAbrirInscricao:hover {
@@ -265,7 +277,7 @@
 }
 
 /* ==========================================================================
-   --- MODAL FLUTUANTE DE INSCRIÇÃO (ROLAGEM E CAIXA AJUSTADAS) ---
+   --- MODAL FLUTUANTE DE INSCRIÇÃO ---
    ========================================================================== */
 .modalBackdrop {
   position: fixed;
@@ -278,6 +290,7 @@
   z-index: 9999;
   padding: 20px;
   animation: fadeIn 0.2s ease;
+  box-sizing: border-box;
 }
 
 .modalBoxContainer {
@@ -288,9 +301,10 @@
   padding: 24px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
-  max-height: 85vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .modalCloseIconBtn {
@@ -319,7 +333,8 @@
 .modalFormContent {
   display: flex;
   flex-direction: column;
-  max-height: calc(85vh - 48px);
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -343,14 +358,23 @@
   font-weight: 800;
 }
 
+.modalFormFlex {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 /* ÁREA ROLÁVEL COM OS CAMPOS DO FORMULÁRIO */
 .modalFormBodyFields {
+  flex: 1;
   overflow-y: auto;
   padding-right: 8px;
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modalFieldGroup {
@@ -370,45 +394,38 @@
   color: #dc2626;
 }
 
-/* ==========================================================================
-   --- MELHORIAS NO CURSOR E INTERATIVIDADE DOS CAMPOS ---
-   ========================================================================== */
-
-/* PONTINHO/TEXTO SUAVE NOS INPUTS E SELECTS DE TEXTO */
-.modalFieldInput, 
+.modalFieldInput,
 .modalFieldSelect {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
-  font-size: 14px;
+  font-size: 16px;
   color: #0f172a;
   outline: none;
   background-color: #f8fafc;
   box-sizing: border-box;
-  cursor: text; /* Indica claramente campo de escrita */
+  cursor: text;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modalFieldSelect {
-  cursor: pointer; /* Cursor de mãozinha para dropdowns */
+  cursor: pointer;
 }
 
-/* DESTAQUE E CURSOR AO PASSAR O MOUSE (HOVER & FOCUS) */
 .modalFieldInput:hover,
 .modalFieldSelect:hover {
   border-color: #94a3b8;
   background-color: #ffffff;
 }
 
-.modalFieldInput:focus, 
+.modalFieldInput:focus,
 .modalFieldSelect:focus {
   border-color: #16a34a;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15); /* Brilho de foco suave */
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
 }
 
-/* CURSOR EM MÃOZINHA (POINTER) PARA TODAS AS CAIXAS DE SELEÇÃO E RÓTULOS */
 .checkboxOptionLabel {
   display: flex;
   align-items: center;
@@ -416,52 +433,27 @@
   font-size: 13.5px;
   font-weight: 600;
   color: #334155;
-  cursor: pointer; /* Cursor de mãozinha no texto ao lado da caixa */
+  cursor: pointer;
   user-select: none;
-  padding: 4px 6px;
+  padding: 6px 8px;
   border-radius: 6px;
   transition: background-color 0.15s ease;
 }
 
 .checkboxOptionLabel:hover {
-  background-color: #e2e8f0; /* Destaque sutil ao passar o mouse na linha */
+  background-color: #e2e8f0;
 }
 
 .modalCheckboxInput {
   width: 18px;
   height: 18px;
-  cursor: pointer; /* Cursor de mãozinha na caixinha */
+  cursor: pointer;
   accent-color: #16a34a;
-}
-
-/* BOTÃO DE FECHAR E BOTÕES PRINCIPAIS */
-.modalCloseIconBtn {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer; /* Mãozinha no botão X */
-  color: #64748b;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.modalCloseIconBtn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
-  transform: rotate(90deg); /* Efeito elegante de rotação no X ao passar o mouse */
 }
 
 .btnConfirmarInscricao {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
   background-color: #16a34a;
   color: #ffffff;
   border: none;
@@ -473,7 +465,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  cursor: pointer; /* Mãozinha no botão principal */
+  cursor: pointer;
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
@@ -483,7 +475,7 @@
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
   transform: translateY(-1px);
 }
-/* COLUNA DE BOTÕES NO BANNER DE INSCRIÇÃO */
+
 .bannerButtonsCol {
   display: flex;
   flex-direction: column;
@@ -509,7 +501,6 @@
   color: #0f5125;
 }
 
-/* TABS DENTRO DO MODAL */
 .modalTabsBar {
   display: flex;
   gap: 8px;
@@ -543,64 +534,43 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.modalFormFlex {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .modalConsultarTexto {
   font-size: 14px;
   color: #475569;
   line-height: 1.5;
   margin: 0 0 16px 0;
 }
-/* ==========================================================================
-   --- ESTILIZAÇÃO E AJUSTE DA BARRA DE ROLAGEM (SCROLLBAR) ---
-   ========================================================================== */
 
-/* ESPAÇAMENTO PARA A BARRA NÃO INVASIVA */
+/* BARRA DE ROLAGEM DOS CAMPOS */
 .modalFormBodyFields {
-  overflow-y: auto;
-  padding-right: 12px; /* Aumentado para afastar a barra do conteúdo */
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  /* Suporte nativo para Firefox */
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
 
-/* BARRA DE ROLAGEM PERSONALIZADA (CHROME, SAFARI, EDGE, OPERA) */
 .modalFormBodyFields::-webkit-scrollbar {
-  width: 6px; /* Largura bem fina em vez da barra preta grossa */
+  width: 6px;
 }
 
-/* TRILHO DA BARRA (FUNDO) */
 .modalFormBodyFields::-webkit-scrollbar-track {
-  background: transparent; /* Fundo transparente */
+  background: transparent;
   border-radius: 10px;
 }
 
-/* INDICADOR DE ROLAGEM (BARRA QUE SE MOVE) */
 .modalFormBodyFields::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* Cinza claro discreto */
-  border-radius: 10px; /* Pontas arredondadas */
+  background-color: #cbd5e1;
+  border-radius: 10px;
   transition: background-color 0.2s ease;
 }
 
-/* ESCURECE UM POUCO AO PASSAR O MOUSE */
 .modalFormBodyFields::-webkit-scrollbar-thumb:hover {
   background-color: #94a3b8;
 }
 
-/* REMOVE AS SETINHAS PRETAS DO TOPO E DA BASE */
 .modalFormBodyFields::-webkit-scrollbar-button {
   display: none;
   height: 0;
 }
+
 .msgErro {
   background-color: #fef2f2;
   color: #dc2626;
@@ -613,126 +583,133 @@
 }
 
 /* ==========================================================================
-   --- COMPROVANTE MODERNO TIPO TICKET ---
+   --- COMPROVANTE TIPO TICKET ---
    ========================================================================== */
 .comprovanteWrapper {
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 2px;
+  align-items: center;
+  overflow: hidden;
+  padding: 0;
 }
 
 .comprovanteCheckIcon {
   color: #16a34a;
-  margin: 0 auto 6px auto;
+  margin: 0 auto 4px auto;
+  flex-shrink: 0;
 }
 
 .comprovanteTituloSucesso {
-  font-size: 20px;
+  font-size: 18px;
   color: #15803d;
   margin: 0 0 2px 0;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .comprovanteSubtitulo {
-  font-size: 13px;
+  font-size: 12px;
   color: #64748b;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
+  flex-shrink: 0;
 }
 
 .comprovanteCardPdf {
   background-color: #ffffff;
   border: 2px solid #0284c7;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 14px 16px;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+  gap: 10px;
+  box-shadow: 0 8px 20px -4px rgba(2, 132, 199, 0.1);
   position: relative;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ticketHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
 }
 
 .ticketBadgeTag {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 800;
   color: #0369a1;
   background-color: #e0f2fe;
-  padding: 3px 8px;
-  border-radius: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
   letter-spacing: 0.5px;
 }
 
 .ticketTitle {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 800;
   color: #0f172a;
-  margin: 6px 0 0 0;
+  margin: 4px 0 0 0;
+  line-height: 1.2;
 }
 
 .ticketCodeBox {
   background-color: #f8fafc;
   border: 1px dashed #0284c7;
-  padding: 8px 12px;
-  border-radius: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .ticketCodeLabel {
   display: block;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   color: #64748b;
 }
 
 .ticketCodeNum {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 900;
   color: #0284c7;
   letter-spacing: 0.5px;
 }
 
 .ticketDivider {
-  border-top: 2px dashed #cbd5e1;
-  margin: 0 -20px;
+  border-top: 1.5px dashed #cbd5e1;
+  margin: 0 -16px;
 }
 
 .ticketSectionLabel {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #64748b;
 }
 
 .ticketEventTitle {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
   color: #0f172a;
-  margin: 2px 0 6px 0;
+  margin: 2px 0 4px 0;
 }
 
 .ticketMetaRow {
-  font-size: 13px;
+  font-size: 12px;
   color: #334155;
 }
 
 .ticketGridDetails {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px 16px;
+  gap: 8px 12px;
   background-color: #f8fafc;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #f1f5f9;
 }
 
@@ -742,13 +719,13 @@
 }
 
 .ticketDetailLabel {
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
   font-weight: 700;
 }
 
 .ticketDetailValue {
-  font-size: 13.5px;
+  font-size: 12px;
   color: #0f172a;
   font-weight: 600;
   word-break: break-word;
@@ -758,27 +735,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  font-size: 10px;
   color: #16a34a;
   font-weight: 700;
   border-top: 1px solid #f1f5f9;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .ticketStamp {
   background-color: #dcfce7;
   color: #15803d;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 9px;
   border: 1px solid #bbf7d0;
 }
 
 .comprovanteActionButtons {
   display: flex;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 8px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -787,15 +762,15 @@
   background-color: #0065a4;
   color: #ffffff;
   border: none;
-  padding: 12px;
+  padding: 10px 14px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 13px;
   transition: background-color 0.2s ease;
 }
 
@@ -807,11 +782,11 @@
   background-color: #e2e8f0;
   color: #334155;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   transition: background-color 0.2s ease;
 }
 
@@ -841,19 +816,19 @@
 }
 
 /* ==========================================================================
-   --- REGRA DE IMPRESSÃO DEFINITIVA (APENAS 1 PÁGINA COM COMPROVANTE) ---
+   --- REGRA DE IMPRESSÃO REVERTIDA PARA PAISAGEM (PAISAGEM NO CERTIFICADO) ---
    ========================================================================== */
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 10mm;
+    size: A4 landscape !important; /* MODO PAISAGEM OBRIGATÓRIO PARA CERTIFICADO */
+    margin: 0 !important;
   }
 
-  :global(html), 
-  :global(body), 
+  :global(html),
+  :global(body),
   :global(#__next) {
-    height: 100% !important;
-    max-height: 100vh !important;
+    width: 297mm !important;
+    height: 210mm !important;
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -871,7 +846,9 @@
   .comprovanteWrapper,
   .comprovanteWrapper *,
   :global(#comprovante-pdf-container),
-  :global(#comprovante-pdf-container) * {
+  :global(#comprovante-pdf-container) *,
+  :global(#certificados-em-lote-print),
+  :global(#certificados-em-lote-print) * {
     visibility: visible !important;
   }
 
@@ -934,21 +911,53 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
+/* ==========================================================================
+   --- RESPONSIVIDADE SMARTPHONES / TABLETS ---
+   ========================================================================== */
 @media (max-width: 768px) {
   .articleCard {
     padding: 24px 20px;
     border-radius: 16px;
   }
 
-  .titulo { font-size: 24px; }
-  .resumo { font-size: 15px; }
-  .bannerInscricao { flex-direction: column; align-items: flex-start; }
-  .btnAbrirInscricao { width: 100%; justify-content: center; }
-  .modalBoxContainer { padding: 20px; }
-  .ticketGridDetails { grid-template-columns: 1fr; }
-  .comprovanteActionButtons { flex-direction: column; }
+  .titulo {
+    font-size: 24px;
+  }
+  .resumo {
+    font-size: 15px;
+  }
+  .bannerInscricao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .btnAbrirInscricao {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modalBackdrop {
+    padding: 12px;
+  }
+
+  .modalBoxContainer {
+    padding: 16px;
+    max-height: 92vh;
+    border-radius: 16px;
+  }
+
+  .ticketGridDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .comprovanteActionButtons {
+    flex-direction: column;
+  }
 }

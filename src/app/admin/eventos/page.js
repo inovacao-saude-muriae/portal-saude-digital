@@ -430,6 +430,7 @@ export default function AdminEventosPage() {
     setMensagem(null);
   };
 
+  // ENVIAR EVENTO (CORRIGIDO PARA O NAVEGADOR MOBILE)
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     setLoadingForm(true);
@@ -525,6 +526,10 @@ export default function AdminEventosPage() {
         const base64Image = reader.result.split(',')[1];
         processarEnvio(base64Image, imagemArquivo.name, imagemArquivo.type);
       };
+      reader.onerror = () => {
+        setLoadingForm(false);
+        setMensagem({ tipo: 'erro', texto: 'Erro ao processar imagem selecionada.' });
+      };
     } else {
       processarEnvio();
     }
@@ -564,7 +569,7 @@ export default function AdminEventosPage() {
     }
   };
 
-  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS
+  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS (BLINDADO CONTRA TRAVAMENTOS MOBILE)
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
@@ -576,10 +581,13 @@ export default function AdminEventosPage() {
 
     try {
       const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(evento.titulo)}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
       const data = await res.json();
 
-      if (data.status === 'success' && Array.isArray(data.inscritos)) {
+      if (data && data.status === 'success' && Array.isArray(data.inscritos)) {
         setInscritos(data.inscritos);
       } else {
         setInscritos([]);
@@ -1007,7 +1015,7 @@ export default function AdminEventosPage() {
                   </div>
 
                   <button type="submit" disabled={loadingForm} className={styles.submitBtn}>
-                    {loadingForm ? 'Enviando...' : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar</>}
+                    {loadingForm ? <Loader2 size={18} className="animate-spin" /> : eventoEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar</>}
                   </button>
                 </div>
               </div>
@@ -1078,7 +1086,7 @@ export default function AdminEventosPage() {
 
       {/* MODAL DE GERENCIAMENTO DE INSCRITOS E EMISSÃO DE CERTIFICADOS */}
       {modalCertificadoAberto && eventoCertificado && (
-        <div className={styles.modalOverlay}>
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setModalCertificadoAberto(false)}>
           <div className={styles.modalContent}>
             
             <button 
@@ -1314,7 +1322,7 @@ export default function AdminEventosPage() {
 
       {/* MODAL / COMPROVANTE INDIVIDUAL PARA O ADMIN */}
       {comprovanteAdmin && (
-        <div className={styles.modalOverlay}>
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setComprovanteAdmin(null)}>
           <div className={styles.modalComprovanteBox}>
             <button 
               onClick={() => setComprovanteAdmin(null)} 

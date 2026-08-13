@@ -49,7 +49,7 @@ function formatarDataBR(dataBruta) {
     return 'A definir';
   }
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
-    return str.split('T')[0];
+    return str.split('T')[0].split(' ')[0];
   }
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     const partes = str.split('T')[0].split('-');
@@ -58,12 +58,12 @@ function formatarDataBR(dataBruta) {
   return str;
 }
 
-// FORMATA DATAS DE REGISTRO E NASCIMENTO (EX: ISO YYYY-MM-DD OU STRINGS GMT BRASÍLIA)
+// FORMATA DATA SEM EXIBIR O HORÁRIO (SOMENTE DD/MM/YYYY)
 function formatarDataParaExibicao(valor) {
   if (!valor) return '-';
   const str = String(valor).trim();
 
-  // Tratamento para strings tipo GMT JavaScript (Ex: Thu Aug 06 2026 15:15:43 GMT-0300)
+  // Tratamento para strings tipo GMT JavaScript
   if (str.includes('GMT') || str.includes('Mon') || str.includes('Tue') || str.includes('Wed') || str.includes('Thu') || str.includes('Fri') || str.includes('Sat') || str.includes('Sun')) {
     try {
       const d = new Date(str);
@@ -71,19 +71,17 @@ function formatarDataParaExibicao(valor) {
         const dia = String(d.getDate()).padStart(2, '0');
         const mes = String(d.getMonth() + 1).padStart(2, '0');
         const ano = d.getFullYear();
-        const horas = String(d.getHours()).padStart(2, '0');
-        const minutos = String(d.getMinutes()).padStart(2, '0');
-        return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+        return `${dia}/${mes}/${ano}`;
       }
     } catch (e) {}
   }
 
-  // Se já estiver no formato DD/MM/YYYY com ou sem horário
+  // Se já estiver no formato DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
-    return str.split('T')[0];
+    return str.split('T')[0].split(' ')[0];
   }
 
-  // Se estiver no formato ISO (Ex: 1993-12-26T02:00:00.000Z)
+  // Se estiver no formato ISO (Ex: YYYY-MM-DD)
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     const partes = str.split('T')[0].split('-');
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -271,8 +269,6 @@ export default function EventoDetailPage() {
 
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'cors',
-        redirect: 'follow',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
@@ -286,7 +282,7 @@ export default function EventoDetailPage() {
         setComprovante({
           codigo: codigoFinal,
           evento: evento.titulo,
-          dataHora: new Date().toLocaleString('pt-BR'),
+          dataHora: new Date().toLocaleDateString('pt-BR'), // Apenas a data de hoje
           detalhes: listaRespostas
         });
       } else {
@@ -298,7 +294,7 @@ export default function EventoDetailPage() {
       setComprovante({
         codigo: codigoFallback,
         evento: evento.titulo,
-        dataHora: new Date().toLocaleString('pt-BR'),
+        dataHora: new Date().toLocaleDateString('pt-BR'),
         detalhes: listaRespostas
       });
     } finally {
@@ -459,7 +455,7 @@ export default function EventoDetailPage() {
 
       {/* MODAL DE INSCRIÇÃO / CONSULTA POR CPF */}
       {modalAberto && (
-        <div className={styles.modalBackdrop}>
+        <div className={styles.modalBackdrop} onClick={(e) => e.target === e.currentTarget && handleFecharModal()}>
           <div className={styles.modalBoxContainer}>
             
             <button onClick={handleFecharModal} className={styles.modalCloseIconBtn}>
@@ -483,7 +479,7 @@ export default function EventoDetailPage() {
                     onClick={() => { setAbaModal('consulta'); setMensagemErro(null); }}
                     className={`${styles.modalTabBtn} ${abaModal === 'consulta' ? styles.modalTabActive : ''}`}
                   >
-                    <Search size={16} /> Emitir 2ª Via / Comprovante
+                    <Search size={16} /> Emitir 2ª Via
                   </button>
                 </div>
 
@@ -622,7 +618,6 @@ export default function EventoDetailPage() {
                     </div>
                   </div>
 
-                  {/* EXIBIÇÃO DE DADOS FILTRADOS COM TRATATIVA DE DATA */}
                   <div className={styles.ticketGridDetails}>
                     {(() => {
                       const chavesDesejadas = [
