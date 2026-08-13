@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import * as XLSX from 'xlsx'; // BIBLIOTECA PARA EXCEL (.XLSX)
+import * as XLSX from 'xlsx';
 
 import { 
   ArrowLeft, 
@@ -34,14 +34,19 @@ import {
   Printer,
   Ticket,
   ShieldCheck,
-  Table
+  Table,
+  Lock,
+  Unlock,
+  AlertTriangle
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
 function formatarCaminhoImagemModelo(caminho) {
-  if (!caminho || typeof caminho !== 'string') return '/img/modelo-certificado/modelo1.png';
+  if (!caminho || typeof caminho !== 'string' || caminho === 'undefined') {
+    return '/img/eventos/simposio.png';
+  }
   let url = caminho.trim();
 
   if (url.includes('drive.google.com') || url.includes('googleusercontent.com')) {
@@ -56,6 +61,16 @@ function formatarCaminhoImagemModelo(caminho) {
   }
 
   return url;
+}
+
+function limparHora(horaBruta) {
+  if (!horaBruta) return '';
+  const str = String(horaBruta).trim();
+  if (str.includes('1899') || str.includes('GMT') || str.includes('Sat Dec') || str.includes('Sun Dec')) {
+    const matchHora = str.match(/\d{2}:\d{2}/);
+    return matchHora ? matchHora[0] : '';
+  }
+  return str;
 }
 
 const MODELOS_CERTIFICADO = {
@@ -203,8 +218,13 @@ export default function AdminEventosPage() {
   const [eventoEmEdicao, setEventoEmEdicao] = useState(null);
 
   const [requerInscricao, setRequerInscricao] = useState(false);
+  const [inscricoesEncerradas, setInscricoesEncerradas] = useState(false);
   const [geraCertificado, setGeraCertificado] = useState(false);
   const [cronograma, setCronograma] = useState([]);
+
+  // ESTADO DO MODAL DE CONFIRMAÇÃO DE ENCERRAMENTO/REABERTURA
+  const [confirmModalData, setConfirmModalAberto] = useState(null); // { evento, novoStatus }
+  const [alterandoStatus, setAlterandoStatus] = useState(false);
 
   // ESTADO DOS CAMPOS DO FORMULÁRIO DE INSCRIÇÃO
   const [formFields, setFormFields] = useState([
@@ -218,7 +238,7 @@ export default function AdminEventosPage() {
   const [loadingEventos, setLoadingEventos] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
-  // MODAIS E GERENCIAMENTO DE INSCRITOS / COMPROVANTE / CERTIFICADO
+  // MODAIS E GERENCIAMENTO DE INSCRITOS
   const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
   const [eventoCertificado, setEventoCertificado] = useState(null);
   const [inscritos, setInscritos] = useState([]);
@@ -229,10 +249,9 @@ export default function AdminEventosPage() {
   const [modeloCertificadoSelecionado, setModeloCertificadoSelecionado] = useState('modelo1');
   const [imagemModeloBase64, setImagemModeloBase64] = useState('');
 
-  // MODAL DE COMPROVANTE INDIVIDUAL (ADMIN)
+  // MODAL DE COMPROVANTE INDIVIDUAL
   const [comprovanteAdmin, setComprovanteAdmin] = useState(null);
 
-  // VERIFICAÇÃO DE PERMISSÃO DE ACESSO À ROTA
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -398,6 +417,7 @@ export default function AdminEventosPage() {
     setEventoEmEdicao(evento);
     setCronograma(Array.isArray(evento.cronograma) ? evento.cronograma : []);
     setRequerInscricao(!!evento.requerInscricao);
+    setInscricoesEncerradas(!!evento.inscricoesEncerradas);
     setGeraCertificado(!!evento.geraCertificado);
     
     setFormFields(
@@ -420,6 +440,7 @@ export default function AdminEventosPage() {
     setEventoEmEdicao(null);
     setCronograma([]);
     setRequerInscricao(false);
+    setInscricoesEncerradas(false);
     setGeraCertificado(false);
     setFormFields([
       { id: 1, label: 'Nome Completo', type: 'text', required: true, options: [] },
@@ -429,6 +450,67 @@ export default function AdminEventosPage() {
     ]);
     setNomeArquivo('');
     setMensagem(null);
+  };
+
+  // ABRE O MODAL DE CONFIRMAÇÃO CUSTOMIZADO
+  const handleAbrirConfirmacaoStatus = (evento) => {
+    const novoStatusEncerrado = !evento.inscricoesEncerradas;
+    setConfirmModalAberto({
+      evento,
+      novoStatus: novoStatusEncerrado
+    });
+  };
+
+  // EXECUTA A ALTERAÇÃO DE STATUS APÓS CONFIRMAR NO MODAL
+  const handleExecutarAlternarStatus = async () => {
+    if (!confirmModalData) return;
+    const { evento, novoStatus } = confirmModalData;
+    setAlterandoStatus(true);
+
+    try {
+      const payload = {
+        target: 'EVENT',
+        action: 'UPDATE',
+        id: evento.id,
+        titulo: evento.titulo,
+        resumo: evento.resumo,
+        local: evento.local,
+        data: evento.data,
+        hora: evento.hora,
+        categoria: evento.categoria,
+        descricao: evento.descricao,
+        requerInscricao: evento.requerInscricao,
+        inscricoesEncerradas: novoStatus,
+        geraCertificado: evento.geraCertificado,
+        formFields: evento.formFields || [],
+        cronograma: evento.cronograma || []
+      };
+
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      const resData = await response.json();
+
+      if (resData.status === 'success') {
+        localStorage.removeItem('cache_portal_eventos');
+        setListaEventos((prev) =>
+          prev.map((item) =>
+            item.id === evento.id ? { ...item, inscricoesEncerradas: novoStatus } : item
+          )
+        );
+        setConfirmModalAberto(null);
+      } else {
+        alert('Erro ao atualizar status: ' + resData.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro na comunicação com o servidor.');
+    } finally {
+      setAlterandoStatus(false);
+    }
   };
 
   const handleSubmitEvento = async (e) => {
@@ -469,6 +551,7 @@ export default function AdminEventosPage() {
         descricao: formData.get('descricao'),
         autor: autorNome, 
         requerInscricao: requerInscricao,
+        inscricoesEncerradas: requerInscricao ? inscricoesEncerradas : false,
         geraCertificado: requerInscricao ? geraCertificado : false,
         formFields: requerInscricao 
           ? formFields.filter((f) => f.label && f.label.trim() !== '') 
@@ -502,6 +585,7 @@ export default function AdminEventosPage() {
             e.target.reset();
             setCronograma([]);
             setRequerInscricao(false);
+            setInscricoesEncerradas(false);
             setGeraCertificado(false);
             setNomeArquivo('');
           } else {
@@ -569,7 +653,6 @@ export default function AdminEventosPage() {
     }
   };
 
-  // ABRIR O GERENCIADOR DE INSCRITOS / CERTIFICADOS
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
@@ -600,7 +683,6 @@ export default function AdminEventosPage() {
     }
   };
 
-  // EXPORTAR A LISTA DE INSCRITOS RESUMIDA EM CSV
   const handleExportarInscritosCSV = () => {
     if (inscritos.length === 0) {
       alert('Não há inscritos para exportar.');
@@ -638,7 +720,6 @@ export default function AdminEventosPage() {
     document.body.removeChild(link);
   };
 
-  // FUNÇÃO PARA EXPORTAR COMPLETO EM EXCEL NATIVO (.XLSX)
   const handleExportarInscritosXLSX = () => {
     if (!inscritos || inscritos.length === 0) {
       alert('Não há inscritos para exportar.');
@@ -660,7 +741,6 @@ export default function AdminEventosPage() {
     }
   };
 
-  // VISUALIZAR COMPROVANTE INDIVIDUAL
   const handleAbrirComprovanteAdmin = (p) => {
     const extrairValor = (termosBusca) => {
       const chaveEncontrada = Object.keys(p).find((key) => {
@@ -827,7 +907,10 @@ export default function AdminEventosPage() {
                         checked={requerInscricao} 
                         onChange={(e) => {
                           setRequerInscricao(e.target.checked);
-                          if (!e.target.checked) setGeraCertificado(false);
+                          if (!e.target.checked) {
+                            setGeraCertificado(false);
+                            setInscricoesEncerradas(false);
+                          }
                         }} 
                         className={styles.checkboxInput}
                       />
@@ -836,6 +919,17 @@ export default function AdminEventosPage() {
 
                     {requerInscricao && (
                       <>
+                        <label className={styles.checkboxLabelRed}>
+                          <input 
+                            type="checkbox" 
+                            checked={inscricoesEncerradas} 
+                            onChange={(e) => setInscricoesEncerradas(e.target.checked)} 
+                            className={styles.checkboxInput}
+                          />
+                          <Lock size={18} color="#dc2626" />
+                          Encerrar Inscrições? (Impede novos cadastros no site)
+                        </label>
+
                         <label className={styles.checkboxLabelBlue}>
                           <input 
                             type="checkbox" 
@@ -1053,38 +1147,63 @@ export default function AdminEventosPage() {
             ) : listaEventos.length > 0 ? (
               <div className={styles.newsListContainer}>
                 {listaEventos.map((item) => {
+                  const urlTratadaImagem = formatarCaminhoImagemModelo(item.imgSrc || item.imagem);
+                  const horaLimpa = limparHora(item.hora);
+
                   return (
                     <div key={item.id} className={styles.newsItemRow}>
                       <div className={styles.newsItemContent}>
+                        
+                        {/* IMAGEM THUMBNAIL TRATADA COM FALLBACK */}
                         <div className={styles.imageThumbnailWrapper}>
-                          <Image 
-                            src={item.imgSrc || item.imagem || '/img/eventos/simposio.png'} 
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={urlTratadaImagem} 
                             alt={item.titulo || 'Capa do Evento'} 
-                            fill 
-                            className={styles.thumbnailImg} 
-                            unoptimized 
+                            className={styles.thumbnailImgDirect}
+                            onError={(e) => {
+                              e.currentTarget.src = '/img/eventos/simposio.png';
+                            }}
                           />
                         </div>
+
                         <div>
                           <span className={styles.newsMetaText}>
-                            {item.categoria} {item.requerInscricao && ' • Inscrição'} {item.geraCertificado && ' • 📜 Certificado'}
+                            {item.categoria} 
+                            {item.requerInscricao && (
+                              item.inscricoesEncerradas 
+                                ? ' • 🔴 INSCRIÇÕES ENCERRADAS' 
+                                : ' • 🟢 INSCRIÇÕES ABERTAS'
+                            )} 
+                            {item.geraCertificado && ' • 📜 CERTIFICADO'}
                           </span>
                           <h3 className={styles.newsItemTitle}>{item.titulo}</h3>
                           <div className={styles.eventDetailsRow}>
                             <span><MapPin size={12} /> {item.local}</span>
-                            <span><Clock size={12} /> {item.hora}</span>
+                            {horaLimpa && <span><Clock size={12} /> {horaLimpa}</span>}
                           </div>
                         </div>
                       </div>
 
                       <div className={styles.actionButtonsGroup}>
                         {item.requerInscricao && (
-                          <button 
-                            onClick={() => handleAbrirEmissorCertificado(item)} 
-                            className={styles.emitCertificateBtn}
-                          >
-                            <ClipboardList size={15} /> Ver Inscritos
-                          </button>
+                          <>
+                            <button 
+                              onClick={() => handleAbrirConfirmacaoStatus(item)}
+                              className={item.inscricoesEncerradas ? styles.btnReabrirInscricao : styles.btnLockInscricao}
+                              title={item.inscricoesEncerradas ? 'Reabrir Inscrições' : 'Encerrar Inscrições'}
+                            >
+                              {item.inscricoesEncerradas ? <Unlock size={15} /> : <Lock size={15} />}
+                              {item.inscricoesEncerradas ? 'Reabrir' : 'Encerrar Inscrições'}
+                            </button>
+
+                            <button 
+                              onClick={() => handleAbrirEmissorCertificado(item)} 
+                              className={styles.emitCertificateBtn}
+                            >
+                              <ClipboardList size={15} /> Ver Inscritos
+                            </button>
+                          </>
                         )}
                         
                         <button onClick={() => handleIniciarEdicao(item)} className={styles.editBtn}>
@@ -1106,7 +1225,55 @@ export default function AdminEventosPage() {
 
       </div>
 
-      {/* MODAL DE GERENCIAMENTO DE INSCRITOS E EMISSÃO DE CERTIFICADOS */}
+      {/* MODAL DE CONFIRMAÇÃO DE ALTERAÇÃO DE STATUS (ENCERRAR / REABRIR) */}
+      {confirmModalData && (
+        <div className={styles.modalOverlay} onClick={() => !alterandoStatus && setConfirmModalAberto(null)}>
+          <div className={styles.modalConfirmBox}>
+            <div className={styles.confirmHeader}>
+              <AlertTriangle size={32} color={confirmModalData.novoStatus ? "#dc2626" : "#16a34a"} />
+              <h3>{confirmModalData.novoStatus ? 'Encerrar Inscrições?' : 'Reabrir Inscrições?'}</h3>
+            </div>
+
+            <p className={styles.confirmText}>
+              Você está prestes a {confirmModalData.novoStatus ? 'encerrar' : 'reabrir'} as inscrições para o evento:
+              <br />
+              <strong className={styles.confirmEventoTitle}>&quot;{confirmModalData.evento.titulo}&quot;</strong>
+            </p>
+
+            <p className={styles.confirmSubtext}>
+              {confirmModalData.novoStatus 
+                ? 'Os cidadãos não conseguirão mais preencher o formulário no portal.' 
+                : 'O formulário de inscrição voltará a ficar disponível para o público.'}
+            </p>
+
+            <div className={styles.confirmActionsRow}>
+              <button 
+                onClick={() => setConfirmModalAberto(null)} 
+                disabled={alterandoStatus}
+                className={styles.btnCancelModal}
+              >
+                Cancelar
+              </button>
+
+              <button 
+                onClick={handleExecutarAlternarStatus} 
+                disabled={alterandoStatus}
+                className={confirmModalData.novoStatus ? styles.btnConfirmLock : styles.btnConfirmUnlock}
+              >
+                {alterandoStatus ? (
+                  <><Loader2 size={16} className="animate-spin" /> Atualizando...</>
+                ) : confirmModalData.novoStatus ? (
+                  <><Lock size={16} /> Confirmar Encerramento</>
+                ) : (
+                  <><Unlock size={16} /> Confirmar Reabertura</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE GERENCIAMENTO DE INSCRITOS */}
       {modalCertificadoAberto && eventoCertificado && (
         <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setModalCertificadoAberto(false)}>
           <div className={styles.modalContent}>
@@ -1125,7 +1292,6 @@ export default function AdminEventosPage() {
               </h3>
             </div>
 
-            {/* BARRA DE AÇÕES COM OS BOTÕES DE EXPORTAÇÃO */}
             <div className={styles.adminActionsHeaderBar}>
               <button 
                 type="button" 
@@ -1134,7 +1300,7 @@ export default function AdminEventosPage() {
                 className={styles.btnExportarCsv}
                 title="Exportar apenas código, nome e CPF em CSV"
               >
-                <Download size={15} /> Exportar Inscritos
+                <Download size={15} /> Exportar Resumido (CSV)
               </button>
 
               <button 
@@ -1148,7 +1314,6 @@ export default function AdminEventosPage() {
               </button>
             </div>
 
-            {/* PAINEL DE CONFIGURAÇÃO DE CERTIFICADO FIXO */}
             <div className={styles.modalControlsBox}>
               <div>
                 <label className={styles.modalLabelWithIcon}>
@@ -1269,7 +1434,6 @@ export default function AdminEventosPage() {
               )}
             </div>
 
-            {/* CERTIFICADOS EM LOTE PRONTOS PARA IMPRESSÃO */}
             <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
               {selecionados.map((idxSelect) => {
                 const p = inscritos[idxSelect];
@@ -1354,7 +1518,6 @@ export default function AdminEventosPage() {
         </div>
       )}
 
-      {/* MODAL / COMPROVANTE INDIVIDUAL PARA O ADMIN */}
       {comprovanteAdmin && (
         <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setComprovanteAdmin(null)}>
           <div className={styles.modalComprovanteBox}>

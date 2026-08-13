@@ -4,13 +4,12 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { X, CheckCircle, Send, Loader2, ClipboardList, Download, Search, FileCheck } from 'lucide-react';
+import { X, CheckCircle, Send, Loader2, ClipboardList, Download, Search, FileCheck, Lock } from 'lucide-react';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
 import styles from './EventosDetail.module.css';
 
 const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
-// --- FUNÇÕES DE MÁSCARA E FORMATAÇÃO DE CAMPOS ---
 function aplicarMascaraCPF(value) {
   return value
     .replace(/\D/g, '')
@@ -58,12 +57,10 @@ function formatarDataBR(dataBruta) {
   return str;
 }
 
-// FORMATA DATA SEM EXIBIR O HORÁRIO (SOMENTE DD/MM/YYYY)
 function formatarDataParaExibicao(valor) {
   if (!valor) return '-';
   const str = String(valor).trim();
 
-  // Tratamento para strings tipo GMT JavaScript
   if (str.includes('GMT') || str.includes('Mon') || str.includes('Tue') || str.includes('Wed') || str.includes('Thu') || str.includes('Fri') || str.includes('Sat') || str.includes('Sun')) {
     try {
       const d = new Date(str);
@@ -76,12 +73,10 @@ function formatarDataParaExibicao(valor) {
     } catch (e) {}
   }
 
-  // Se já estiver no formato DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}/.test(str)) {
     return str.split('T')[0].split(' ')[0];
   }
 
-  // Se estiver no formato ISO (Ex: YYYY-MM-DD)
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     const partes = str.split('T')[0].split('-');
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -97,17 +92,14 @@ export default function EventoDetailPage() {
   const [evento, setEvento] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ESTADOS DO MODAL
   const [modalAberto, setModalAberto] = useState(false);
-  const [abaModal, setAbaModal] = useState('inscricao'); // 'inscricao' | 'consulta'
+  const [abaModal, setAbaModal] = useState('inscricao');
   
-  // ESTADOS DO FORMULÁRIO DE INSCRIÇÃO
   const [respostas, setRespostas] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [comprovante, setComprovante] = useState(null);
   const [mensagemErro, setMensagemErro] = useState(null);
 
-  // ESTADOS DA CONSULTA POR CPF
   const [cpfConsulta, setCpfConsulta] = useState('');
   const [buscandoCpf, setBuscandoCpf] = useState(false);
 
@@ -185,7 +177,13 @@ export default function EventoDetailPage() {
     );
   }
 
-  const status = getStatusEvento(evento, styles);
+  // TRATAMENTO DA BADGE DE STATUS DO TOPO
+  const isEncerrado = evento.inscricoesEncerradas === true || String(evento.inscricoesEncerradas) === 'true';
+  const statusOriginal = getStatusEvento(evento, styles);
+  
+  const statusLabel = isEncerrado ? 'Inscrições Encerradas' : statusOriginal.label;
+  const statusClass = isEncerrado ? styles.statusBadgeEncerrado : statusOriginal.class;
+
   const imagemExibicao = evento.imgSrc || evento.imagem || '/img/eventos/simposio.png';
   const horaExibicao = limparHora(evento.hora);
 
@@ -217,6 +215,10 @@ export default function EventoDetailPage() {
   };
 
   const handleAbrirModal = (aba = 'inscricao') => {
+    if (aba === 'inscricao' && isEncerrado) {
+      alert('As inscrições para este evento estão encerradas.');
+      return;
+    }
     setAbaModal(aba);
     setModalAberto(true);
     setMensagemErro(null);
@@ -231,9 +233,13 @@ export default function EventoDetailPage() {
     setMensagemErro(null);
   };
 
-  // ENVIO DA NOVA INSCRIÇÃO (UTILIZANDO A NOVA ROTA DE API INTERNA DO NEXT.JS)
   const handleInscricaoSubmit = async (e) => {
     e.preventDefault();
+    if (isEncerrado) {
+      setMensagemErro('As inscrições estão encerradas.');
+      return;
+    }
+
     setEnviando(true);
     setMensagemErro(null);
 
@@ -267,7 +273,6 @@ export default function EventoDetailPage() {
         respostas: listaRespostas
       };
 
-      // Dispara a requisição para a rota interna de API do Next.js
       const response = await fetch('/api/inscricoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -295,7 +300,6 @@ export default function EventoDetailPage() {
     }
   };
 
-  // BUSCA NO GOOGLE SHEETS PARA EMISSÃO DE 2ª VIA
   const handleConsultarCpfSubmit = async (e) => {
     e.preventDefault();
     const digitos = cpfConsulta.replace(/\D/g, '');
@@ -356,12 +360,13 @@ export default function EventoDetailPage() {
         <div className={styles.container}>
           <article className={styles.articleCard}>
             
+            {/* META HEADER COM STATUS ATUALIZADO */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
                 Data: {formatarDataBR(evento.data)} {horaExibicao ? `• ${horaExibicao}` : ''}
               </span>
-              <span className={`${styles.statusBadge} ${status.class}`}>
-                {status.label}
+              <span className={`${styles.statusBadge} ${statusClass}`}>
+                {statusLabel}
               </span>
             </div>
 
@@ -375,20 +380,31 @@ export default function EventoDetailPage() {
               </div>
             )}
 
-            {/* BANNER DE INSCRIÇÃO COM LINK DE SEGUNDA VIA */}
+            {/* BANNER DE INSCRIÇÃO ABERTA / ENCERRADA */}
             {evento.requerInscricao && (
-              <div className={styles.bannerInscricao}>
+              <div className={`${styles.bannerInscricao} ${isEncerrado ? styles.bannerEncerrado : ''}`}>
                 <div>
-                  <h3 className={styles.bannerInscricaoTitulo}>Inscrições Abertas!</h3>
+                  <h3 className={styles.bannerInscricaoTitulo}>
+                    {isEncerrado ? 'Inscrições Encerradas' : 'Inscrições Abertas!'}
+                  </h3>
                   <p className={styles.bannerInscricaoTexto}>
-                    Garanta sua vaga neste evento preenchendo o formulário de participação.
+                    {isEncerrado 
+                      ? 'As inscrições para este evento foram encerradas pela organização.' 
+                      : 'Garanta sua vaga neste evento preenchendo o formulário de participação.'}
                   </p>
                 </div>
                 
                 <div className={styles.bannerButtonsCol}>
-                  <button onClick={() => handleAbrirModal('inscricao')} className={styles.btnAbrirInscricao}>
-                    <ClipboardList size={20} /> Inscrever-se Agora
-                  </button>
+                  {!isEncerrado ? (
+                    <button onClick={() => handleAbrirModal('inscricao')} className={styles.btnAbrirInscricao}>
+                      <ClipboardList size={20} /> Inscrever-se Agora
+                    </button>
+                  ) : (
+                    /* BOTÃO CINZA E DESABILITADO QUANDO ENCERRADO */
+                    <button disabled className={styles.btnInscricaoDisabled}>
+                      <Lock size={18} /> Inscrição Encerrada
+                    </button>
+                  )}
 
                   <button onClick={() => handleAbrirModal('consulta')} className={styles.btnLinkSegundaVia}>
                     <FileCheck size={15} /> Já se inscreveu? Emitir 2ª via do comprovante
@@ -458,15 +474,16 @@ export default function EventoDetailPage() {
             {!comprovante ? (
               <div className={styles.modalFormContent}>
                 
-                {/* ALTERNADOR DE ABAS NO MODAL */}
                 <div className={styles.modalTabsBar}>
-                  <button 
-                    type="button"
-                    onClick={() => { setAbaModal('inscricao'); setMensagemErro(null); }}
-                    className={`${styles.modalTabBtn} ${abaModal === 'inscricao' ? styles.modalTabActive : ''}`}
-                  >
-                    <ClipboardList size={16} /> Nova Inscrição
-                  </button>
+                  {!isEncerrado && (
+                    <button 
+                      type="button"
+                      onClick={() => { setAbaModal('inscricao'); setMensagemErro(null); }}
+                      className={`${styles.modalTabBtn} ${abaModal === 'inscricao' ? styles.modalTabActive : ''}`}
+                    >
+                      <ClipboardList size={16} /> Nova Inscrição
+                    </button>
+                  )}
                   <button 
                     type="button"
                     onClick={() => { setAbaModal('consulta'); setMensagemErro(null); }}
@@ -478,8 +495,7 @@ export default function EventoDetailPage() {
 
                 {mensagemErro && <div className={styles.msgErro}>{mensagemErro}</div>}
 
-                {/* ABA 1: FORMULÁRIO DE NOVA INSCRIÇÃO */}
-                {abaModal === 'inscricao' && (
+                {abaModal === 'inscricao' && !isEncerrado && (
                   <form onSubmit={handleInscricaoSubmit} className={styles.modalFormFlex}>
                     <div className={styles.modalFormBodyFields}>
                       {camposFormulario.map((campo, idx) => {
@@ -556,7 +572,6 @@ export default function EventoDetailPage() {
                   </form>
                 )}
 
-                {/* ABA 2: CONSULTA POR CPF DIRETA NA PLANILHA */}
                 {abaModal === 'consulta' && (
                   <form onSubmit={handleConsultarCpfSubmit} className={styles.modalFormFlex}>
                     <p className={styles.modalConsultarTexto}>
@@ -583,7 +598,6 @@ export default function EventoDetailPage() {
 
               </div>
             ) : (
-              /* COMPROVANTE ENCONTRADO / GERADO */
               <div className={styles.comprovanteWrapper}>
                 <CheckCircle size={48} className={styles.comprovanteCheckIcon} />
                 <h3 className={styles.comprovanteTituloSucesso}>Comprovante de Inscrição</h3>

@@ -94,6 +94,16 @@
   background-color: #64748b;
 }
 
+/* BADGE ESPECÍFICA PARA INSCRIÇÕES ENCERRADAS NO TOPO */
+.statusBadgeEncerrado {
+  background-color: #64748b !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
 /* TÍTULO E RESUMO */
 .titulo {
   font-size: 32px;
@@ -178,6 +188,36 @@
 .btnAbrirInscricao:hover {
   background-color: #15803d;
   transform: translateY(-1px);
+}
+
+/* BANNER E BOTÃO DE INSCRIÇÃO ENCERRADA (CINZA / BLOQUEADO) */
+.bannerEncerrado {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.bannerEncerrado .bannerInscricaoTitulo {
+  color: #475569 !important;
+}
+
+.bannerEncerrado .bannerInscricaoTexto {
+  color: #64748b !important;
+}
+
+.btnInscricaoDisabled {
+  background-color: #94a3b8 !important;
+  color: #ffffff !important;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: not-allowed !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: none !important;
+  opacity: 0.9;
 }
 
 /* CERTIFICADO BADGE */
