@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -16,21 +16,37 @@ import {
 } from 'lucide-react';
 import styles from './AdminHub.module.css';
 
+// Função para inscrever ouvintes de eventos (não precisamos escutar mudanças externas aqui)
+const subscribe = () => () => {};
+
+// Lê os dados do localStorage apenas no navegador
+const getClientSnapshot = () => {
+  try {
+    return localStorage.getItem('user_info') || '';
+  } catch {
+    return '';
+  }
+};
+
+// Retorna o estado padrão para o Servidor (SSR)
+const getServerSnapshot = () => '';
+
 export default function AdminHubPage() {
   const router = useRouter();
 
-  // Leitura síncrona do usuário salvo no localStorage
-  const [userInfo] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const savedUser = localStorage.getItem('user_info');
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch {
-      return null;
-    }
-  });
+  // Lê do localStorage de forma segura entre Servidor e Cliente
+  const userInfoRaw = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
-  // Redireciona para o login caso não exista token de autenticação
+  let userInfo = null;
+  if (userInfoRaw) {
+    try {
+      userInfo = JSON.parse(userInfoRaw);
+    } catch (e) {
+      console.error('Erro ao analisar user_info:', e);
+    }
+  }
+
+  // Valida a autenticação apenas no navegador
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -68,7 +84,7 @@ export default function AdminHubPage() {
               {userInfo?.nome ? `Olá, ${userInfo.nome}` : 'Área Restrita do Gestor'}
             </h1>
             <p className={styles.subTitle}>
-              Perfil de Acesso: <strong style={{ textTransform: 'uppercase', color: '#0f172a' }}>{userCargo}</strong>
+              Perfil de Acesso: <strong style={{ textTransform: 'uppercase', color: '#0f172a' }}>{userInfo ? userCargo : 'Carregando...'}</strong>
             </p>
           </div>
 
@@ -99,7 +115,7 @@ export default function AdminHubPage() {
           </div>
         </div>
 
-        {/* CARDS DE NAVEGAÇÃO DOS MÓDULOS - EXIBIÇÃO POR PERMISSÃO */}
+        {/* CARDS DE NAVEGAÇÃO DOS MÓDULOS */}
         <div className={styles.cardsGrid}>
           
           {/* MÓDULO 1: CCZ / ADOÇÃO DE ANIMAIS */}

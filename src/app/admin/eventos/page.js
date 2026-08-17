@@ -80,7 +80,7 @@ const MODELOS_CERTIFICADO = {
     imagem: '/img/modelo-certificado/modelo1.png',
     gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
+        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
       </>
     )
   },
@@ -90,7 +90,7 @@ const MODELOS_CERTIFICADO = {
     imagem: '/img/modelo-certificado/modelo2.png',
     gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong className={styles.boldText}>&quot;{tituloEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
+        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{tituloEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
       </>
     )
   }
@@ -222,11 +222,11 @@ export default function AdminEventosPage() {
   const [geraCertificado, setGeraCertificado] = useState(false);
   const [cronograma, setCronograma] = useState([]);
 
-  // ESTADO DO MODAL DE CONFIRMAÇÃO DE ENCERRAMENTO/REABERTURA
-  const [confirmModalData, setConfirmModalAberto] = useState(null); // { evento, novoStatus }
+  // MODAL DE CONFIRMAÇÃO DE STATUS
+  const [confirmModalData, setConfirmModalAberto] = useState(null);
   const [alterandoStatus, setAlterandoStatus] = useState(false);
 
-  // ESTADO DOS CAMPOS DO FORMULÁRIO DE INSCRIÇÃO
+  // CAMPOS DO FORMULÁRIO
   const [formFields, setFormFields] = useState([
     { id: 1, label: 'Nome Completo', type: 'text', required: true, options: [] },
     { id: 2, label: 'CPF', type: 'cpf', required: true, options: [] },
@@ -326,7 +326,7 @@ export default function AdminEventosPage() {
     }
   }, [modeloCertificadoSelecionado, modalCertificadoAberto]);
 
-  // MANIPULAÇÃO DE CRONOGRAMA
+  // CRONOGRAMA
   const handleAdicionarItemCronograma = () => {
     setCronograma((prev) => [...prev, { horario: '', atividade: '', palestrante: '' }]);
   };
@@ -343,7 +343,7 @@ export default function AdminEventosPage() {
     });
   };
 
-  // GERENCIAMENTO DOS CAMPOS DO FORMULÁRIO DE INSCRIÇÃO
+  // CAMPOS DO FORMULÁRIO
   const handleAdicionarCampoForm = () => {
     setFormFields((prev) => [
       ...prev,
@@ -452,7 +452,6 @@ export default function AdminEventosPage() {
     setMensagem(null);
   };
 
-  // ABRE O MODAL DE CONFIRMAÇÃO CUSTOMIZADO
   const handleAbrirConfirmacaoStatus = (evento) => {
     const novoStatusEncerrado = !evento.inscricoesEncerradas;
     setConfirmModalAberto({
@@ -461,7 +460,6 @@ export default function AdminEventosPage() {
     });
   };
 
-  // EXECUTA A ALTERAÇÃO DE STATUS APÓS CONFIRMAR NO MODAL
   const handleExecutarAlternarStatus = async () => {
     if (!confirmModalData) return;
     const { evento, novoStatus } = confirmModalData;
@@ -768,26 +766,157 @@ export default function AdminEventosPage() {
     });
   };
 
+  // GERENCIAMENTO DA SELEÇÃO DE CERTIFICADOS EM LOTE
   const handleToggleSelecionarTudo = () => {
-    if (selecionados.length === inscritos.length) {
+    if (selecionados.length === inscritos.length && inscritos.length > 0) {
       setSelecionados([]);
     } else {
-      setSelecionados(inscritos.map((_, idx) => idx));
+      setSelecionados(Array.from({ length: inscritos.length }, (_, i) => i));
     }
   };
 
   const handleToggleInscrito = (index) => {
-    setSelecionados((prev) => 
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    );
+    setSelecionados((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((i) => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    });
   };
 
+  // IMPRESSÃO EM LOTE DIRETA VIA INJEÇÃO NO BODY (GARANTE A4 LANDSCAPE COMPLETO)
   const handleImprimirCertificados = () => {
     if (selecionados.length === 0) {
       alert('Selecione pelo menos um participante para gerar o certificado.');
       return;
     }
-    window.print();
+
+    const extrairValor = (p, termosBusca) => {
+      const chaveEncontrada = Object.keys(p).find((key) => {
+        const k = key.toLowerCase().trim();
+        return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+      });
+      return chaveEncontrada ? p[chaveEncontrada] : null;
+    };
+
+    const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
+    const srcBg = imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem);
+    const tituloEvento = eventoCertificado?.titulo || 'Título do Evento';
+    const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
+    const localEvento = eventoCertificado?.local || 'Local';
+    const cargaHoraria = cargaHorariaGeral || '8';
+    const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
+
+    // Constrói as folhas de cada participante selecionado
+    let paginasHTML = '';
+    selecionados.forEach((idxSelect) => {
+      const p = inscritos[idxSelect];
+      if (!p) return;
+
+      const nome = extrairValor(p, ['nome completo', 'nome']) || 'NOME DO PARTICIPANTE';
+      const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || eventoCertificado.id;
+
+      let textoDinamico = '';
+      if (modeloCertificadoSelecionado === 'modelo2') {
+        textoDinamico = `Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;${tituloEvento}&quot;</strong>, promovido no dia ${dataEvento}, nas dependências de ${localEvento}, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas.`;
+      } else {
+        textoDinamico = `Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;${tituloEvento}&quot;</strong> realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas.`;
+      }
+
+      paginasHTML += `
+        <div class="print-page">
+          <img src="${srcBg}" class="print-bg" />
+          <div class="print-nome">${nome}</div>
+          <div class="print-texto">${textoDinamico}</div>
+          <div class="print-codigo">AUTENTICIDADE: CERT-${codigo}</div>
+        </div>
+      `;
+    });
+
+    // Cria uma área temporária de impressão no topo do documento
+    const printArea = document.createElement('div');
+    printArea.id = 'direct-print-container';
+    printArea.innerHTML = `
+      <style>
+        @media print {
+          @page { size: A4 landscape; margin: 0; }
+          body * { visibility: hidden !important; }
+          #direct-print-container, #direct-print-container * { visibility: visible !important; }
+          #direct-print-container {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .print-page {
+            position: relative !important;
+            width: 297mm !important;
+            height: 210mm !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .print-bg {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 297mm !important;
+            height: 210mm !important;
+            object-fit: cover !important;
+            z-index: 1 !important;
+          }
+          .print-nome {
+            position: absolute !important;
+            top: 75mm !important;
+            left: 20mm !important;
+            width: 257mm !important;
+            text-align: center !important;
+            font-size: 24pt !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            text-transform: uppercase !important;
+            font-family: sans-serif !important;
+            z-index: 10 !important;
+          }
+          .print-texto {
+            position: absolute !important;
+            top: 92mm !important;
+            left: 30mm !important;
+            width: 237mm !important;
+            text-align: center !important;
+            font-size: 10.5pt !important;
+            line-height: 1.6 !important;
+            color: #334155 !important;
+            font-family: sans-serif !important;
+            z-index: 10 !important;
+          }
+          .print-codigo {
+            position: absolute !important;
+            bottom: 6mm !important;
+            right: 12mm !important;
+            font-size: 7.5pt !important;
+            color: #64748b !important;
+            font-family: monospace !important;
+            z-index: 10 !important;
+          }
+        }
+      </style>
+      ${paginasHTML}
+    `;
+
+    document.body.appendChild(printArea);
+
+    setTimeout(() => {
+      window.print();
+      if (document.body.contains(printArea)) {
+        document.body.removeChild(printArea);
+      }
+    }, 150);
   };
 
   return (
@@ -1154,7 +1283,6 @@ export default function AdminEventosPage() {
                     <div key={item.id} className={styles.newsItemRow}>
                       <div className={styles.newsItemContent}>
                         
-                        {/* IMAGEM THUMBNAIL TRATADA COM FALLBACK */}
                         <div className={styles.imageThumbnailWrapper}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img 
@@ -1225,7 +1353,7 @@ export default function AdminEventosPage() {
 
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO DE ALTERAÇÃO DE STATUS (ENCERRAR / REABRIR) */}
+      {/* MODAL DE CONFIRMAÇÃO DE ALTERAÇÃO DE STATUS */}
       {confirmModalData && (
         <div className={styles.modalOverlay} onClick={() => !alterandoStatus && setConfirmModalAberto(null)}>
           <div className={styles.modalConfirmBox}>
@@ -1273,7 +1401,7 @@ export default function AdminEventosPage() {
         </div>
       )}
 
-      {/* MODAL DE GERENCIAMENTO DE INSCRITOS */}
+      {/* MODAL DE GERENCIAMENTO DE INSCRITOS / CERTIFICADOS */}
       {modalCertificadoAberto && eventoCertificado && (
         <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setModalCertificadoAberto(false)}>
           <div className={styles.modalContent}>
@@ -1358,7 +1486,7 @@ export default function AdminEventosPage() {
                 </button>
                 
                 <span className={styles.selectedCountText}>
-                  Total de Inscritos: <strong>{inscritos.length}</strong>
+                  Total de Inscritos: <strong>{inscritos.length}</strong> | Selecionados: <strong>{selecionados.length}</strong>
                 </span>
               </div>
             </div>
@@ -1434,76 +1562,13 @@ export default function AdminEventosPage() {
               )}
             </div>
 
-            <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
-              {selecionados.map((idxSelect) => {
-                const p = inscritos[idxSelect];
-                if (!p) return null;
-
-                const extrairValor = (termosBusca) => {
-                  const chaveEncontrada = Object.keys(p).find((key) => {
-                    const k = key.toLowerCase().trim();
-                    return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
-                  });
-                  return chaveEncontrada ? p[chaveEncontrada] : null;
-                };
-
-                const nome = extrairValor(['nome completo', 'nome']) || 'NOME DO PARTICIPANTE';
-                const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || eventoCertificado.id;
-
-                const tituloEvento = eventoCertificado?.titulo || 'Título do Evento';
-                const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
-                const localEvento = eventoCertificado?.local || 'Local';
-                
-                const cargaHoraria = cargaHorariaGeral || '8';
-                const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
-
-                const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
-
-                return (
-                  <div 
-                    key={idxSelect}
-                    className={styles.certificadoPageSingle}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem)} 
-                      alt={modeloAtual?.nome || 'Certificado'}
-                      className={styles.certificadoBgImage}
-                    />
-
-                    <div className={styles.certificadoNomeWrapper}>
-                      <h2 className={styles.certificadoNomeText}>
-                        {nome}
-                      </h2>
-                    </div>
-
-                    <div className={styles.certificadoTextoWrapper}>
-                      <p className={styles.certificadoTextoParagraph}>
-                        {typeof modeloAtual?.gerarTexto === 'function' && modeloAtual.gerarTexto({
-                          tituloEvento,
-                          dataEvento,
-                          localEvento,
-                          cargaHoraria,
-                          cargaHorariaExtenso
-                        })}
-                      </p>
-                    </div>
-
-                    <div className={styles.certificadoAutenticidadeText}>
-                      AUTENTICIDADE: CERT-{codigo}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
             <div className={styles.flexRowGap12}>
               <button 
                 onClick={handleImprimirCertificados}
                 disabled={selecionados.length === 0}
                 className={styles.downloadCertificatesBtn}
               >
-                <Download size={18} /> Imprimir Certificado(s) ({selecionados.length})
+                <Printer size={18} /> Imprimir Certificado(s) ({selecionados.length})
               </button>
               
               <button 
@@ -1518,6 +1583,7 @@ export default function AdminEventosPage() {
         </div>
       )}
 
+      {/* MODAL DE COMPROVANTE INDIVIDUAL */}
       {comprovanteAdmin && (
         <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setComprovanteAdmin(null)}>
           <div className={styles.modalComprovanteBox}>
