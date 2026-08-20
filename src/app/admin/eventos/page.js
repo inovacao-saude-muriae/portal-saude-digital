@@ -73,14 +73,15 @@ function limparHora(horaBruta) {
   return str;
 }
 
+// MODELOS CONFIGURADOS PARA USAR O RESUMO DO EVENTO
 const MODELOS_CERTIFICADO = {
   modelo1: {
     id: 'modelo1',
     nome: 'Modelo 1 - Plenária Municipal de Saúde',
     imagem: '/img/modelo-certificado/modelo1.png',
-    gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
+    gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{tituloEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
+        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{resumoEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
       </>
     )
   },
@@ -88,9 +89,9 @@ const MODELOS_CERTIFICADO = {
     id: 'modelo2',
     nome: 'Modelo 2 - Simpósio / Workshop',
     imagem: '/img/modelo-certificado/modelo2.png',
-    gerarTexto: ({ tituloEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
+    gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{tituloEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
+        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{resumoEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
       </>
     )
   }
@@ -785,7 +786,7 @@ export default function AdminEventosPage() {
     });
   };
 
-  // IMPRESSÃO EM LOTE DIRETA VIA INJEÇÃO NO BODY (GARANTE A4 LANDSCAPE COMPLETO)
+  // IMPRESSÃO EM LOTE USANDO O BREVE RESUMO DO EVENTO
   const handleImprimirCertificados = () => {
     if (selecionados.length === 0) {
       alert('Selecione pelo menos um participante para gerar o certificado.');
@@ -802,13 +803,15 @@ export default function AdminEventosPage() {
 
     const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
     const srcBg = imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem);
-    const tituloEvento = eventoCertificado?.titulo || 'Título do Evento';
+    
+    // PEGA O BREVE RESUMO DO EVENTO
+    const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
+    
     const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
     const localEvento = eventoCertificado?.local || 'Local';
     const cargaHoraria = cargaHorariaGeral || '8';
     const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
-    // Constrói as folhas de cada participante selecionado
     let paginasHTML = '';
     selecionados.forEach((idxSelect) => {
       const p = inscritos[idxSelect];
@@ -819,9 +822,9 @@ export default function AdminEventosPage() {
 
       let textoDinamico = '';
       if (modeloCertificadoSelecionado === 'modelo2') {
-        textoDinamico = `Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;${tituloEvento}&quot;</strong>, promovido no dia ${dataEvento}, nas dependências de ${localEvento}, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas.`;
+        textoDinamico = `Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;${resumoEvento}&quot;</strong>, promovido no dia ${dataEvento}, nas dependências de ${localEvento}, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas.`;
       } else {
-        textoDinamico = `Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;${tituloEvento}&quot;</strong> realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas.`;
+        textoDinamico = `Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;${resumoEvento}&quot;</strong> realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas.`;
       }
 
       paginasHTML += `
@@ -834,7 +837,6 @@ export default function AdminEventosPage() {
       `;
     });
 
-    // Cria uma área temporária de impressão no topo do documento
     const printArea = document.createElement('div');
     printArea.id = 'direct-print-container';
     printArea.innerHTML = `
@@ -1560,6 +1562,70 @@ export default function AdminEventosPage() {
                   Nenhum participante inscrito encontrado para este evento.
                 </div>
               )}
+            </div>
+
+            {/* CONTAINER DOS CERTIFICADOS RENDERIZADOS PARA O MODAL (USA O BREVE RESUMO) */}
+            <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
+              {selecionados.map((idxSelect) => {
+                const p = inscritos[idxSelect];
+                if (!p) return null;
+
+                const extrairValor = (termosBusca) => {
+                  const chaveEncontrada = Object.keys(p).find((key) => {
+                    const k = key.toLowerCase().trim();
+                    return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+                  });
+                  return chaveEncontrada ? p[chaveEncontrada] : null;
+                };
+
+                const nome = extrairValor(['nome completo', 'nome']) || 'NOME DO PARTICIPANTE';
+                const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || eventoCertificado.id;
+
+                const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
+                const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
+                const localEvento = eventoCertificado?.local || 'Local';
+                
+                const cargaHoraria = cargaHorariaGeral || '8';
+                const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
+
+                const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
+
+                return (
+                  <div 
+                    key={idxSelect}
+                    className={styles.certificadoPageSingle}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem)} 
+                      alt={modeloAtual?.nome || 'Certificado'}
+                      className={styles.certificadoBgImage}
+                    />
+
+                    <div className={styles.certificadoNomeWrapper}>
+                      <h2 className={styles.certificadoNomeText}>
+                        {nome}
+                      </h2>
+                    </div>
+
+                    <div className={styles.certificadoTextoWrapper}>
+                      <p className={styles.certificadoTextoParagraph}>
+                        {typeof modeloAtual?.gerarTexto === 'function' && modeloAtual.gerarTexto({
+                          resumoEvento,
+                          dataEvento,
+                          localEvento,
+                          cargaHoraria,
+                          cargaHorariaExtenso
+                        })}
+                      </p>
+                    </div>
+
+                    <div className={styles.certificadoAutenticidadeText}>
+                      AUTENTICIDADE: CERT-{codigo}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div className={styles.flexRowGap12}>
