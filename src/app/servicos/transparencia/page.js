@@ -41,7 +41,7 @@ const categoriasTransparencia = [
         id: 'fisioterapia',
         titulo: 'Fisioterapia',
         subtitulo: 'Fila de Espera para Atendimento Fisioterapêutico',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiNzM5OWYyZTEtY2JhYS00YzAzLWE0MjQtZjZjZmJiNzkxNzYxIiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiNzNlZGYyMzktZGRlNy00OGI2LTk0YTAtZDM1MDkzODQ2MmYzIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
         id: 'ressonancia',
