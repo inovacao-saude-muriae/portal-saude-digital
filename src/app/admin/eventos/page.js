@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import JSZip from 'jszip';
 
 import { 
   ArrowLeft, 
@@ -37,7 +39,11 @@ import {
   Table,
   Lock,
   Unlock,
-  AlertTriangle
+  AlertTriangle,
+  Archive,
+  Users,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
 
@@ -73,7 +79,6 @@ function limparHora(horaBruta) {
   return str;
 }
 
-// MODELOS CONFIGURADOS PARA USAR O RESUMO DO EVENTO
 const MODELOS_CERTIFICADO = {
   modelo1: {
     id: 'modelo1',
@@ -81,7 +86,7 @@ const MODELOS_CERTIFICADO = {
     imagem: '/img/modelo-certificado/modelo1.png',
     gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{resumoEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG, com carga horária total de {cargaHoraria} ({cargaHorariaExtenso}) horas.
+        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{resumoEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG{cargaHoraria ? `, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas` : ''}.
       </>
     )
   },
@@ -91,7 +96,7 @@ const MODELOS_CERTIFICADO = {
     imagem: '/img/modelo-certificado/modelo2.png',
     gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
       <>
-        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{resumoEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}, cumprindo a carga horária de {cargaHoraria} ({cargaHorariaExtenso}) horas de atividades acadêmicas.
+        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{resumoEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}{cargaHoraria ? `, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas` : ''}.
       </>
     )
   }
@@ -183,6 +188,7 @@ function formatarDataParaExibicao(valor) {
 }
 
 function numeroParaExtenso(numero) {
+  if (!numero) return '';
   const num = parseInt(numero, 10);
   if (isNaN(num)) return '';
 
@@ -211,6 +217,7 @@ function numeroParaExtenso(numero) {
 export default function AdminEventosPage() {
   const router = useRouter();
 
+  // CONTROLE DE SUB-ABAS: 'cadastrar' | 'gerenciar' | 'inscritos'
   const [abaSub, setAbaSub] = useState('cadastrar');
 
   const [loadingForm, setLoadingForm] = useState(false);
@@ -227,7 +234,7 @@ export default function AdminEventosPage() {
   const [confirmModalData, setConfirmModalAberto] = useState(null);
   const [alterandoStatus, setAlterandoStatus] = useState(false);
 
-  // CAMPOS DO FORMULÁRIO
+  // CAMPOS DO FORMULÁRIO DE INSCRIÇÃO
   const [formFields, setFormFields] = useState([
     { id: 1, label: 'Nome Completo', type: 'text', required: true, options: [] },
     { id: 2, label: 'CPF', type: 'cpf', required: true, options: [] },
@@ -239,13 +246,17 @@ export default function AdminEventosPage() {
   const [loadingEventos, setLoadingEventos] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
-  // MODAIS E GERENCIAMENTO DE INSCRITOS
-  const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
+  // ABA DE INSCRITOS / CERTIFICADOS
   const [eventoCertificado, setEventoCertificado] = useState(null);
   const [inscritos, setInscritos] = useState([]);
   const [loadingInscritos, setLoadingInscritos] = useState(false);
   const [selecionados, setSelecionados] = useState([]);
-  const [cargaHorariaGeral, setCargaHorariaGeral] = useState('8');
+  const [cargaHorariaGeral, setCargaHorariaGeral] = useState('');
+  const [gerandoZip, setGerandoZip] = useState(false);
+
+  // ESTADOS DA PAGINAÇÃO DE INSCRITOS
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 30;
 
   const [modeloCertificadoSelecionado, setModeloCertificadoSelecionado] = useState('modelo1');
   const [imagemModeloBase64, setImagemModeloBase64] = useState('');
@@ -322,10 +333,10 @@ export default function AdminEventosPage() {
       }
     }
 
-    if (modalCertificadoAberto) {
+    if (abaSub === 'inscritos') {
       converterImagemParaBase64();
     }
-  }, [modeloCertificadoSelecionado, modalCertificadoAberto]);
+  }, [modeloCertificadoSelecionado, abaSub]);
 
   // CRONOGRAMA
   const handleAdicionarItemCronograma = () => {
@@ -652,13 +663,15 @@ export default function AdminEventosPage() {
     }
   };
 
+  // ABRE A ABA DE INSCRITOS EM TELA CHEIA (SUBISTITUI O POPUP)
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
     setSelecionados([]);
     setModeloCertificadoSelecionado('modelo1');
-    setCargaHorariaGeral('8');
-    setModalCertificadoAberto(true);
+    setCargaHorariaGeral('');
+    setPaginaAtual(1); // Reseta para a primeira página
+    setAbaSub('inscritos');
     setLoadingInscritos(true);
 
     try {
@@ -767,7 +780,7 @@ export default function AdminEventosPage() {
     });
   };
 
-  // GERENCIAMENTO DA SELEÇÃO DE CERTIFICADOS EM LOTE
+  // GERENCIAMENTO DA SELEÇÃO DE CERTIFICADOS
   const handleToggleSelecionarTudo = () => {
     if (selecionados.length === inscritos.length && inscritos.length > 0) {
       setSelecionados([]);
@@ -786,139 +799,211 @@ export default function AdminEventosPage() {
     });
   };
 
-  // IMPRESSÃO EM LOTE USANDO O BREVE RESUMO DO EVENTO
-  const handleImprimirCertificados = () => {
+  // CÁLCULOS DA PAGINAÇÃO
+  const totalPaginas = Math.ceil(inscritos.length / ITENS_POR_PAGINA);
+  const inicioIndice = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const fimIndice = inicioIndice + ITENS_POR_PAGINA;
+  const inscritosPaginados = inscritos.slice(inicioIndice, fimIndice);
+
+  // GERADOR E BAIXADOR UNIFICADO DE CERTIFICADOS COM NEGRITO REAL
+  const handleBaixarCertificados = async () => {
     if (selecionados.length === 0) {
-      alert('Selecione pelo menos um participante para gerar o certificado.');
+      alert('Selecione pelo menos um participante para baixar o certificado.');
       return;
     }
 
-    const extrairValor = (p, termosBusca) => {
-      const chaveEncontrada = Object.keys(p).find((key) => {
-        const k = key.toLowerCase().trim();
-        return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
-      });
-      return chaveEncontrada ? p[chaveEncontrada] : null;
-    };
+    setGerandoZip(true);
 
-    const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
-    const srcBg = imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem);
-    
-    // PEGA O BREVE RESUMO DO EVENTO
-    const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
-    
-    const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
-    const localEvento = eventoCertificado?.local || 'Local';
-    const cargaHoraria = cargaHorariaGeral || '8';
-    const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
+    try {
+      const extrairValor = (p, termosBusca) => {
+        const chaveEncontrada = Object.keys(p).find((key) => {
+          const k = key.toLowerCase().trim();
+          return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+        });
+        return chaveEncontrada ? p[chaveEncontrada] : null;
+      };
 
-    let paginasHTML = '';
-    selecionados.forEach((idxSelect) => {
-      const p = inscritos[idxSelect];
-      if (!p) return;
+      const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
+      const srcBg = imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem);
+      
+      const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
+      const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
+      const localEvento = eventoCertificado?.local || 'Local';
+      const cargaHoraria = cargaHorariaGeral ? cargaHorariaGeral.trim() : '';
+      const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
-      const nome = extrairValor(p, ['nome completo', 'nome']) || 'NOME DO PARTICIPANTE';
-      const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || eventoCertificado.id;
-
-      let textoDinamico = '';
-      if (modeloCertificadoSelecionado === 'modelo2') {
-        textoDinamico = `Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;${resumoEvento}&quot;</strong>, promovido no dia ${dataEvento}, nas dependências de ${localEvento}, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas.`;
-      } else {
-        textoDinamico = `Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;${resumoEvento}&quot;</strong> realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas.`;
+      // Carrega imagem de fundo em base64
+      let bgImageData = null;
+      if (srcBg) {
+        try {
+          const imgResp = await fetch(srcBg);
+          const blob = await imgResp.blob();
+          bgImageData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        } catch (err) {
+          console.warn('Erro ao carregar imagem de fundo:', err);
+        }
       }
 
-      paginasHTML += `
-        <div class="print-page">
-          <img src="${srcBg}" class="print-bg" />
-          <div class="print-nome">${nome}</div>
-          <div class="print-texto">${textoDinamico}</div>
-          <div class="print-codigo">AUTENTICIDADE: CERT-${codigo}</div>
-        </div>
-      `;
-    });
+      // Função utilitária com divisão por estilos (Normal / Bold)
+      const criarPdfCertificado = (idxSelect) => {
+        const p = inscritos[idxSelect];
+        if (!p) return null;
 
-    const printArea = document.createElement('div');
-    printArea.id = 'direct-print-container';
-    printArea.innerHTML = `
-      <style>
-        @media print {
-          @page { size: A4 landscape; margin: 0; }
-          body * { visibility: hidden !important; }
-          #direct-print-container, #direct-print-container * { visibility: visible !important; }
-          #direct-print-container {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 297mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
+        const nome = extrairValor(p, ['nome completo', 'nome']) || 'PARTICIPANTE';
+        const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || eventoCertificado.id;
+
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        // 1. Fundo
+        if (bgImageData) {
+          doc.addImage(bgImageData, 'PNG', 0, 0, 297, 210);
+        }
+
+        // 2. Nome
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(24);
+        doc.setTextColor(15, 23, 42);
+        const nomeFormatado = String(nome).toUpperCase().trim();
+        doc.text(nomeFormatado, 148.5, 80, { align: 'center' });
+
+        // 3. Texto do Certificado com Trechos em Negrito
+        doc.setFontSize(11);
+        doc.setTextColor(51, 65, 85);
+
+        let segmentos = [];
+
+        if (modeloCertificadoSelecionado === 'modelo2') {
+          segmentos = [
+            { text: 'Concluiu com êxito a participação no Simpósio de Saúde sobre ', style: 'normal' },
+            { text: `"${resumoEvento}"`, style: 'bold' },
+            { text: `, promovido no dia ${dataEvento}, nas dependências de ${localEvento}`, style: 'normal' }
+          ];
+
+          if (cargaHoraria) {
+            segmentos.push({ text: ', cumprindo a carga horária de ', style: 'normal' });
+            segmentos.push({ text: `${cargaHoraria} (${cargaHorariaExtenso}) horas`, style: 'bold' });
+            segmentos.push({ text: ' de atividades acadêmicas.', style: 'normal' });
+          } else {
+            segmentos.push({ text: '.', style: 'normal' });
           }
-          .print-page {
-            position: relative !important;
-            width: 297mm !important;
-            height: 210mm !important;
-            page-break-after: always !important;
-            break-after: page !important;
-            overflow: hidden !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          .print-bg {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 297mm !important;
-            height: 210mm !important;
-            object-fit: cover !important;
-            z-index: 1 !important;
-          }
-          .print-nome {
-            position: absolute !important;
-            top: 75mm !important;
-            left: 20mm !important;
-            width: 257mm !important;
-            text-align: center !important;
-            font-size: 24pt !important;
-            font-weight: 800 !important;
-            color: #0f172a !important;
-            text-transform: uppercase !important;
-            font-family: sans-serif !important;
-            z-index: 10 !important;
-          }
-          .print-texto {
-            position: absolute !important;
-            top: 92mm !important;
-            left: 30mm !important;
-            width: 237mm !important;
-            text-align: center !important;
-            font-size: 10.5pt !important;
-            line-height: 1.6 !important;
-            color: #334155 !important;
-            font-family: sans-serif !important;
-            z-index: 10 !important;
-          }
-          .print-codigo {
-            position: absolute !important;
-            bottom: 6mm !important;
-            right: 12mm !important;
-            font-size: 7.5pt !important;
-            color: #64748b !important;
-            font-family: monospace !important;
-            z-index: 10 !important;
+        } else {
+          segmentos = [
+            { text: 'Participou da Plenária Municipal de Saúde de Muriaé, com o tema ', style: 'normal' },
+            { text: `"${resumoEvento}"`, style: 'bold' },
+            { text: ` realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG`, style: 'normal' }
+          ];
+
+          if (cargaHoraria) {
+            segmentos.push({ text: ', com carga horária total de ', style: 'normal' });
+            segmentos.push({ text: `${cargaHoraria} (${cargaHorariaExtenso}) horas`, style: 'bold' });
+            segmentos.push({ text: '.', style: 'normal' });
+          } else {
+            segmentos.push({ text: '.', style: 'normal' });
           }
         }
-      </style>
-      ${paginasHTML}
-    `;
 
-    document.body.appendChild(printArea);
+        // Algoritmo de quebra de linha e centralização preservando estilos
+        const larguraMax = 220; // mm
+        let linhas = [];
+        let linhaAtual = [];
+        let larguraLinhaAtual = 0;
 
-    setTimeout(() => {
-      window.print();
-      if (document.body.contains(printArea)) {
-        document.body.removeChild(printArea);
+        segmentos.forEach((seg) => {
+          doc.setFont('helvetica', seg.style);
+          const palavras = seg.text.split(' ');
+
+          palavras.forEach((palavra, pIdx) => {
+            const espaco = pIdx === palavras.length - 1 ? '' : ' ';
+            const termo = palavra + espaco;
+            const larguraTermo = doc.getTextWidth(termo);
+
+            if (larguraLinhaAtual + larguraTermo > larguraMax && linhaAtual.length > 0) {
+              linhas.push({ tokens: linhaAtual, largura: larguraLinhaAtual });
+              linhaAtual = [];
+              larguraLinhaAtual = 0;
+            }
+
+            linhaAtual.push({ text: termo, style: seg.style });
+            larguraLinhaAtual += larguraTermo;
+          });
+        });
+
+        if (linhaAtual.length > 0) {
+          linhas.push({ tokens: linhaAtual, largura: larguraLinhaAtual });
+        }
+
+        let yPos = 96;
+        const alturaLinha = 6;
+
+        linhas.forEach((linha) => {
+          let xPos = 148.5 - (linha.largura / 2);
+
+          linha.tokens.forEach((token) => {
+            doc.setFont('helvetica', token.style);
+            doc.text(token.text, xPos, yPos);
+            xPos += doc.getTextWidth(token.text);
+          });
+
+          yPos += alturaLinha;
+        });
+
+        // 4. Autenticidade
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`AUTENTICIDADE: CERT-${codigo}`, 280, 202, { align: 'right' });
+
+        return { doc, nomeFormatado };
+      };
+
+      // CASO 1: SE 1 SELECIONADO -> PDF DIRETO
+      if (selecionados.length === 1) {
+        const resultado = criarPdfCertificado(selecionados[0]);
+        if (resultado) {
+          const nomeArquivoClean = resultado.nomeFormatado.replace(/[^A-Z0-9_\-\s]/gi, '').trim() || 'PARTICIPANTE';
+          resultado.doc.save(`Certificado_${nomeArquivoClean}.pdf`);
+        }
+      } 
+      // CASO 2: SE MÚLTIPLOS SELECIONADOS -> ARQUIVO ZIP COM PDFS
+      else {
+        const zip = new JSZip();
+
+        for (const idxSelect of selecionados) {
+          const resultado = criarPdfCertificado(idxSelect);
+          if (resultado) {
+            const pdfArrayBuffer = resultado.doc.output('arraybuffer');
+            const nomeArquivoSanitizado = resultado.nomeFormatado.replace(/[^A-Z0-9_\-\s]/gi, '').trim() || `PARTICIPANTE_${idxSelect + 1}`;
+            zip.file(`Certificado_${nomeArquivoSanitizado}.pdf`, pdfArrayBuffer);
+          }
+        }
+
+        const zipContent = await zip.generateAsync({ type: 'blob' });
+        const urlZip = URL.createObjectURL(zipContent);
+        const link = document.createElement('a');
+        const nomeEventoClean = (eventoCertificado?.titulo || 'Certificados').replace(/[^a-zA-Z0-9]/g, '_');
+        
+        link.href = urlZip;
+        link.download = `Certificados_${nomeEventoClean}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(urlZip);
       }
-    }, 150);
+
+    } catch (error) {
+      console.error('Erro ao gerar certificado:', error);
+      alert('Ocorreu um erro ao gerar o(s) certificado(s).');
+    } finally {
+      setGerandoZip(false);
+    }
   };
 
   return (
@@ -939,6 +1024,7 @@ export default function AdminEventosPage() {
           </Link>
         </div>
 
+        {/* NAVEGAÇÃO DE SUB-ABAS */}
         <div className={styles.subTabContainer}>
           <button
             onClick={() => { handleCancelarEdicao(); setAbaSub('cadastrar'); }}
@@ -953,6 +1039,15 @@ export default function AdminEventosPage() {
           >
             <List size={16} /> Ver e Gerenciar Eventos
           </button>
+
+          {abaSub === 'inscritos' && (
+            <button
+              onClick={() => setAbaSub('inscritos')}
+              className={`${styles.subTabBtn} ${styles.subTabInscritosActive}`}
+            >
+              <Users size={16} /> Inscritos: {eventoCertificado?.titulo || 'Evento'}
+            </button>
+          )}
         </div>
 
         {mensagem && (
@@ -962,6 +1057,7 @@ export default function AdminEventosPage() {
           </div>
         )}
 
+        {/* ABA 1: CADASTRAR / EDITAR */}
         {abaSub === 'cadastrar' && (
           <form onSubmit={handleSubmitEvento}>
             {eventoEmEdicao && (
@@ -1270,6 +1366,7 @@ export default function AdminEventosPage() {
           </form>
         )}
 
+        {/* ABA 2: GERENCIAR EVENTOS */}
         {abaSub === 'gerenciar' && (
           <div className={styles.cardSection}>
             <h2 className={styles.sectionTitle}><List size={20} color="#0065a4" /> Eventos Cadastrados no Portal</h2>
@@ -1353,6 +1450,234 @@ export default function AdminEventosPage() {
           </div>
         )}
 
+        {/* ABA 3: GERENCIAR INSCRITOS (COM PAGINAÇÃO A CADA 30 INSCRITOS) */}
+        {abaSub === 'inscritos' && eventoCertificado && (
+          <div className={styles.cardSection}>
+            <div className={styles.inscritosHeaderBar}>
+              <div>
+                <span className={styles.modalBadgeText}>PAINEL COMPLETO DE INSCRITOS</span>
+                <h2 className={styles.sectionTitleNoBorder}>
+                  <ClipboardList color="#0284c7" size={24} /> {eventoCertificado.titulo}
+                </h2>
+              </div>
+
+              <div className={styles.adminActionsHeaderBar}>
+                <button 
+                  type="button" 
+                  onClick={handleExportarInscritosCSV}
+                  disabled={inscritos.length === 0}
+                  className={styles.btnExportarCsv}
+                  title="Exportar apenas código, nome e CPF em CSV"
+                >
+                  <Download size={15} /> Exportar Resumido
+                </button>
+
+                <button 
+                  type="button" 
+                  onClick={handleExportarInscritosXLSX}
+                  disabled={inscritos.length === 0}
+                  className={styles.btnExportarXlsx}
+                  title="Exportar todas as colunas da planilha em formato nativo do Excel (.xlsx)"
+                >
+                  <Table size={15} /> Exportar Completo
+                </button>
+
+                <button 
+                  type="button" 
+                  onClick={() => setAbaSub('gerenciar')}
+                  className={styles.backLink}
+                >
+                  <ArrowLeft size={15} /> Voltar aos Eventos
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.modalControlsBoxFull}>
+              <div>
+                <label className={styles.modalLabelWithIcon}>
+                  <FileText size={14} /> Modelo / Layout do Certificado:
+                </label>
+                <select 
+                  value={modeloCertificadoSelecionado}
+                  onChange={(e) => setModeloCertificadoSelecionado(e.target.value)}
+                  className={styles.modalSelect}
+                >
+                  {Object.values(MODELOS_CERTIFICADO).map((mod) => (
+                    <option key={mod.id} value={mod.id}>
+                      {mod.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={styles.modalLabelBlock}>
+                  Carga Horária:
+                </label>
+                <input 
+                  type="text" 
+                  value={cargaHorariaGeral} 
+                  onChange={(e) => setCargaHorariaGeral(e.target.value)}
+                  placeholder="Carga Horária"
+                  className={styles.modalInputCargaHoraria}
+                />
+              </div>
+
+              <div className={styles.flexAlignEnd}>
+                <button 
+                  onClick={handleBaixarCertificados}
+                  disabled={selecionados.length === 0 || gerandoZip}
+                  className={styles.btnExportarZipLarge}
+                  title="Baixar certificado em PDF (se 1 selecionado) ou em arquivo ZIP com PDFs separados (se múltiplos selecionados)"
+                >
+                  {gerandoZip ? (
+                    <><Loader2 size={18} className="animate-spin" /> Processando...</>
+                  ) : selecionados.length > 1 ? (
+                    <><Archive size={18} /> Baixar Certificados Selecionados ({selecionados.length})</>
+                  ) : (
+                    <><Download size={18} /> Baixar Certificado Selecionado</>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.modalSelectionBar}>
+              <div className={styles.flexRowCenterGap10}>
+                <button 
+                  type="button"
+                  onClick={handleToggleSelecionarTudo}
+                  className={styles.toggleAllBtn}
+                >
+                  {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={18} color="#0284c7" /> : <Square size={18} />} 
+                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos os Participantes'}
+                </button>
+                
+                <span className={styles.selectedCountText}>
+                  Total de Inscritos: <strong>{inscritos.length}</strong> | Selecionados: <strong>{selecionados.length}</strong>
+                </span>
+              </div>
+
+              {/* INFO DA PÁGINA */}
+              {inscritos.length > 0 && (
+                <span className={styles.paginaInfoText}>
+                  Exibindo <strong>{inicioIndice + 1}</strong>–<strong>{Math.min(fimIndice, inscritos.length)}</strong> de <strong>{inscritos.length}</strong>
+                </span>
+              )}
+            </div>
+
+            <div className={styles.tableFullWrapper}>
+              {loadingInscritos ? (
+                <div className={styles.loadingInscritosBox}>
+                  <Loader2 size={22} className="animate-spin" /> Buscando lista de inscritos do evento...
+                </div>
+              ) : inscritos.length > 0 ? (
+                <table className={styles.inscritosTableFull}>
+                  <thead>
+                    <tr>
+                      <th className={styles.colIndex}>#</th>
+                      <th>Nº Inscrição</th>
+                      <th>Nome / Participante</th>
+                      <th>CPF / Documento</th>
+                      <th className={styles.textCenter}>Comprovante</th>
+                      <th className={styles.textCenter}>Emitir Certificado?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inscritosPaginados.map((p, pIdx) => {
+                      const idxGlobal = inicioIndice + pIdx;
+                      const isSelected = selecionados.includes(idxGlobal);
+                      
+                      const extrairValor = (termosBusca) => {
+                        const chaveEncontrada = Object.keys(p).find((key) => {
+                          const k = key.toLowerCase().trim();
+                          return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+                        });
+                        return chaveEncontrada ? p[chaveEncontrada] : null;
+                      };
+
+                      const nome = extrairValor(['nome completo', 'nome']) || 'Participante';
+                      const cpf = extrairValor(['cpf']) || '-';
+                      const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || '-';
+
+                      return (
+                        <tr key={idxGlobal} className={isSelected ? styles.selectedRow : ''}>
+                          <td className={styles.colIndexText}>{idxGlobal + 1}</td>
+                          <td className={styles.codigoText}>{codigo}</td>
+                          <td className={styles.nomeParticipanteText}>{nome}</td>
+                          <td className={styles.cpfText}>{cpf}</td>
+                          
+                          <td className={styles.textCenter}>
+                            <button 
+                              type="button"
+                              onClick={() => handleAbrirComprovanteAdmin(p)}
+                              className={styles.btnVerTicketSmall}
+                              title="Visualizar Comprovante do Inscrito"
+                            >
+                              <Ticket size={13} /> Comprovante
+                            </button>
+                          </td>
+
+                          <td className={styles.textCenter}>
+                            <input 
+                              type="checkbox" 
+                              checked={isSelected} 
+                              onChange={() => handleToggleInscrito(idxGlobal)} 
+                              className={styles.checkboxInputLarge}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div className={styles.emptyInscritosBox}>
+                  Nenhum participante inscrito encontrado para este evento.
+                </div>
+              )}
+            </div>
+
+            {/* BARRA DE CONTROLE DA PAGINAÇÃO */}
+            {totalPaginas > 1 && (
+              <div className={styles.paginationContainer}>
+                <button
+                  type="button"
+                  onClick={() => setPaginaAtual((prev) => Math.max(prev - 1, 1))}
+                  disabled={paginaAtual === 1}
+                  className={styles.paginationBtn}
+                  title="Página Anterior"
+                >
+                  <ChevronLeft size={16} /> Anterior
+                </button>
+
+                <div className={styles.paginationNumbersBox}>
+                  {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((numPagina) => (
+                    <button
+                      key={numPagina}
+                      type="button"
+                      onClick={() => setPaginaAtual(numPagina)}
+                      className={`${styles.paginationNumberBtn} ${paginaAtual === numPagina ? styles.paginationNumberActive : ''}`}
+                    >
+                      {numPagina}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPaginaAtual((prev) => Math.min(prev + 1, totalPaginas))}
+                  disabled={paginaAtual === totalPaginas}
+                  className={styles.paginationBtn}
+                  title="Próxima Página"
+                >
+                  Próxima <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+
+          </div>
+        )}
+
       </div>
 
       {/* MODAL DE CONFIRMAÇÃO DE ALTERAÇÃO DE STATUS */}
@@ -1399,252 +1724,6 @@ export default function AdminEventosPage() {
                 )}
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DE GERENCIAMENTO DE INSCRITOS / CERTIFICADOS */}
-      {modalCertificadoAberto && eventoCertificado && (
-        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setModalCertificadoAberto(false)}>
-          <div className={styles.modalContent}>
-            
-            <button 
-              onClick={() => setModalCertificadoAberto(false)} 
-              className={styles.closeModalBtn}
-            >
-              <X size={18} />
-            </button>
-
-            <div className={styles.marginBottom16}>
-              <span className={styles.modalBadgeText}>PAINEL DE INSCRITOS</span>
-              <h3 className={styles.modalTitle}>
-                <ClipboardList color="#0284c7" size={22} /> {eventoCertificado.titulo}
-              </h3>
-            </div>
-
-            <div className={styles.adminActionsHeaderBar}>
-              <button 
-                type="button" 
-                onClick={handleExportarInscritosCSV}
-                disabled={inscritos.length === 0}
-                className={styles.btnExportarCsv}
-                title="Exportar apenas código, nome e CPF em CSV"
-              >
-                <Download size={15} /> Exportar Resumido (CSV)
-              </button>
-
-              <button 
-                type="button" 
-                onClick={handleExportarInscritosXLSX}
-                disabled={inscritos.length === 0}
-                className={styles.btnExportarXlsx}
-                title="Exportar todas as colunas da planilha em formato nativo do Excel (.xlsx)"
-              >
-                <Table size={15} /> Exportar Completo (.xlsx)
-              </button>
-            </div>
-
-            <div className={styles.modalControlsBox}>
-              <div>
-                <label className={styles.modalLabelWithIcon}>
-                  <FileText size={14} /> Modelo / Layout do Certificado:
-                </label>
-                <select 
-                  value={modeloCertificadoSelecionado}
-                  onChange={(e) => setModeloCertificadoSelecionado(e.target.value)}
-                  className={styles.modalSelect}
-                >
-                  {Object.values(MODELOS_CERTIFICADO).map((mod) => (
-                    <option key={mod.id} value={mod.id}>
-                      {mod.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className={styles.modalLabelBlock}>
-                  Carga Horária Geral (Horas):
-                </label>
-                <input 
-                  type="text" 
-                  value={cargaHorariaGeral} 
-                  onChange={(e) => setCargaHorariaGeral(e.target.value)}
-                  placeholder="Ex: 8"
-                  className={styles.modalInputCargaHoraria}
-                />
-              </div>
-            </div>
-
-            <div className={styles.modalSelectionBar}>
-              <div className={styles.flexRowCenterGap10}>
-                <button 
-                  type="button"
-                  onClick={handleToggleSelecionarTudo}
-                  className={styles.toggleAllBtn}
-                >
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={16} color="#0284c7" /> : <Square size={16} />} 
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos para Certificado'}
-                </button>
-                
-                <span className={styles.selectedCountText}>
-                  Total de Inscritos: <strong>{inscritos.length}</strong> | Selecionados: <strong>{selecionados.length}</strong>
-                </span>
-              </div>
-            </div>
-
-            <div className={styles.tableScrollWrapper}>
-              {loadingInscritos ? (
-                <div className={styles.loadingInscritosBox}>
-                  <Loader2 size={20} className="animate-spin" /> Buscando inscritos da planilha...
-                </div>
-              ) : inscritos.length > 0 ? (
-                <table className={styles.inscritosTable}>
-                  <thead>
-                    <tr>
-                      <th className={styles.colIndex}>#</th>
-                      <th>Nº Inscrição</th>
-                      <th>Nome / Participante</th>
-                      <th>CPF / Documento</th>
-                      <th className={styles.textCenter}>Comprovante</th>
-                      <th className={styles.textCenter}>Certificado?</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inscritos.map((p, idx) => {
-                      const isSelected = selecionados.includes(idx);
-                      
-                      const extrairValor = (termosBusca) => {
-                        const chaveEncontrada = Object.keys(p).find((key) => {
-                          const k = key.toLowerCase().trim();
-                          return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
-                        });
-                        return chaveEncontrada ? p[chaveEncontrada] : null;
-                      };
-
-                      const nome = extrairValor(['nome completo', 'nome']) || 'Participante';
-                      const cpf = extrairValor(['cpf']) || '-';
-                      const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || '-';
-
-                      return (
-                        <tr key={idx} className={isSelected ? styles.selectedRow : ''}>
-                          <td className={styles.colIndexText}>{idx + 1}</td>
-                          <td className={styles.codigoText}>{codigo}</td>
-                          <td className={styles.nomeParticipanteText}>{nome}</td>
-                          <td className={styles.cpfText}>{cpf}</td>
-                          
-                          <td className={styles.textCenter}>
-                            <button 
-                              type="button"
-                              onClick={() => handleAbrirComprovanteAdmin(p)}
-                              className={styles.btnVerTicketSmall}
-                              title="Visualizar Comprovante do Inscrito"
-                            >
-                              <Ticket size={13} /> Comprovante
-                            </button>
-                          </td>
-
-                          <td className={styles.textCenter}>
-                            <input 
-                              type="checkbox" 
-                              checked={isSelected} 
-                              onChange={() => handleToggleInscrito(idx)} 
-                              className={styles.checkboxInputLarge}
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              ) : (
-                <div className={styles.emptyInscritosBox}>
-                  Nenhum participante inscrito encontrado para este evento.
-                </div>
-              )}
-            </div>
-
-            {/* CONTAINER DOS CERTIFICADOS RENDERIZADOS PARA O MODAL (USA O BREVE RESUMO) */}
-            <div id="certificados-em-lote-print" className={styles.hiddenPrintContainer}>
-              {selecionados.map((idxSelect) => {
-                const p = inscritos[idxSelect];
-                if (!p) return null;
-
-                const extrairValor = (termosBusca) => {
-                  const chaveEncontrada = Object.keys(p).find((key) => {
-                    const k = key.toLowerCase().trim();
-                    return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
-                  });
-                  return chaveEncontrada ? p[chaveEncontrada] : null;
-                };
-
-                const nome = extrairValor(['nome completo', 'nome']) || 'NOME DO PARTICIPANTE';
-                const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || eventoCertificado.id;
-
-                const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
-                const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
-                const localEvento = eventoCertificado?.local || 'Local';
-                
-                const cargaHoraria = cargaHorariaGeral || '8';
-                const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
-
-                const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
-
-                return (
-                  <div 
-                    key={idxSelect}
-                    className={styles.certificadoPageSingle}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem)} 
-                      alt={modeloAtual?.nome || 'Certificado'}
-                      className={styles.certificadoBgImage}
-                    />
-
-                    <div className={styles.certificadoNomeWrapper}>
-                      <h2 className={styles.certificadoNomeText}>
-                        {nome}
-                      </h2>
-                    </div>
-
-                    <div className={styles.certificadoTextoWrapper}>
-                      <p className={styles.certificadoTextoParagraph}>
-                        {typeof modeloAtual?.gerarTexto === 'function' && modeloAtual.gerarTexto({
-                          resumoEvento,
-                          dataEvento,
-                          localEvento,
-                          cargaHoraria,
-                          cargaHorariaExtenso
-                        })}
-                      </p>
-                    </div>
-
-                    <div className={styles.certificadoAutenticidadeText}>
-                      AUTENTICIDADE: CERT-{codigo}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className={styles.flexRowGap12}>
-              <button 
-                onClick={handleImprimirCertificados}
-                disabled={selecionados.length === 0}
-                className={styles.downloadCertificatesBtn}
-              >
-                <Printer size={18} /> Imprimir Certificado(s) ({selecionados.length})
-              </button>
-              
-              <button 
-                onClick={() => setModalCertificadoAberto(false)} 
-                className={styles.closeModalSecondaryBtn}
-              >
-                Fechar
-              </button>
-            </div>
-
           </div>
         </div>
       )}

@@ -76,11 +76,12 @@
   color: #003f66;
 }
 
-/* SUB-ABAS */
+/* SUB-ABAS DE NAVEGAÇÃO */
 .subTabContainer {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .subTabBtn {
@@ -103,11 +104,19 @@
   color: #0f172a;
 }
 
-.subTabCadastrarActive, .subTabGerenciarActive {
+.subTabCadastrarActive, 
+.subTabGerenciarActive {
   background-color: #0065a4 !important;
   color: #ffffff !important;
   border-color: #0065a4 !important;
   box-shadow: 0 2px 8px rgba(0, 101, 164, 0.25);
+}
+
+.subTabInscritosActive {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
 }
 
 /* ALERTAS E BANNERS DE EDIÇÃO */
@@ -187,6 +196,16 @@
   margin: 0 0 20px 0;
   padding-bottom: 12px;
   border-bottom: 1px solid #f1f5f9;
+}
+
+.sectionTitleNoBorder {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 0 0;
 }
 
 .formGroup {
@@ -282,6 +301,20 @@
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #bae6fd;
+  cursor: pointer;
+}
+
+.checkboxLabelRed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626;
+  background-color: #fef2f2;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
   cursor: pointer;
 }
 
@@ -636,8 +669,11 @@
   flex-shrink: 0;
 }
 
-.thumbnailImg {
+.thumbnailImgDirect {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .newsMetaText {
@@ -716,6 +752,46 @@
   background-color: #fca5a5;
 }
 
+.btnLockInscricao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  transition: all 0.2s ease;
+}
+
+.btnLockInscricao:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btnReabrirInscricao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  transition: all 0.2s ease;
+}
+
+.btnReabrirInscricao:hover {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
 .loadingText, .emptyText {
   text-align: center;
   padding: 30px;
@@ -724,51 +800,189 @@
 }
 
 /* ==========================================================
-   MODAIS DE INSCRITOS & CERTIFICADO
+   ABA COMPLETA DE INSCRITOS (TELA CHEIA)
    ========================================================== */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+.inscritosHeaderBar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  z-index: 9999;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.modalBadgeText {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: 1px;
+}
+
+.modalControlsBoxFull {
+  display: grid;
+  grid-template-columns: 1fr 220px 280px;
+  gap: 16px;
+  background-color: #f8fafc;
   padding: 20px;
-  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 20px;
+  align-items: flex-end;
 }
 
-.modalContent {
-  background-color: #ffffff;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
+.modalLabelWithIcon, .modalLabelBlock {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
   display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  position: relative;
-  box-sizing: border-box;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
-.modalComprovanteBox {
-  background-color: #ffffff;
+.modalSelect, .modalInputCargaHoraria {
   width: 100%;
-  max-width: 580px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-  position: relative;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #0f172a;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+}
+
+.modalInputCargaHoraria {
+  cursor: text;
+}
+
+.modalSelect:focus, .modalInputCargaHoraria:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.flexAlignEnd {
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.btnExportarZipLarge {
+  width: 100%;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btnExportarZipLarge:hover {
+  background-color: #15803d;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.35);
+}
+
+.btnExportarZipLarge:disabled {
+  background-color: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.modalSelectionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.flexRowCenterGap10 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggleAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0369a1;
+  cursor: pointer;
+}
+
+.selectedCountText {
+  font-size: 13.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* TABELA DE INSCRITOS EM TELA CHEIA */
+.tableFullWrapper {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow-x: auto;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.inscritosTableFull {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.inscritosTableFull th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 14px 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.inscritosTableFull td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.selectedRow {
+  background-color: #f0f9ff;
+}
+
+.colIndex { width: 40px; }
+.colIndexText { color: #94a3b8; font-weight: 600; }
+.nomeParticipanteText { font-weight: 700; color: #0f172a; }
+.cpfText, .codigoText { font-family: monospace; color: #475569; }
+.textCenter { text-align: center; }
+
+.checkboxInputLarge {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.loadingInscritosBox, .emptyInscritosBox {
+  text-align: center;
+  padding: 50px 20px;
+  color: #64748b;
+  font-size: 15px;
 }
 
 /* BARRA DE AÇÕES COM OS BOTÕES DE EXPORTAÇÃO */
@@ -777,8 +991,6 @@
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
-  margin-bottom: 12px;
-  flex-shrink: 0;
   flex-wrap: wrap;
 }
 
@@ -803,7 +1015,6 @@
   color: #ffffff;
 }
 
-/* ESTILO DO BOTÃO EXPORTAR COMPLETO (.XLSX) */
 .btnExportarXlsx {
   background-color: #0284c7;
   color: #ffffff;
@@ -840,20 +1051,53 @@
   background-color: #f0f9ff;
   color: #0369a1;
   border: 1px solid #bae6fd;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 4px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   transition: all 0.2s ease;
 }
 
 .btnVerTicketSmall:hover {
   background-color: #0284c7;
   color: #ffffff;
+}
+
+/* ==========================================================
+   MODAIS (CONFIRMAÇÃO DE STATUS & COMPROVANTE INDIVIDUAL)
+   ========================================================== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modalComprovanteBox {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .closeModalBtn {
@@ -878,198 +1122,6 @@
   color: #0f172a;
 }
 
-.marginBottom16 {
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
-.modalBadgeText {
-  font-size: 11px;
-  font-weight: 800;
-  color: #0284c7;
-  letter-spacing: 1px;
-}
-
-.modalTitle {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 4px 0 0 0;
-}
-
-/* SEÇÃO DE CONTROLES DO CERTIFICADO (MODELO E CARGA HORÁRIA) */
-.modalControlsBox {
-  display: grid;
-  grid-template-columns: 1fr 180px;
-  gap: 16px;
-  background-color: #f8fafc;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 5;
-  flex-shrink: 0;
-}
-
-.modalLabelWithIcon, .modalLabelBlock {
-  font-size: 12px;
-  font-weight: 700;
-  color: #334155;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.modalSelect, .modalInputCargaHoraria {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 13.5px;
-  color: #0f172a;
-  background-color: #ffffff;
-  box-sizing: border-box;
-  cursor: pointer;
-  outline: none;
-}
-
-.modalInputCargaHoraria {
-  cursor: text;
-}
-
-.modalSelect:focus, .modalInputCargaHoraria:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-}
-
-.modalSelectionBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-
-.flexRowCenterGap10 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.toggleAllBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0369a1;
-  cursor: pointer;
-}
-
-.selectedCountText {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 600;
-}
-
-/* TABELA DE INSCRITOS */
-.tableScrollWrapper {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  min-height: 200px;
-  max-height: 380px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.inscritosTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  text-align: left;
-}
-
-.inscritosTable th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-weight: 700;
-  padding: 10px 14px;
-  border-bottom: 1px solid #e2e8f0;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.inscritosTable td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #f1f5f9;
-  color: #334155;
-}
-
-.selectedRow {
-  background-color: #f0f9ff;
-}
-
-.colIndex { width: 40px; }
-.colIndexText { color: #94a3b8; font-weight: 600; }
-.nomeParticipanteText { font-weight: 700; color: #0f172a; }
-.cpfText, .codigoText { font-family: monospace; color: #475569; }
-.textCenter { text-align: center; }
-
-.checkboxInputLarge {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.loadingInscritosBox, .emptyInscritosBox {
-  text-align: center;
-  padding: 40px 20px;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.flexRowGap12 {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  flex-shrink: 0;
-  margin-top: auto;
-}
-
-.downloadCertificatesBtn, .btnDownloadPdf {
-  background-color: #0284c7;
-  color: #ffffff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 13.5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.downloadCertificatesBtn:hover, .btnDownloadPdf:hover {
-  background-color: #0369a1;
-}
-
-.downloadCertificatesBtn:disabled {
-  background-color: #cbd5e1;
-  cursor: not-allowed;
-}
-
 .closeModalSecondaryBtn {
   background-color: #f1f5f9;
   color: #475569;
@@ -1079,6 +1131,14 @@
   font-weight: 600;
   font-size: 13.5px;
   cursor: pointer;
+}
+
+.flexRowGap12 {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 /* COMPROVANTE INDIVIDUAL */
@@ -1214,233 +1274,25 @@
   border: 1px solid #bbf7d0;
 }
 
-.hiddenPrintContainer {
-  display: none;
-}
-
-/* DESIGN BARRA DE ROLAGEM */
-.tableScrollWrapper,
-.modalContent {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
-}
-
-.tableScrollWrapper::-webkit-scrollbar,
-.modalContent::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.tableScrollWrapper::-webkit-scrollbar-track,
-.modalContent::-webkit-scrollbar-track {
-  background-color: #f1f5f9;
-  border-radius: 8px;
-}
-
-.tableScrollWrapper::-webkit-scrollbar-thumb,
-.modalContent::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 8px;
-  border: 2px solid #f1f5f9;
-  transition: background-color 0.2s ease;
-}
-
-.tableScrollWrapper::-webkit-scrollbar-thumb:hover,
-.modalContent::-webkit-scrollbar-thumb:hover {
+.btnDownloadPdf {
   background-color: #0284c7;
-}
-
-/* ==========================================================
-   REGRA DE IMPRESSÃO DO CERTIFICADO
-   ========================================================== */
-@media print {
-  @page {
-    size: A4 landscape;
-    margin: 0 !important;
-  }
-
-  html, body {
-    width: 297mm !important;
-    height: 210mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    overflow: hidden !important;
-  }
-
-  body * {
-    visibility: hidden !important;
-  }
-
-  .hiddenPrintContainer, .hiddenPrintContainer * {
-    visibility: visible !important;
-  }
-
-  .hiddenPrintContainer {
-    display: block !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    z-index: 99999 !important;
-  }
-
-  .certificadoPageSingle {
-    position: relative !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    page-break-after: always;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .certificadoBgImage {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    object-fit: fill !important;
-    z-index: 1 !important;
-  }
-
-  .certificadoNomeWrapper {
-    position: absolute !important;
-    top: 82mm !important;
-    left: 20mm !important;
-    width: 257mm !important;
-    text-align: center !important;
-    z-index: 10 !important;
-  }
-
-  .certificadoNomeText {
-    font-size: 28pt !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1.1 !important;
-  }
-
-  .certificadoTextoWrapper {
-    position: absolute !important;
-    top: 102mm !important;
-    left: 25mm !important;
-    width: 247mm !important;
-    text-align: center !important;
-    z-index: 10 !important;
-  }
-
-  .certificadoTextoParagraph {
-    font-size: 11.5pt !important;
-    line-height: 1.5 !important;
-    color: #334155 !important;
-    margin: 0 !important;
-  }
-
-  .boldText {
-    font-weight: 700 !important;
-    color: #0f172a !important;
-  }
-
-  .certificadoAutenticidadeText {
-    position: absolute !important;
-    bottom: 8mm !important;
-    right: 12mm !important;
-    font-size: 7.5pt !important;
-    color: #64748b !important;
-    font-family: monospace !important;
-    z-index: 10 !important;
-  }
-
-  :global(#comprovante-admin-pdf-container),
-  :global(#comprovante-admin-pdf-container) * {
-    visibility: visible !important;
-  }
-
-  :global(#comprovante-admin-pdf-container) {
-    position: absolute !important;
-    top: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    max-width: 580px !important;
-    padding: 20px !important;
-    border: 2px solid #0065a4 !important;
-    background-color: #ffffff !important;
-    box-shadow: none !important;
-  }
-}
-/* CHECKBOX VERMELHO PARA ENCERRAR INSCRIÇÕES NO FORMULÁRIO */
-.checkboxLabelRed {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #dc2626;
-  background-color: #fef2f2;
-  padding: 10px 14px;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
   border-radius: 8px;
-  border: 1px solid #fecaca;
+  font-weight: 700;
+  font-size: 13.5px;
   cursor: pointer;
-}
-
-/* BOTÕES RÁPIDOS DE LOCK / UNLOCK NA LISTA DE EVENTOS */
-.btnLockInscricao {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  transition: all 0.2s ease;
+  gap: 8px;
 }
 
-.btnLockInscricao:hover {
-  background-color: #dc2626;
-  color: #ffffff;
+.btnDownloadPdf:hover {
+  background-color: #0369a1;
 }
 
-.btnReabrirInscricao {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  background-color: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-  transition: all 0.2s ease;
-}
-
-.btnReabrirInscricao:hover {
-  background-color: #16a34a;
-  color: #ffffff;
-}
-/* AJUSTE DIRETO PARA AS MINIATURAS DAS IMAGENS */
-.thumbnailImgDirect {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* MODAL CUSTOMIZADO DE CONFIRMAÇÃO DE STATUS */
+/* MODAL DE CONFIRMAÇÃO DE STATUS */
 .modalConfirmBox {
   background-color: #ffffff;
   width: 100%;
@@ -1551,7 +1403,148 @@
 .btnConfirmUnlock:hover {
   background-color: #15803d;
 }
-/* MEDIA QUERIES */
+
+/* BARRA DE ROLAGEM DESIGN */
+.tableFullWrapper,
+.modalComprovanteBox {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.tableFullWrapper::-webkit-scrollbar,
+.modalComprovanteBox::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tableFullWrapper::-webkit-scrollbar-track,
+.modalComprovanteBox::-webkit-scrollbar-track {
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+
+.tableFullWrapper::-webkit-scrollbar-thumb,
+.modalComprovanteBox::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.tableFullWrapper::-webkit-scrollbar-thumb:hover,
+.modalComprovanteBox::-webkit-scrollbar-thumb:hover {
+  background-color: #0284c7;
+}
+
+/* SUPORTE DE IMPRESSÃO PARA COMPROVANTES INDIVIDUAIS */
+@media print {
+  @page {
+    size: auto;
+    margin: 0 !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  :global(#comprovante-admin-pdf-container),
+  :global(#comprovante-admin-pdf-container) * {
+    visibility: visible !important;
+  }
+
+  :global(#comprovante-admin-pdf-container) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 580px !important;
+    padding: 20px !important;
+    border: 2px solid #0065a4 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+  }
+}
+/* CONTROLES DE PAGINAÇÃO DE INSCRITOS */
+.paginaInfoText {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.paginationBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationBtn:hover:not(:disabled) {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.paginationBtn:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.paginationNumbersBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.paginationNumberBtn {
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.paginationNumberBtn:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.paginationNumberActive {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #0284c7 !important;
+}
+
+/* MEDIA QUERIES PARA RESPONSIVIDADE */
 @media (max-width: 1024px) {
   .formGrid {
     grid-template-columns: 1fr;
@@ -1561,23 +1554,14 @@
     grid-template-columns: 1fr 140px 70px 38px;
   }
   
-  .modalContent {
-    width: 95%;
-    padding: 20px;
+  .modalControlsBoxFull {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .modalOverlay {
     padding: 10px;
-  }
-  
-  .modalContent {
-    max-height: 95vh;
-  }
-  
-  .tableScrollWrapper {
-    max-height: 300px;
   }
 }
 
@@ -1596,17 +1580,20 @@
     grid-template-columns: 1fr;
   }
 
-  .modalControlsBox {
-    grid-template-columns: 1fr;
+  .inscritosHeaderBar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .adminActionsHeaderBar {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
   }
 
   .btnExportarCsv,
-  .btnExportarXlsx {
+  .btnExportarXlsx,
+  .btnExportarZipLarge {
     width: 100%;
     justify-content: center;
   }
@@ -1616,7 +1603,7 @@
     gap: 8px;
   }
   
-  .downloadCertificatesBtn, .closeModalSecondaryBtn {
+  .closeModalSecondaryBtn {
     width: 100%;
     justify-content: center;
   }

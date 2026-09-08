@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
     "keen-slider": "^6.8.6",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
