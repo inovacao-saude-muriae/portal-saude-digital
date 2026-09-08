@@ -50,7 +50,7 @@ const categoriasTransparencia = [
         url: 'https://app.powerbi.com/view?r=eyJrIjoiYzM0OTQ2ZTMtMzg2My00MTRmLWE5NWMtNTQ4NzI4NjNkMWQyIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
-        id: 'tomografia',
+        id: 'tomografiaa',
         titulo: 'Tomografia Computadorizada',
         subtitulo: 'Fila de Espera para Exames de Tomografia',
         url: 'https://app.powerbi.com/view?r=eyJrIjoiNDM4M2JmMDQtOTkzZi00YjViLTllZDgtNTg3YTFjZGVjNGUyIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
