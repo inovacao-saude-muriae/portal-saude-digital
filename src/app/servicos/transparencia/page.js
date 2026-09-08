@@ -79,7 +79,7 @@ const categoriasTransparencia = [
         id: 'estoque-medicamentos',
         titulo: 'Estoque de Medicamentos',
         subtitulo: 'Acompanhamento do Estoque e Disponibilidade de Insumos',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiYTUxNGNiMTYtYTVlYy00YjY0LWE3M2YtYjAyMzEzYTk5YjY0IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiNTlhMTdlODItZmMxYi00MTQ3LWIxNTktNzFjOWQ0NTIzODUxIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       }
     ]
   }
