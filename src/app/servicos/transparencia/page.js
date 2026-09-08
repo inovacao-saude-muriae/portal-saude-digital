@@ -23,19 +23,19 @@ const categoriasTransparencia = [
         id: 'catarata',
         titulo: 'Catarata e Pterígio',
         subtitulo: 'Fila de Espera para Cirurgias de Catarata e Pterígio',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiYmZiMmQwYWQtMTdmNi00MDk3LTljMDEtNzkyMmJlNGFhM2U5IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiNzRmODMzZmYtZjA5OS00ZGI2LWExZjEtMWI4N2VlNmE0M2UwIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
         id: 'eletivas',
         titulo: 'Cirurgias Eletivas',
         subtitulo: 'Fila de Espera para Procedimentos Cirúrgicos Eletivos',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiYzA2MWRlMDMtZGRjYS00ZDIyLWJiNGMtOGM3YzcwOGI4NmI0IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiOTNmYzM3NDgtMjMyYi00MmQxLWIwOTEtMGU0ZDAyZDE0M2ZmIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
         id: 'consultas-exames',
         titulo: 'Consultas e Exames',
         subtitulo: 'Fila de Espera para Consultas Especializadas e Exames',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiMWMxMDY5NDMtNjA0Ny00YWE5LTk3NDMtNGE2NDVhY2RiNWNhIiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiMDJkMmY4ZDctZjA5OS00ZGViLWIwMTktNzk3OTlkNDE4OGQyIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
         id: 'fisioterapia',
@@ -47,13 +47,13 @@ const categoriasTransparencia = [
         id: 'ressonancia',
         titulo: 'Ressonância Magnética',
         subtitulo: 'Fila de Espera para Exames de Ressonância Magnética',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiZjA4MmE1YzMtMmE0Ny00NTk2LTliOGMtYmU5MTYyODVkYmFhIiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiYzM0OTQ2ZTMtMzg2My00MTRmLWE5NWMtNTQ4NzI4NjNkMWQyIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       },
       {
         id: 'tomografia',
         titulo: 'Tomografia Computadorizada',
         subtitulo: 'Fila de Espera para Exames de Tomografia',
-        url: 'https://app.powerbi.com/view?r=eyJrIjoiZTg0NzQwMmYtY2UxNC00M2I5LTg3OTQtY2EyNWIyMjUxOWE5IiwidCI6Ijg5N2M4NzA0LWRkMGMtNDczMy1hZjA1LWZmYmYyMTg1MzIxZSJ9'
+        url: 'https://app.powerbi.com/view?r=eyJrIjoiNDM4M2JmMDQtOTkzZi00YjViLTllZDgtNTg3YTFjZGVjNGUyIiwidCI6IjQ3OGExYTg4LTIxNTYtNDQ2NS1iMWUxLTY0NThiMjIwNWQ3MCJ9'
       }
     ]
   },
