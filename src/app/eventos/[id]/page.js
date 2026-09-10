@@ -274,24 +274,6 @@ export default function EventoDetailPage() {
     setEnviando(true);
     setMensagemErro(null);
 
-    // VERIFICAÇÃO DE VAGAS EM TEMPO REAL ANTES DE ENVIAR
-    if (vagasLimite && !isNaN(vagasLimite)) {
-      try {
-        const checkRes = await fetch(`/api/inscricoes?eventoTitulo=${encodeURIComponent(evento.titulo)}`);
-        const checkData = await checkRes.json();
-        if (checkData.status === 'success') {
-          setTotalInscritos(checkData.total);
-          if (checkData.total >= vagasLimite) {
-            setMensagemErro('Que pena! As vagas para este evento acabaram de ser esgotadas.');
-            setEnviando(false);
-            return;
-          }
-        }
-      } catch {
-        // Segue em frente se não conseguir verificar
-      }
-    }
-
     for (const campo of camposFormulario) {
       const val = respostas[campo.label];
       if (campo.required && (!val || (Array.isArray(val) && val.length === 0))) {
@@ -319,6 +301,7 @@ export default function EventoDetailPage() {
         action: 'SUBMIT_INSCRICAO',
         eventoId: evento.id,
         eventoTitulo: evento.titulo,
+        vagasMaximo: vagasLimite || null,
         respostas: listaRespostas
       };
 
@@ -330,7 +313,7 @@ export default function EventoDetailPage() {
 
       const resData = await response.json();
 
-      if (resData.status === 'success' || response.ok) {
+      if (resData.status === 'success') {
         const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
         // Atualiza contagem local imediatamente após inscrição confirmada
         setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
@@ -341,7 +324,22 @@ export default function EventoDetailPage() {
           detalhes: listaRespostas
         });
       } else {
-        setMensagemErro('Erro ao realizar inscrição: ' + (resData.message || 'Tente novamente.'));
+        const msg = resData.message || '';
+
+        // Mensagem amigável para CPF duplicado
+        if (msg.toLowerCase().includes('cpf') && msg.toLowerCase().includes('já possui')) {
+          setMensagemErro('Você já possui uma inscrição confirmada neste evento. Use a opção "Emitir 2ª via do comprovante" para recuperar seus dados.');
+          return;
+        }
+
+        // Se vagas esgotadas, atualiza estado visual do contador
+        if (msg.toLowerCase().includes('vagas esgotadas')) {
+          setTotalInscritos(vagasLimite);
+          setMensagemErro('Que pena! As vagas para este evento foram esgotadas.');
+          return;
+        }
+
+        setMensagemErro(msg || 'Erro ao realizar inscrição. Tente novamente.');
       }
     } catch (err) {
       console.error('Erro de envio:', err);
