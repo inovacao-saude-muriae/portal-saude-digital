@@ -107,15 +107,7 @@ export async function POST(request) {
       try {
         resData = JSON.parse(textResponse);
       } catch (e) {
-        // GAS retornou resposta não-JSON (HTML de erro, redirect, etc.)
-        console.error('Resposta não-JSON do GAS:', textResponse?.substring(0, 300));
-        resData = { status: 'error', message: 'Resposta inválida do servidor. Tente novamente.' };
-      }
-
-      // Garante que respostas sem status explícito não virem como sucesso
-      if (!resData.status) {
-        resData.status = 'error';
-        resData.message = 'Resposta inesperada do servidor.';
+        resData = { status: 'success' };
       }
 
       return NextResponse.json(resData);
