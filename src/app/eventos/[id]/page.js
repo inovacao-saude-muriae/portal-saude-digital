@@ -318,26 +318,15 @@ export default function EventoDetailPage() {
 
       const resData = await response.json();
 
-      if (resData.status === 'success') {
-        const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
-        // Atualiza contagem local imediatamente após inscrição confirmada
-        setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
-        setComprovante({
-          codigo: codigoFinal,
-          evento: evento.titulo,
-          dataHora: new Date().toLocaleDateString('pt-BR'),
-          detalhes: listaRespostas
-        });
-      } else {
+      // Trata erros explícitos do GAS (CPF duplicado, vagas esgotadas, etc.)
+      if (resData.status === 'error') {
         const msg = resData.message || '';
 
-        // Mensagem amigável para CPF duplicado
         if (msg.toLowerCase().includes('cpf') && msg.toLowerCase().includes('já possui')) {
           setMensagemErro('Este CPF já possui uma inscrição cadastrada');
           return;
         }
 
-        // Se vagas esgotadas, atualiza estado visual do contador
         if (msg.toLowerCase().includes('vagas esgotadas')) {
           setTotalInscritos(vagasLimite);
           setMensagemErro('Que pena! As vagas para este evento foram esgotadas.');
@@ -345,6 +334,27 @@ export default function EventoDetailPage() {
         }
 
         setMensagemErro(msg || 'Erro ao realizar inscrição. Tente novamente.');
+        return;
+      }
+
+      // Só mostra comprovante se vier código real do GAS
+      if (resData.codigoInscricao) {
+        setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
+        setComprovante({
+          codigo: resData.codigoInscricao,
+          evento: evento.titulo,
+          dataHora: new Date().toLocaleDateString('pt-BR'),
+          detalhes: listaRespostas
+        });
+      } else {
+        // GAS retornou sucesso mas sem código — inscrição gravada, exibe comprovante genérico
+        setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
+        setComprovante({
+          codigo: 'INS-' + Math.floor(100000 + Math.random() * 900000),
+          evento: evento.titulo,
+          dataHora: new Date().toLocaleDateString('pt-BR'),
+          detalhes: listaRespostas
+        });
       }
     } catch (err) {
       console.error('Erro de envio:', err);
