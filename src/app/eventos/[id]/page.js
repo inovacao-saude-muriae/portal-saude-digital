@@ -333,7 +333,7 @@ export default function EventoDetailPage() {
 
         // Mensagem amigável para CPF duplicado
         if (msg.toLowerCase().includes('cpf') && msg.toLowerCase().includes('já possui')) {
-          setMensagemErro('Você já possui uma inscrição confirmada neste evento. Use a opção "Emitir 2ª via do comprovante" para recuperar seus dados.');
+          setMensagemErro('Este CPF já possui uma inscrição cadastrada');
           return;
         }
 
