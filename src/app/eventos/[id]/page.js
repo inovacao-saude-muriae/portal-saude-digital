@@ -97,6 +97,7 @@ export default function EventoDetailPage() {
   
   const [respostas, setRespostas] = useState({});
   const [enviando, setEnviando] = useState(false);
+  const [enviandoMsgExtra, setEnviandoMsgExtra] = useState(false);
   const [comprovante, setComprovante] = useState(null);
   const [mensagemErro, setMensagemErro] = useState(null);
 
@@ -272,7 +273,11 @@ export default function EventoDetailPage() {
     }
 
     setEnviando(true);
+    setEnviandoMsgExtra(false);
     setMensagemErro(null);
+
+    // Após 8s mostra mensagem de "aguarde, ainda processando"
+    const timerMsgExtra = setTimeout(() => setEnviandoMsgExtra(true), 8000);
 
     for (const campo of camposFormulario) {
       const val = respostas[campo.label];
@@ -345,6 +350,8 @@ export default function EventoDetailPage() {
       console.error('Erro de envio:', err);
       setMensagemErro('Ocorreu um erro ao processar sua inscrição. Tente novamente.');
     } finally {
+      clearTimeout(timerMsgExtra);
+      setEnviandoMsgExtra(false);
       setEnviando(false);
     }
   };
@@ -623,7 +630,12 @@ export default function EventoDetailPage() {
                     </div>
 
                     <button type="submit" disabled={enviando} className={styles.btnConfirmarInscricao}>
-                      {enviando ? <><Loader2 size={18} className="animate-spin" /> Processando...</> : <><Send size={18} /> Confirmar Inscrição</>}
+                      {enviando
+                        ? enviandoMsgExtra
+                          ? <><Loader2 size={18} className="animate-spin" /> Aguarde, o servidor está respondendo...</>
+                          : <><Loader2 size={18} className="animate-spin" /> Processando inscrição...</>
+                        : <><Send size={18} /> Confirmar Inscrição</>
+                      }
                     </button>
                   </form>
                 )}

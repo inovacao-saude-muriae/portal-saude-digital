@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Tempo máximo de espera para o GAS responder (30 segundos)
+export const maxDuration = 30;
+
 // 1. Converte TUDO para CAIXA ALTA 
 function caixaAlta(texto) {
   if (!texto || typeof texto !== 'string') return '';
@@ -39,15 +42,24 @@ export async function GET(request) {
       return NextResponse.json({ status: 'error', message: 'Parâmetro eventoTitulo obrigatório.' }, { status: 400 });
     }
 
-    const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(eventoTitulo)}`;
-    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
-    const text = await res.text();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
 
-    let data = {};
-    try { data = JSON.parse(text); } catch { data = { status: 'error' }; }
+    try {
+      const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(eventoTitulo)}`;
+      const res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+      clearTimeout(timeout);
+      const text = await res.text();
 
-    const total = Array.isArray(data.inscritos) ? data.inscritos.length : 0;
-    return NextResponse.json({ status: 'success', total });
+      let data = {};
+      try { data = JSON.parse(text); } catch { data = { status: 'error' }; }
+
+      const total = Array.isArray(data.inscritos) ? data.inscritos.length : 0;
+      return NextResponse.json({ status: 'success', total });
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      throw fetchErr;
+    }
 
   } catch (error) {
     console.error('Erro ao contar inscrições:', error);
@@ -66,38 +78,49 @@ export async function POST(request) {
         const label = (item.label || '').toLowerCase().trim();
 
         if (typeof valor === 'string') {
-          // SE FOR NOME: Converte para CAIXA ALTA (TUDO MAIÚSCULO)
           if (label.includes('nome')) {
             valor = caixaAlta(valor);
-          } 
-          // SE NÃO FOR E-MAIL NEM CPF: Aplica iniciais maiúsculas (Capitalize)
-          else if (!label.includes('email') && !label.includes('cpf') && !label.includes('e-mail')) {
+          } else if (!label.includes('email') && !label.includes('cpf') && !label.includes('e-mail')) {
             valor = capitalizarTexto(valor);
           }
         }
 
-        return {
-          ...item,
-          valor: valor
-        };
+        return { ...item, valor };
       });
     }
 
-    const googleResponse = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
 
-    const textResponse = await googleResponse.text();
-    let resData = {};
     try {
-      resData = JSON.parse(textResponse);
-    } catch (e) {
-      resData = { status: 'success' };
-    }
+      const googleResponse = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
 
-    return NextResponse.json(resData);
+      const textResponse = await googleResponse.text();
+      let resData = {};
+      try {
+        resData = JSON.parse(textResponse);
+      } catch (e) {
+        resData = { status: 'success' };
+      }
+
+      return NextResponse.json(resData);
+
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      if (fetchErr.name === 'AbortError') {
+        return NextResponse.json(
+          { status: 'error', message: 'O servidor demorou muito para responder. Verifique sua inscrição pela opção "Emitir 2ª via" antes de tentar novamente.' },
+          { status: 504 }
+        );
+      }
+      throw fetchErr;
+    }
 
   } catch (error) {
     console.error('Erro na API de Inscrições:', error);
