@@ -25,6 +25,36 @@ function capitalizarTexto(texto) {
     .join(' ');
 }
 
+const SCRIPT_URL =
+  process.env.NEXT_PUBLIC_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+
+// GET — retorna a contagem de inscrições de um evento
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const eventoTitulo = searchParams.get('eventoTitulo');
+
+    if (!eventoTitulo) {
+      return NextResponse.json({ status: 'error', message: 'Parâmetro eventoTitulo obrigatório.' }, { status: 400 });
+    }
+
+    const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(eventoTitulo)}`;
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+    const text = await res.text();
+
+    let data = {};
+    try { data = JSON.parse(text); } catch { data = { status: 'error' }; }
+
+    const total = Array.isArray(data.inscritos) ? data.inscritos.length : 0;
+    return NextResponse.json({ status: 'success', total });
+
+  } catch (error) {
+    console.error('Erro ao contar inscrições:', error);
+    return NextResponse.json({ status: 'error', total: 0 }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -53,12 +83,7 @@ export async function POST(request) {
       });
     }
 
-    // Leitura da URL do Google Script com URL padrão de reserva (fallback)
-    const scriptUrl = 
-      process.env.NEXT_PUBLIC_SCRIPT_URL || 
-      'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
-
-    const googleResponse = await fetch(scriptUrl, {
+    const googleResponse = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),

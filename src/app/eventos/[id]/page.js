@@ -103,6 +103,9 @@ export default function EventoDetailPage() {
   const [cpfConsulta, setCpfConsulta] = useState('');
   const [buscandoCpf, setBuscandoCpf] = useState(false);
 
+  // CONTAGEM DE VAGAS
+  const [totalInscritos, setTotalInscritos] = useState(null); // null = ainda carregando
+
   useEffect(() => {
     async function carregarEvento() {
       let eventoEncontrado = null;
@@ -153,6 +156,27 @@ export default function EventoDetailPage() {
     if (id) carregarEvento();
   }, [id]);
 
+  // BUSCA CONTAGEM DE INSCRIÇÕES QUANDO O EVENTO TEM LIMITE DE VAGAS
+  useEffect(() => {
+    if (!evento || !evento.requerInscricao) return;
+    const limite = evento.vagasMaximo != null ? parseInt(evento.vagasMaximo, 10) : null;
+    if (!limite || isNaN(limite)) return;
+
+    async function buscarContagem() {
+      try {
+        const res = await fetch(`/api/inscricoes?eventoTitulo=${encodeURIComponent(evento.titulo)}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          setTotalInscritos(data.total);
+        }
+      } catch (err) {
+        console.warn('Não foi possível verificar contagem de vagas:', err);
+      }
+    }
+
+    buscarContagem();
+  }, [evento]);
+
   if (loading) {
     return (
       <div className={styles.pageWrapper}>
@@ -179,10 +203,17 @@ export default function EventoDetailPage() {
 
   // TRATAMENTO DA BADGE DE STATUS DO TOPO
   const isEncerrado = evento.inscricoesEncerradas === true || String(evento.inscricoesEncerradas) === 'true';
+  const vagasLimite = evento.vagasMaximo != null ? parseInt(evento.vagasMaximo, 10) : null;
+  const vagasEsgotadas = vagasLimite && !isNaN(vagasLimite) && totalInscritos !== null && totalInscritos >= vagasLimite;
+  const inscricaoBloqueada = isEncerrado || vagasEsgotadas;
+  const vagasRestantes = vagasLimite && !isNaN(vagasLimite) && totalInscritos !== null ? vagasLimite - totalInscritos : null;
+
   const statusOriginal = getStatusEvento(evento, styles);
   
-  const statusLabel = isEncerrado ? 'Inscrições Encerradas' : statusOriginal.label;
-  const statusClass = isEncerrado ? styles.statusBadgeEncerrado : statusOriginal.class;
+  const statusLabel = inscricaoBloqueada
+    ? (vagasEsgotadas && !isEncerrado ? 'Vagas Esgotadas' : 'Inscrições Encerradas')
+    : statusOriginal.label;
+  const statusClass = inscricaoBloqueada ? styles.statusBadgeEncerrado : statusOriginal.class;
 
   const imagemExibicao = evento.imgSrc || evento.imagem || '/img/eventos/simposio.png';
   const horaExibicao = limparHora(evento.hora);
@@ -215,8 +246,8 @@ export default function EventoDetailPage() {
   };
 
   const handleAbrirModal = (aba = 'inscricao') => {
-    if (aba === 'inscricao' && isEncerrado) {
-      alert('As inscrições para este evento estão encerradas.');
+    if (aba === 'inscricao' && inscricaoBloqueada) {
+      alert(vagasEsgotadas && !isEncerrado ? 'As vagas para este evento estão esgotadas.' : 'As inscrições para este evento estão encerradas.');
       return;
     }
     setAbaModal(aba);
@@ -242,6 +273,24 @@ export default function EventoDetailPage() {
 
     setEnviando(true);
     setMensagemErro(null);
+
+    // VERIFICAÇÃO DE VAGAS EM TEMPO REAL ANTES DE ENVIAR
+    if (vagasLimite && !isNaN(vagasLimite)) {
+      try {
+        const checkRes = await fetch(`/api/inscricoes?eventoTitulo=${encodeURIComponent(evento.titulo)}`);
+        const checkData = await checkRes.json();
+        if (checkData.status === 'success') {
+          setTotalInscritos(checkData.total);
+          if (checkData.total >= vagasLimite) {
+            setMensagemErro('Que pena! As vagas para este evento acabaram de ser esgotadas.');
+            setEnviando(false);
+            return;
+          }
+        }
+      } catch {
+        // Segue em frente se não conseguir verificar
+      }
+    }
 
     for (const campo of camposFormulario) {
       const val = respostas[campo.label];
@@ -283,6 +332,8 @@ export default function EventoDetailPage() {
 
       if (resData.status === 'success' || response.ok) {
         const codigoFinal = resData.codigoInscricao || ('INS-' + Math.floor(100000 + Math.random() * 900000));
+        // Atualiza contagem local imediatamente após inscrição confirmada
+        setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
         setComprovante({
           codigo: codigoFinal,
           evento: evento.titulo,
@@ -382,27 +433,34 @@ export default function EventoDetailPage() {
 
             {/* BANNER DE INSCRIÇÃO ABERTA / ENCERRADA */}
             {evento.requerInscricao && (
-              <div className={`${styles.bannerInscricao} ${isEncerrado ? styles.bannerEncerrado : ''}`}>
+              <div className={`${styles.bannerInscricao} ${inscricaoBloqueada ? styles.bannerEncerrado : ''}`}>
                 <div>
                   <h3 className={styles.bannerInscricaoTitulo}>
-                    {isEncerrado ? 'Inscrições Encerradas' : 'Inscrições Abertas!'}
+                    {vagasEsgotadas && !isEncerrado
+                      ? 'Vagas Esgotadas'
+                      : isEncerrado
+                      ? 'Inscrições Encerradas'
+                      : 'Inscrições Abertas!'}
                   </h3>
                   <p className={styles.bannerInscricaoTexto}>
-                    {isEncerrado 
-                      ? 'As inscrições para este evento foram encerradas pela organização.' 
+                    {vagasEsgotadas && !isEncerrado
+                      ? 'Todas as vagas disponíveis para este evento foram preenchidas.'
+                      : isEncerrado
+                      ? 'As inscrições para este evento foram encerradas pela organização.'
                       : 'Garanta sua vaga neste evento preenchendo o formulário de participação.'}
                   </p>
+
+                  {/* CONTADOR DE VAGAS — removido da página pública, disponível no painel admin */}
                 </div>
                 
                 <div className={styles.bannerButtonsCol}>
-                  {!isEncerrado ? (
+                  {!inscricaoBloqueada ? (
                     <button onClick={() => handleAbrirModal('inscricao')} className={styles.btnAbrirInscricao}>
                       <ClipboardList size={20} /> Inscrever-se Agora
                     </button>
                   ) : (
-                    /* BOTÃO CINZA E DESABILITADO QUANDO ENCERRADO */
                     <button disabled className={styles.btnInscricaoDisabled}>
-                      <Lock size={18} /> Inscrição Encerrada
+                      <Lock size={18} /> {vagasEsgotadas && !isEncerrado ? 'Vagas Esgotadas' : 'Inscrição Encerrada'}
                     </button>
                   )}
 
@@ -475,7 +533,7 @@ export default function EventoDetailPage() {
               <div className={styles.modalFormContent}>
                 
                 <div className={styles.modalTabsBar}>
-                  {!isEncerrado && (
+                  {!inscricaoBloqueada && (
                     <button 
                       type="button"
                       onClick={() => { setAbaModal('inscricao'); setMensagemErro(null); }}
@@ -495,7 +553,7 @@ export default function EventoDetailPage() {
 
                 {mensagemErro && <div className={styles.msgErro}>{mensagemErro}</div>}
 
-                {abaModal === 'inscricao' && !isEncerrado && (
+                {abaModal === 'inscricao' && !inscricaoBloqueada && (
                   <form onSubmit={handleInscricaoSubmit} className={styles.modalFormFlex}>
                     <div className={styles.modalFormBodyFields}>
                       {camposFormulario.map((campo, idx) => {

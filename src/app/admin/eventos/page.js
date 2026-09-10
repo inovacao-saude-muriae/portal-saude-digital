@@ -228,6 +228,7 @@ export default function AdminEventosPage() {
   const [requerInscricao, setRequerInscricao] = useState(false);
   const [inscricoesEncerradas, setInscricoesEncerradas] = useState(false);
   const [geraCertificado, setGeraCertificado] = useState(false);
+  const [vagasMaximo, setVagasMaximo] = useState('');
   const [cronograma, setCronograma] = useState([]);
 
   // MODAL DE CONFIRMAÇÃO DE STATUS
@@ -431,6 +432,7 @@ export default function AdminEventosPage() {
     setRequerInscricao(!!evento.requerInscricao);
     setInscricoesEncerradas(!!evento.inscricoesEncerradas);
     setGeraCertificado(!!evento.geraCertificado);
+    setVagasMaximo(evento.vagasMaximo != null ? String(evento.vagasMaximo) : '');
     
     setFormFields(
       Array.isArray(evento.formFields) && evento.formFields.length > 0
@@ -454,6 +456,7 @@ export default function AdminEventosPage() {
     setRequerInscricao(false);
     setInscricoesEncerradas(false);
     setGeraCertificado(false);
+    setVagasMaximo('');
     setFormFields([
       { id: 1, label: 'Nome Completo', type: 'text', required: true, options: [] },
       { id: 2, label: 'CPF', type: 'cpf', required: true, options: [] },
@@ -492,6 +495,7 @@ export default function AdminEventosPage() {
         requerInscricao: evento.requerInscricao,
         inscricoesEncerradas: novoStatus,
         geraCertificado: evento.geraCertificado,
+        vagasMaximo: evento.vagasMaximo != null ? evento.vagasMaximo : null,
         formFields: evento.formFields || [],
         cronograma: evento.cronograma || []
       };
@@ -563,6 +567,7 @@ export default function AdminEventosPage() {
         requerInscricao: requerInscricao,
         inscricoesEncerradas: requerInscricao ? inscricoesEncerradas : false,
         geraCertificado: requerInscricao ? geraCertificado : false,
+        vagasMaximo: requerInscricao && vagasMaximo !== '' ? parseInt(vagasMaximo, 10) : null,
         formFields: requerInscricao 
           ? formFields.filter((f) => f.label && f.label.trim() !== '') 
           : [],
@@ -597,6 +602,7 @@ export default function AdminEventosPage() {
             setRequerInscricao(false);
             setInscricoesEncerradas(false);
             setGeraCertificado(false);
+            setVagasMaximo('');
             setNomeArquivo('');
           } else {
             handleCancelarEdicao();
@@ -1157,6 +1163,27 @@ export default function AdminEventosPage() {
                           Encerrar Inscrições? (Impede novos cadastros no site)
                         </label>
 
+                        {/* CAMPO DE LIMITE DE VAGAS */}
+                        <div className={styles.vagasFieldWrapper}>
+                          <label className={styles.vagasFieldLabel}>
+                            <Users size={16} color="#0284c7" />
+                            Limite de Vagas <span className={styles.vagasFieldOptional}>(deixe em branco para ilimitado)</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            placeholder="Ex: 200"
+                            value={vagasMaximo}
+                            onChange={(e) => setVagasMaximo(e.target.value)}
+                            className={styles.vagasFieldInput}
+                          />
+                          {vagasMaximo !== '' && (
+                            <p className={styles.vagasFieldHint}>
+                              ⚡ Quando atingir <strong>{vagasMaximo}</strong> {parseInt(vagasMaximo) === 1 ? 'inscrição' : 'inscrições'}, as inscrições serão bloqueadas automaticamente.
+                            </p>
+                          )}
+                        </div>
+
                         <label className={styles.checkboxLabelBlue}>
                           <input 
                             type="checkbox" 
@@ -1459,6 +1486,33 @@ export default function AdminEventosPage() {
                 <h2 className={styles.sectionTitleNoBorder}>
                   <ClipboardList color="#0284c7" size={24} /> {eventoCertificado.titulo}
                 </h2>
+
+                {/* CONTADOR DE VAGAS NA ABA INSCRITOS */}
+                {(() => {
+                  const limite = eventoCertificado.vagasMaximo != null ? parseInt(eventoCertificado.vagasMaximo, 10) : null;
+                  if (!limite || isNaN(limite)) return null;
+                  const restantes = limite - inscritos.length;
+                  const percentual = Math.round((inscritos.length / limite) * 100);
+                  const cor = restantes <= 0 ? '#dc2626' : restantes <= 10 ? '#d97706' : '#16a34a';
+                  return (
+                    <div className={styles.vagasAdminBox}>
+                      <div className={styles.vagasAdminNums}>
+                        <span className={styles.vagasAdminInscritos}>{inscritos.length}</span>
+                        <span className={styles.vagasAdminSep}>/</span>
+                        <span className={styles.vagasAdminTotal}>{limite} vagas</span>
+                        <span className={styles.vagasAdminBadge} style={{ backgroundColor: restantes <= 0 ? '#fee2e2' : restantes <= 10 ? '#fef3c7' : '#dcfce7', color: cor, border: `1px solid ${restantes <= 0 ? '#fecaca' : restantes <= 10 ? '#fde68a' : '#bbf7d0'}` }}>
+                          {restantes <= 0 ? '🚫 Vagas esgotadas' : `🎟️ ${restantes} ${restantes === 1 ? 'vaga restante' : 'vagas restantes'}`}
+                        </span>
+                      </div>
+                      <div className={styles.vagasAdminBarWrap}>
+                        <div className={styles.vagasAdminBar}>
+                          <div className={styles.vagasAdminBarFill} style={{ width: `${Math.min(percentual, 100)}%`, backgroundColor: cor }} />
+                        </div>
+                        <span className={styles.vagasAdminPct}>{percentual}% preenchido</span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className={styles.adminActionsHeaderBar}>

@@ -160,8 +160,8 @@ export const fluxosAssistenciaisData = {
           titulo: 'Média Complexidade',
           texto: `Segurança no dia a dia e cuidado com a saúde: um compromisso de todos. Condução defensiva no trânsito, uso correto dos Equipamentos de Proteção Individual (EPIs) no ambiente de trabalho e atenção constante nas atividades diárias são medidas simples, mas extremamente importantes para evitar acidentes. Muitos traumas e lesões graves, que resultam em cirurgias ortopédicas de urgência, podem ser prevenidos com responsabilidade e cuidado.\n\nQuando a cirurgia é necessária, é fundamental seguir todos os fluxos e orientações médicas para garantir a segurança e o sucesso do tratamento. A Prefeitura de Muriaé, por meio da Secretaria Municipal de Saúde, assegura aos seus cidadãos todo o suporte necessário no pré-operatório através do Programa Opera Já Muriaé, reafirmando o compromisso com a saúde e o bem-estar da população.`,
           imagens: [
-            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/media/fluxo.png', alt: 'Fluxo Ortopedia Média Complexidade' },
-            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/media/pactuacao.png', alt: 'Pactuação Ortopedia Média Complexidade' }
+            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/fluxo.png', alt: 'Fluxo Ortopedia Média Complexidade' },
+            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/pactuacao.png', alt: 'Pactuação Ortopedia Média Complexidade' }
           ]
         },
         {
@@ -169,8 +169,8 @@ export const fluxosAssistenciaisData = {
           titulo: 'Alta Complexidade',
           texto: `Ortopedia de Alta Complexidade: entenda como funciona. Alguns problemas mais graves nos ossos, articulações ou na coluna, como fraturas complexas ou lesões sérias, são considerados de alta complexidade e, na maioria das vezes, são resolvidos diretamente nos atendimentos de urgência e emergência, quando o paciente precisa de cuidado imediato.\n\nJá nos casos que não são urgentes, a pessoa deve procurar a Secretaria Municipal de Saúde para receber as orientações correctas sobre o encaminhamento e tratamento necessário.`,
           imagens: [
-            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/alta/ortopedia-fluxo.png', alt: 'Fluxo Ortopedia Alta Complexidade' },
-            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/alta/pactuacao.png', alt: 'Pactuação Ortopedia Alta Complexidade' }
+            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/ortopedia-fluxo.png', alt: 'Fluxo Ortopedia Alta Complexidade' },
+            { src: '/img/fluxos-assistenciais/ortopedia-traumatologia/pactuacao.png', alt: 'Pactuação Ortopedia Alta Complexidade' }
           ]
         }
       ]
@@ -201,20 +201,6 @@ export const fluxosAssistenciaisData = {
           imagens: [
             { src: '/img/fluxos-assistenciais/tomografia/fluxo.png', alt: 'Fluxo Tomografia' },
             { src: '/img/fluxos-assistenciais/tomografia/pactuacao.png', alt: 'Pactuação Tomografia' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'incremento-federal',
-      titulo: 'Incremento Federal',
-      submodulos: [
-        {
-          id: 'incremento-federal-geral',
-          titulo: 'Incremento Federal CPRE - Regra de Aplicação',
-          texto: `Apenas para internação eletiva. Urgência não recebe incremento.`,
-          imagens: [
-            { src: '/img/fluxos-assistenciais/incremento-federal/incrementofederal.png', alt: 'Incremento Federal' }
           ]
         }
       ]

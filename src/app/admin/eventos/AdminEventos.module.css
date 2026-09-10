@@ -324,6 +324,132 @@
   cursor: pointer;
 }
 
+/* CAMPO DE LIMITE DE VAGAS */
+.vagasFieldWrapper {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vagasFieldLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.vagasFieldOptional {
+  font-weight: 400;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.vagasFieldInput {
+  width: 160px;
+  padding: 8px 12px;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e40af;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.vagasFieldInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.vagasFieldHint {
+  font-size: 12px;
+  color: #1d4ed8;
+  margin: 0;
+  background-color: #dbeafe;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* CONTADOR DE VAGAS NA ABA INSCRITOS */
+.vagasAdminBox {
+  margin-top: 10px;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 480px;
+}
+
+.vagasAdminNums {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vagasAdminInscritos {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.vagasAdminSep {
+  font-size: 20px;
+  color: #94a3b8;
+}
+
+.vagasAdminTotal {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.vagasAdminBadge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-left: 4px;
+}
+
+.vagasAdminBarWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vagasAdminBar {
+  flex: 1;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.vagasAdminBarFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.vagasAdminPct {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
 /* CONSTRUTOR DE FORMULÁRIO DE INSCRIÇÃO */
 .formFieldsContainer {
   background-color: #f8fafc;
@@ -692,7 +818,8 @@
 
 .eventDetailsRow {
   display: flex;
-  gap: 14px;
+  flex-direction: column;
+  gap: 4px;
   font-size: 12px;
   color: #64748b;
 }
