@@ -15,30 +15,20 @@ import {
   PlusCircle, 
   Pencil, 
   XCircle,
-  Link2 
+  Link2,
+  Loader2
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useUI } from '@/components/UIFeedback';
 import styles from './AdminCarousel.module.css';
-
-const SCRIPT_CARROSSEL_URL = 'https://script.google.com/macros/s/AKfycbxXCjv22fJcKIuwYV9ml5B6d99pQIX2rT0WBKkbz2JpjV78zADBCCQoGcFvjkt9DuJs3A/exec';
 
 function tratarUrlImagem(url) {
   if (!url || typeof url !== 'string') return '/img/carousel/1.png';
-  let cleanUrl = url.trim();
-
-  if (cleanUrl.includes('drive.google.com') || cleanUrl.includes('googleusercontent.com')) {
-    let fileId = '';
-    if (cleanUrl.includes('/d/')) {
-      fileId = cleanUrl.split('/d/')[1].split('/')[0].split('?')[0];
-    } else if (cleanUrl.includes('id=')) {
-      fileId = cleanUrl.split('id=')[1].split('&')[0];
-    }
-    if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}`;
-  }
-
-  return cleanUrl;
+  return url.trim();
 }
 
 export default function AdminCarouselPage() {
+  const { notificar, confirmar } = useUI();
   const [abaSub, setAbaSub] = useState('cadastrar');
   const [loadingForm, setLoadingForm] = useState(false);
   const [mensagem, setMensagem] = useState(null);
@@ -49,30 +39,38 @@ export default function AdminCarouselPage() {
   const [loadingSlides, setLoadingSlides] = useState(false);
   const [deletandoId, setDeletandoId] = useState(null);
 
+  // LEITURA DOS BANNERS NO SUPABASE
   useEffect(() => {
+    let montado = true;
+
     async function carregarSlides() {
       setLoadingSlides(true);
       try {
-        const response = await fetch(`${SCRIPT_CARROSSEL_URL}?_t=${Date.now()}`, {
-          method: 'GET',
-          redirect: 'follow',
-        });
-        const resData = await response.json();
+        const { data, error } = await supabase
+          .from('carrossel')
+          .select('*')
+          .order('ordem', { ascending: true });
 
-        if (resData.status === 'success' && Array.isArray(resData.slides)) {
-          setListaSlides(resData.slides);
-          localStorage.setItem('cache_portal_carrossel', JSON.stringify(resData.slides));
+        if (error) throw error;
+
+        if (Array.isArray(data) && montado) {
+          setListaSlides(data);
+          localStorage.setItem('cache_portal_carrossel', JSON.stringify(data));
         }
       } catch (err) {
         console.error('Erro ao carregar slides do carrossel:', err);
       } finally {
-        setLoadingSlides(false);
+        if (montado) setLoadingSlides(false);
       }
     }
 
     if (abaSub === 'gerenciar') {
       carregarSlides();
     }
+
+    return () => {
+      montado = false;
+    };
   }, [abaSub]);
 
   const handleFileChange = (e) => {
@@ -94,6 +92,26 @@ export default function AdminCarouselPage() {
     setMensagem(null);
   };
 
+  // UPLOAD DA IMAGEM PARA O BUCKET 'carrossel' NO SUPABASE STORAGE
+  const uploadImagemCarrossel = async (file) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `slide_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('carrossel')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from('carrossel')
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  };
+
+  // SALVAR OU ATUALIZAR BANNER NO SUPABASE
   const handleSubmitSlide = async (e) => {
     e.preventDefault();
     setLoadingForm(true);
@@ -115,94 +133,90 @@ export default function AdminCarouselPage() {
     const imagemArquivo = imagemInput && imagemInput.files ? imagemInput.files[0] : null;
     const isEditing = !!slideEmEdicao;
 
-    const processarEnvio = async (base64Image = '', name = '', type = '') => {
-      const payload = {
-        action: isEditing ? 'UPDATE' : 'CREATE',
-        id: isEditing ? slideEmEdicao.id : 'slide-' + Date.now(),
-        alt: formData.get('alt'),
-        link: formData.get('link') || '', // CAPTURA O LINK
-        ordem: formData.get('ordem') || 1,
-        autor: autorNome,
-        imagemBase64: base64Image,
-        imagemNome: name,
-        imagemType: type
-      };
+    try {
+      let imagemUrl = isEditing ? slideEmEdicao.imagem : '';
 
-      try {
-        const response = await fetch(SCRIPT_CARROSSEL_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          redirect: 'follow',
-        });
-
-        const resData = await response.json();
-
-        if (resData.status === 'success') {
-          localStorage.removeItem('cache_portal_carrossel');
-
-          setMensagem({ 
-            tipo: 'sucesso', 
-            texto: isEditing ? 'Banner atualizado com sucesso!' : 'Banner publicado no portal com sucesso!' 
-          });
-
-          if (!isEditing) {
-            e.target.reset();
-            setNomeArquivo('');
-          } else {
-            handleCancelarEdicao();
-            setAbaSub('gerenciar');
-          }
-        } else {
-          setMensagem({ tipo: 'erro', texto: 'Erro ao salvar banner: ' + resData.message });
-        }
-      } catch (err) {
-        console.error('Erro na requisição do carrossel:', err);
-        setMensagem({ tipo: 'erro', texto: 'Falha na comunicação com o servidor do carrossel.' });
-      } finally {
-        setLoadingForm(false);
+      // Se um novo arquivo de imagem foi selecionado, faz o upload no Supabase Storage
+      if (imagemArquivo) {
+        imagemUrl = await uploadImagemCarrossel(imagemArquivo);
       }
-    };
 
-    if (imagemArquivo) {
-      const reader = new FileReader();
-      reader.readAsDataURL(imagemArquivo);
-      reader.onloadend = () => {
-        const base64Image = reader.result.split(',')[1];
-        processarEnvio(base64Image, imagemArquivo.name, imagemArquivo.type);
+      const payload = {
+        alt: formData.get('alt'),
+        link: formData.get('link') || '',
+        ordem: parseInt(formData.get('ordem') || '1', 10),
+        autor: autorNome,
+        imagem: imagemUrl,
+        updated_at: new Date().toISOString()
       };
-    } else {
-      processarEnvio();
+
+      let error;
+
+      if (isEditing) {
+        const { error: updateError } = await supabase
+          .from('carrossel')
+          .update(payload)
+          .eq('id', slideEmEdicao.id);
+        error = updateError;
+      } else {
+        // ID único (ms + sufixo aleatório) evita colisão de chave quando
+        // dois slides são criados no mesmo segundo.
+        const novoId = `slide-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const { error: insertError } = await supabase
+          .from('carrossel')
+          .insert([{ id: novoId, ...payload }]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+
+      localStorage.removeItem('cache_portal_carrossel');
+
+      setMensagem({ 
+        tipo: 'sucesso', 
+        texto: isEditing ? 'Banner atualizado com sucesso!' : 'Banner publicado no portal com sucesso!' 
+      });
+
+      if (!isEditing) {
+        e.target.reset();
+        setNomeArquivo('');
+      } else {
+        handleCancelarEdicao();
+        setAbaSub('gerenciar');
+      }
+    } catch (err) {
+      console.error('Erro ao salvar carrossel:', err);
+      setMensagem({ tipo: 'erro', texto: 'Erro ao salvar banner: ' + err.message });
+    } finally {
+      setLoadingForm(false);
     }
   };
 
+  // EXCLUIR BANNER NO SUPABASE
   const handleDeletarSlide = async (id, alt) => {
-    const confirmou = window.confirm(`Tem certeza que deseja remover o banner:\n"${alt}"?`);
+    const confirmou = await confirmar({
+      titulo: 'Remover banner',
+      mensagem: `Tem certeza que deseja remover o banner "${alt}"?`,
+      textoConfirmar: 'Remover'
+    });
     if (!confirmou) return;
 
     setDeletandoId(id);
 
     try {
-      const response = await fetch(SCRIPT_CARROSSEL_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'DELETE',
-          id: id
-        }),
-        redirect: 'follow',
-      });
+      const { error } = await supabase
+        .from('carrossel')
+        .delete()
+        .eq('id', id);
 
-      const resData = await response.json();
+      if (error) throw error;
 
-      if (resData.status === 'success') {
-        localStorage.removeItem('cache_portal_carrossel');
-        alert('Banner excluído com sucesso!');
-        setListaSlides((prev) => prev.filter((item) => item.id !== id));
-      } else {
-        alert('Erro ao excluir: ' + resData.message);
-      }
+      localStorage.removeItem('cache_portal_carrossel');
+      notificar('sucesso', 'Banner excluído com sucesso!');
+      setListaSlides((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       console.error('Erro ao excluir banner:', err);
-      alert('Ocorreu um erro ao tentar excluir o banner.');
+      notificar('erro', 'Ocorreu um erro ao tentar excluir o banner: ' + err.message);
     } finally {
       setDeletandoId(null);
     }
@@ -280,18 +294,16 @@ export default function AdminCarouselPage() {
                   />
                 </div>
 
-                {/* NOVO CAMPO: LINK DE REDIRECIONAMENTO */}
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Link de Redirecionamento (Opcional)</label>
-                  {/* CÓDIGO CORRIGIDO */}
-<input 
-  key={slideEmEdicao ? `link-${slideEmEdicao.id}` : 'link-novo'}
-  type="text" 
-  name="link" 
-  defaultValue={slideEmEdicao?.link || ''} 
-  placeholder="Ex: /servicos/aplicativos ou https://muriae.mg.gov.br" 
-  className={styles.input} 
-/>
+                  <input 
+                    key={slideEmEdicao ? `link-${slideEmEdicao.id}` : 'link-novo'}
+                    type="text" 
+                    name="link" 
+                    defaultValue={slideEmEdicao?.link || ''} 
+                    placeholder="Ex: /servicos/aplicativos ou https://muriae.mg.gov.br" 
+                    className={styles.input} 
+                  />
                   <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                     Se informado, ao clicar no banner o usuário será direcionado para este link.
                   </small>
@@ -329,7 +341,13 @@ export default function AdminCarouselPage() {
 
                 <div className={styles.cardSection}>
                   <button type="submit" disabled={loadingForm} className={styles.submitBtn}>
-                    {loadingForm ? 'Enviando' : slideEmEdicao ? <><Pencil size={18} /> Salvar Alterações</> : <><Send size={18} /> Publicar</>}
+                    {loadingForm ? (
+                      <><Loader2 size={18} className="animate-spin" /> Enviando...</>
+                    ) : slideEmEdicao ? (
+                      <><Pencil size={18} /> Salvar Alterações</>
+                    ) : (
+                      <><Send size={18} /> Publicar</>
+                    )}
                   </button>
                 </div>
               </div>

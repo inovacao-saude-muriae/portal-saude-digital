@@ -121,7 +121,7 @@ export const listaContatos = [
   {
     id: 13,
     nome: "UBS CERÂMICA",
-    telefone: "(32) 2020-8072",
+    telefone: "(32) 2020-8076",
     endereco: "Rua Silvério Campos, s/n",
     email: "ubsceramicamuriae2018@gmail.com",
     categoria: "UBS",
@@ -139,7 +139,7 @@ export const listaContatos = [
   {
     id: 15,
     nome: "UBS DORNELAS II",
-    telefone: "(32) 2020-8094",
+    telefone: "(32) 2020-8134",
     endereco: "Rua Nílton Henrique de Almeida, 175",
     email: "dornelas2ubsmuriae@gmail.com",
     categoria: "UBS",
@@ -167,7 +167,7 @@ export const listaContatos = [
     id: 18,
     nome: "UBS INCONFIDÊNCIA",
     telefone: "(32) 2020-8073",
-    endereco: "Rua Claudio Manoel Costa, s/n",
+    endereco: "Rua Alvarenga Peixoto / Rua Farmacêutico Sebastião Bruno, 681",
     email: "ubsinconfidencia2018@gmail.com",
     categoria: "UBS",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=UBS+Inconfidencia+Muriae+MG"
@@ -255,12 +255,12 @@ export const listaContatos = [
   },
   {
     id: 28,
-    nome: "SÃO FRANCISCO DO GLÓRIA",
+    nome: "SÃO JOÃO DO GLÓRIA",
     telefone: "(32) 2020-8083",
-    endereco: "Comunidade São Francisco do Glória",
+    endereco: "Comunidade São João do Glória",
     email: "ubsmarambaiamuriae@gmail.com",
     categoria: "Ponto de Apoio",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Sao+Francisco+do+Gloria+Muriae+MG"
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Sao+Joao+do+Gloria+Muriae+MG"
   },
   {
     id: 29,

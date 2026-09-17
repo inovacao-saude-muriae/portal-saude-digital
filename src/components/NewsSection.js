@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; 
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData'; 
+import { Camera } from 'lucide-react';
+import Loading from '@/components/Loading';
 import styles from './NewsSection.module.css';
 
 function getClasseCategoria(categoria) {
@@ -49,9 +51,7 @@ export default function NewsSection() {
     return (
       <section className={styles.newsSection}>
         <div className={styles.container}>
-          <p style={{ textAlign: 'center', color: '#004066', fontWeight: 'bold' }}>
-            Carregando notícias da saúde...
-          </p>
+          <Loading texto="Carregando notícias da saúde..." />
         </div>
       </section>
     );
@@ -79,14 +79,21 @@ export default function NewsSection() {
               
               {/* IMAGEM DO CARD */}
               <div className={styles.imageWrapper}>
-                <Image 
-                  alt={noticia.titulo || 'Notícia'} 
-                  className={styles.cardImage} 
-                  src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized 
-                />
+                {noticia.imagem ? (
+                  <Image 
+                    alt={noticia.titulo || 'Notícia'} 
+                    className={styles.cardImage} 
+                    src={noticia.imagem} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized 
+                  />
+                ) : (
+                  <div className={styles.cardImagePlaceholder}>
+                    <Camera size={36} strokeWidth={1.5} />
+                    <span>Sem imagem</span>
+                  </div>
+                )}
               </div>
               
               {/* ÁREA DE TEXTO */}

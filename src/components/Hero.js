@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
 import styles from './Hero.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
 const VALORES_PADRAO = {
   c1Val: '4.375', c1Text: 'Nº de Agendamentos em Consultas',
@@ -43,10 +42,8 @@ export default function Hero() {
     let cancelado = false;
 
     async function carregarOnline() {
-      if (!SCRIPT_URL) return;
-
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_HERO_STATS`);
+        const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.HERO));
         const data = await res.json();
 
         if (!cancelado && data && data.status === 'success' && data.stats) {

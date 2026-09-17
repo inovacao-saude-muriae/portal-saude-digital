@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search } from 'lucide-react';
+import { Search, Camera } from 'lucide-react';
 import { getDbNoticias, converterParaDate } from '@/data/noticiasData';
+import Loading from '@/components/Loading';
 import styles from './Noticias.module.css';
 
 // Mapeamento dinâmico baseado no texto da categoria
@@ -39,7 +40,7 @@ export default function NoticiasPage() {
   const [loading, setLoading] = useState(true);
   const ITENS_POR_PAGINA = 9;
 
-  // Carrega as notícias do Google Sheets de forma assíncrona
+  // Carrega as notícias do Supabase de forma assíncrona
   useEffect(() => {
     async function carregarDados() {
       setLoading(true);
@@ -142,27 +143,34 @@ export default function NoticiasPage() {
           </form>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#0065a4' }}>
-              <p>Carregando notícias da saúde...</p>
-            </div>
+            <Loading texto="Carregando notícias da saúde..." />
           ) : noticiasPagina.length > 0 ? (
             <>
               <div className={styles.gridNoticias}>
-                {noticiasPagina.map((noticia) => {
+                {noticiasPagina.map((noticia, index) => {
                   // Mapeia a classe da badge com base na categoria cadastrada
                   const classCategoriaCss = getClasseCategoria(noticia.categoria, noticia.tipoCategoria);
 
                   return (
                     <Link className={styles.cardNoticia} href={`/noticias/${noticia.id}`} key={noticia.id}>
                       <div className={styles.capsulaImagem}>
-                        <Image 
-                          alt={noticia.titulo || 'Notícia'} 
-                          className={styles.imagemNoticiaSrc} 
-                          height={200} 
-                          src={noticia.imagem || '/img/noticias/noticia1.jpeg'} 
-                          unoptimized 
-                          width={360}
-                        />
+                        {noticia.imagem ? (
+                          <Image 
+                            alt={noticia.titulo || 'Notícia'} 
+                            className={styles.imagemNoticiaSrc} 
+                            height={200} 
+                            src={noticia.imagem} 
+                            style={{ height: 'auto' }}
+                            width={360}
+                            unoptimized 
+                            priority={index < 3}
+                          />
+                        ) : (
+                          <div className={styles.imagemNoticiaPlaceholder}>
+                            <Camera size={40} strokeWidth={1.5} />
+                            <span>Sem imagem</span>
+                          </div>
+                        )}
                       </div>
                       
                       <div className={styles.infoCard}>

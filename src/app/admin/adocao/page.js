@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,14 +16,19 @@ import {
   Pencil,
   XCircle,
   Search,
-  ImageOff
+  ImageOff,
+  ClipboardList,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
+import { useUI } from '@/components/UIFeedback';
 import styles from './AdminAdocao.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || 'https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec';
 
 export default function AdminAdocaoPage() {
   const router = useRouter();
+  const { notificar, confirmar } = useUI();
 
   const [animais, setAnimais] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -37,6 +42,7 @@ export default function AdminAdocaoPage() {
   const [animalEmEdicao, setAnimalEmEdicao] = useState(null);
 
   const [novoAnimal, setNovoAnimal] = useState({
+    idAnimal: '',
     nome: '',
     especie: 'Cachorro',
     sexo: 'macho',
@@ -46,6 +52,10 @@ export default function AdminAdocaoPage() {
 
   const [arquivoFoto, setArquivoFoto] = useState(null);
   const [previewFoto, setPreviewFoto] = useState('');
+
+  // SOLICITAÇÕES DE ADOÇÃO (por animal)
+  const [solicitacoes, setSolicitacoes] = useState([]);
+  const [animalExpandido, setAnimalExpandido] = useState(null);
 
   // 1. VERIFICAÇÃO DE PERMISSÃO
   useEffect(() => {
@@ -63,62 +73,91 @@ export default function AdminAdocaoPage() {
         const cargosPermitidos = ['admin', 'master', 'gestor', 'ccz', 'zoonoses', 'veterinario'];
         
         if (!cargosPermitidos.includes(cargo)) {
-          alert('Acesso negado: Você não possui permissão para acessar o módulo do CCZ.');
+          notificar('erro', 'Acesso negado: você não possui permissão para acessar o módulo do CCZ.');
           router.push('/admin');
         }
       } catch (e) {
         console.error('Erro ao validar permissões:', e);
       }
     }
-  }, [router]);
+  }, [router, notificar]);
 
-  // 2. BUSCAR ANIMAIS
-  const buscarAnimais = useCallback(async () => {
-    setCarregando(true);
-    try {
-      const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`, {
-        method: 'GET',
-        redirect: 'follow',
-      });
-      const data = await res.json();
-      if (data && data.status === 'success') {
-        setAnimais(data.animais || []);
-      }
-    } catch (err) {
-      console.error('Erro ao buscar animais:', err);
-    } finally {
-      setCarregando(false);
-    }
-  }, []);
-
-  // 3. CARREGAMENTO INICIAL
+  // 2. CARREGAMENTO INICIAL DOS ANIMAIS (SEGURO E SEM RE-RENDERS INFINITOS)
   useEffect(() => {
-    let ativo = true;
+    let montado = true;
 
-    async function carregarIniciais() {
+    async function carregarAnimais() {
       setCarregando(true);
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`, {
-          method: 'GET',
-          redirect: 'follow',
-        });
-        const data = await res.json();
-        if (ativo && data && data.status === 'success') {
-          setAnimais(data.animais || []);
-        }
+        const { data, error } = await supabase
+          .from('ccz_animais')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (montado) setAnimais(data || []);
       } catch (err) {
-        console.error('Erro ao buscar animais:', err);
+        console.error('Erro ao buscar animais no Supabase:', err);
       } finally {
-        if (ativo) setCarregando(false);
+        if (montado) setCarregando(false);
       }
     }
 
-    carregarIniciais();
+    carregarAnimais();
 
     return () => {
-      ativo = false;
+      montado = false;
+    };
+  }, []); // Array vazio garante que roda apenas 1 vez ao carregar
+
+  // CARREGA AS SOLICITAÇÕES DE ADOÇÃO (para exibir por animal)
+  useEffect(() => {
+    let montado = true;
+
+    async function carregarSolicitacoes() {
+      try {
+        const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.ADOCAO_SOLICITACOES, { _t: Date.now() }));
+        const data = await res.json();
+        if (montado && data.status === 'success') {
+          setSolicitacoes(data.solicitacoes || []);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar solicitações de adoção:', err);
+      }
+    }
+
+    carregarSolicitacoes();
+
+    return () => {
+      montado = false;
     };
   }, []);
+
+  // Retorna as solicitações feitas para um animal específico
+  const solicitacoesDoAnimal = (animal) => {
+    return solicitacoes.filter((s) => {
+      const porId = s.animal_id && animal.id && String(s.animal_id) === String(animal.id);
+      const porNome = s.animal_nome && animal.nome &&
+        s.animal_nome.toLowerCase().trim() === animal.nome.toLowerCase().trim();
+      return porId || porNome;
+    });
+  };
+
+  // FUNÇÃO AUXILIAR PARA RECARREGAR A LISTA APÓS SALVAR/EXCLUIR
+  const recarregarLista = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ccz_animais')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setAnimais(data);
+      }
+    } catch (err) {
+      console.error('Erro ao recarregar lista:', err);
+    }
+  };
 
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
@@ -128,10 +167,30 @@ export default function AdminAdocaoPage() {
     }
   };
 
+  // UPLOAD DA FOTO PARA O BUCKET 'ccz' NO SUPABASE STORAGE
+  const uploadFotoAnimal = async (file) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `animal_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('ccz')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from('ccz')
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  };
+
   // INICIAR EDIÇÃO
   const handleIniciarEdicao = (animal) => {
     setAnimalEmEdicao(animal);
     setNovoAnimal({
+      idAnimal: animal.id_animal || '',
       nome: animal.nome || '',
       especie: animal.especie || 'Cachorro',
       sexo: animal.sexo || 'macho',
@@ -139,7 +198,6 @@ export default function AdminAdocaoPage() {
       descricao: animal.descricao || ''
     });
     
-    // Se foto for "SEM_FOTO", limpa o preview para indicar que está sem foto
     const fotoExistente = animal.foto || animal.imagemUrl || animal.imagem || '';
     setPreviewFoto(fotoExistente === 'SEM_FOTO' ? '' : fotoExistente);
     setArquivoFoto(null);
@@ -151,6 +209,7 @@ export default function AdminAdocaoPage() {
   const handleCancelarEdicao = () => {
     setAnimalEmEdicao(null);
     setNovoAnimal({
+      idAnimal: '',
       nome: '',
       especie: 'Cachorro',
       sexo: 'macho',
@@ -161,83 +220,88 @@ export default function AdminAdocaoPage() {
     setPreviewFoto('');
   };
 
-  // CADASTRAR OU ATUALIZAR ANIMAL
+  // CADASTRAR OU ATUALIZAR ANIMAL NO SUPABASE
   const handleCadastrarOuEditar = async (e) => {
     e.preventDefault();
     setEnviando(true);
 
     try {
-      let imagemBase64 = '';
-      let imagemNome = '';
-      let imagemType = '';
+      const isEditing = !!animalEmEdicao;
+      let urlFotoFinal = isEditing ? (animalEmEdicao.foto || 'SEM_FOTO') : 'SEM_FOTO';
 
       if (arquivoFoto) {
-        imagemNome = arquivoFoto.name;
-        imagemType = arquivoFoto.type;
-        imagemBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(arquivoFoto);
-        });
+        urlFotoFinal = await uploadFotoAnimal(arquivoFoto);
       }
 
-      const isEditing = !!animalEmEdicao;
-
-      // Se não enviou arquivo nem tinha foto anterior, marca como SEM_FOTO
-      const fotoFinalAntiga = isEditing ? (animalEmEdicao.foto || 'SEM_FOTO') : 'SEM_FOTO';
-
       const payload = {
-        action: isEditing ? 'UPDATE_ANIMAL' : 'ADD_ANIMAL',
-        id: isEditing ? animalEmEdicao.id : undefined,
-        ...novoAnimal,
-        imagemBase64,
-        imagemNome,
-        imagemType,
-        fotoAntiga: fotoFinalAntiga,
-        semFoto: !arquivoFoto && (!isEditing || animalEmEdicao.foto === 'SEM_FOTO')
+        id_animal: novoAnimal.idAnimal.trim(),
+        nome: novoAnimal.nome.trim(),
+        especie: novoAnimal.especie,
+        sexo: novoAnimal.sexo,
+        filhote: novoAnimal.filhote === 'true',
+        descricao: novoAnimal.descricao.trim(),
+        foto: urlFotoFinal
       };
 
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
+      let error;
+
+      if (isEditing) {
+        const { error: updateError } = await supabase
+          .from('ccz_animais')
+          .update(payload)
+          .eq('id', animalEmEdicao.id);
+        error = updateError;
+      } else {
+        // ID único (ms + sufixo aleatório) evita colisão de chave quando
+        // dois animais são cadastrados no mesmo segundo.
+        const novoId = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+        const { error: insertError } = await supabase
+          .from('ccz_animais')
+          .insert([{ id: novoId, ...payload }]);
+        error = insertError;
+      }
+
+      if (error) throw error;
 
       setMsgSucesso(isEditing ? 'Animal atualizado com sucesso!' : 'Animal cadastrado com sucesso!');
       
       handleCancelarEdicao();
+      await recarregarLista();
 
       setTimeout(() => {
-        buscarAnimais();
         setMsgSucesso('');
-      }, 1200);
+      }, 2500);
 
     } catch (err) {
-      console.error(err);
-      alert('Erro ao salvar informações do animal.');
+      console.error('Erro ao salvar animal:', err);
+      notificar('erro', 'Erro ao salvar informações do animal: ' + err.message);
     } finally {
       setEnviando(false);
     }
   };
 
+  // EXCLUIR ANIMAL NO SUPABASE
   const handleExcluir = async (id, nome) => {
-    if (!confirm(`Tem certeza que deseja remover o animal "${nome}" da lista de adoção?`)) return;
+    const confirmou = await confirmar({
+      titulo: 'Remover animal',
+      mensagem: `Tem certeza que deseja remover o animal "${nome}" da lista de adoção?`,
+      textoConfirmar: 'Remover'
+    });
+    if (!confirmou) return;
 
     try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'DELETE_ANIMAL',
-          id: id
-        })
-      });
+      const { error } = await supabase
+        .from('ccz_animais')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
 
       setAnimais((prev) => prev.filter((a) => a.id !== id));
       if (animalEmEdicao?.id === id) handleCancelarEdicao();
     } catch (err) {
-      console.error(err);
-      alert('Erro ao excluir animal.');
+      console.error('Erro ao excluir animal:', err);
+      notificar('erro', 'Erro ao excluir animal: ' + err.message);
     }
   };
 
@@ -250,7 +314,7 @@ export default function AdminAdocaoPage() {
     const especie = (animal.especie || '').toLowerCase();
     const sexo = (animal.sexo || '').toLowerCase();
     const descricao = (animal.descricao || '').toLowerCase();
-    const idade = animal.filhote === 'true' ? 'filhote' : 'adulto';
+    const idade = String(animal.filhote) === 'true' ? 'filhote' : 'adulto';
 
     return (
       nome.includes(termo) ||
@@ -307,15 +371,26 @@ export default function AdminAdocaoPage() {
             </div>
 
             <form onSubmit={handleCadastrarOuEditar} className={styles.formContainer}>
-              <div className={styles.inputGroup}>
-                <label>Nome do Animal *</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={novoAnimal.nome}
-                  onChange={(e) => setNovoAnimal({ ...novoAnimal, nome: e.target.value })}
-                  placeholder="Ex: Paçoca"
-                />
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label>ID do Animal</label>
+                  <input 
+                    type="text" 
+                    value={novoAnimal.idAnimal}
+                    onChange={(e) => setNovoAnimal({ ...novoAnimal, idAnimal: e.target.value })}
+                    placeholder="Ex: CCZ-001 (opcional)"
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label>Nome do Animal *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={novoAnimal.nome}
+                    onChange={(e) => setNovoAnimal({ ...novoAnimal, nome: e.target.value })}
+                    placeholder="Ex: Paçoca"
+                  />
+                </div>
               </div>
 
               <div className={styles.formRow}>
@@ -366,9 +441,7 @@ export default function AdminAdocaoPage() {
 
               {/* UPLOAD DA FOTO (OPCIONAL) */}
               <div className={styles.inputGroup}>
-                <label>
-                  Foto do Animal (Opcional)
-                </label>
+                <label>Foto do Animal (Opcional)</label>
                 <label className={styles.fileBox}>
                   <Upload size={20} color="#008a83" />
                   <span>{arquivoFoto ? arquivoFoto.name : 'Clique para selecionar a foto'}</span>
@@ -444,7 +517,7 @@ export default function AdminAdocaoPage() {
               <p className={styles.emptyMsg}>
                 {buscaAnimal 
                   ? `Nenhum animal encontrado para "${buscaAnimal}".`
-                  : 'Nenhum animal cadastrado na planilha ainda.'}
+                  : 'Nenhum animal cadastrado no banco ainda.'}
               </p>
             ) : (
               <div className={styles.animaisList}>
@@ -452,50 +525,92 @@ export default function AdminAdocaoPage() {
                   const urlFoto = animal.foto || animal.imagemUrl || animal.imagem || '';
                   const temFotoValida = urlFoto && urlFoto !== 'SEM_FOTO' && urlFoto !== 'undefined' && urlFoto !== 'null';
 
+                  const pedidos = solicitacoesDoAnimal(animal);
+                  const expandido = animalExpandido === animal.id;
+
                   return (
-                    <div key={animal.id} className={styles.animalRow}>
-                      
-                      {/* EXIBIÇÃO DE FOTO OU BOX "SEM FOTO" */}
-                      {temFotoValida ? (
-                        <Image 
-                          src={urlFoto} 
-                          alt={animal.nome} 
-                          width={60} 
-                          height={80} 
-                          unoptimized 
-                          className={styles.thumbImg} 
-                        />
-                      ) : (
-                        <div className={styles.noPhotoBox}>
-                          <ImageOff size={20} />
-                          <span>Sem foto</span>
+                    <div key={animal.id} className={styles.animalWrapper}>
+                      <div className={styles.animalRow}>
+
+                        {/* EXIBIÇÃO DE FOTO OU BOX "SEM FOTO" */}
+                        {temFotoValida ? (
+                          <Image 
+                            src={urlFoto} 
+                            alt={animal.nome} 
+                            width={60} 
+                            height={80} 
+                            unoptimized 
+                            className={styles.thumbImg} 
+                          />
+                        ) : (
+                          <div className={styles.noPhotoBox}>
+                            <ImageOff size={20} />
+                            <span>Sem foto</span>
+                          </div>
+                        )}
+
+                        <div className={styles.animalInfo}>
+                          <h3>
+                            {animal.id_animal ? <span className={styles.idAnimalTag}>{animal.id_animal}</span> : null}
+                            {animal.nome}
+                          </h3>
+                          <p>
+                            {animal.especie} • {animal.sexo === 'macho' ? 'Macho' : 'Fêmea'} • {String(animal.filhote) === 'true' ? 'Filhote' : 'Adulto'}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setAnimalExpandido(expandido ? null : animal.id)}
+                            className={`${styles.btnSolicitacoes} ${pedidos.length > 0 ? styles.btnSolicitacoesAtivo : ''}`}
+                          >
+                            <ClipboardList size={14} />
+                            {pedidos.length > 0
+                              ? `${pedidos.length} solicitaç${pedidos.length === 1 ? 'ão' : 'ões'} de adoção`
+                              : 'Nenhuma solicitação'}
+                            {pedidos.length > 0 && (expandido ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                          </button>
+                        </div>
+
+                        <div className={styles.actionGroup}>
+                          <button 
+                            onClick={() => handleIniciarEdicao(animal)} 
+                            className={styles.btnEdit} 
+                            title="Editar animal"
+                          >
+                            <Pencil size={16} />
+                          </button>
+
+                          <button 
+                            onClick={() => handleExcluir(animal.id, animal.nome)} 
+                            className={styles.btnDelete} 
+                            title="Excluir animal"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* PAINEL EXPANSÍVEL COM AS SOLICITAÇÕES DO ANIMAL */}
+                      {expandido && pedidos.length > 0 && (
+                        <div className={styles.solicitacoesPainel}>
+                          {pedidos.map((s) => (
+                            <div key={s.id} className={styles.solicitacaoCard}>
+                              <div className={styles.solicitacaoTopo}>
+                                <strong>{s.nome}</strong>
+                                <span className={styles.solicitacaoData}>
+                                  {s.created_at ? new Date(s.created_at).toLocaleString('pt-BR') : ''}
+                                </span>
+                              </div>
+                              <div className={styles.solicitacaoInfo}>
+                                <span><b>CPF:</b> {s.cpf || '-'}</span>
+                                <span><b>Telefone:</b> {s.telefone || '-'}</span>
+                                <span className={styles.solicitacaoEndereco}>
+                                  <b>Endereço:</b> {[s.rua, s.numero && `nº ${s.numero}`, s.bairro, s.cidade, s.cep].filter(Boolean).join(', ') || '-'}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
-
-                      <div className={styles.animalInfo}>
-                        <h3>{animal.nome}</h3>
-                        <p>
-                          {animal.especie} • {animal.sexo === 'macho' ? 'Macho' : 'Fêmea'} • {animal.filhote === 'true' ? 'Filhote' : 'Adulto'}
-                        </p>
-                      </div>
-
-                      <div className={styles.actionGroup}>
-                        <button 
-                          onClick={() => handleIniciarEdicao(animal)} 
-                          className={styles.btnEdit} 
-                          title="Editar animal"
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button 
-                          onClick={() => handleExcluir(animal.id, animal.nome)} 
-                          className={styles.btnDelete} 
-                          title="Excluir animal"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
                     </div>
                   );
                 })}

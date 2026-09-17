@@ -1,0 +1,124 @@
+.container {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Botão flutuante de acesso */
+.botaoFlutuante {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #0065a4;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 64, 102, 0.35);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.botaoFlutuante:hover {
+  background-color: #004e80;
+  transform: translateY(-2px);
+}
+
+.botaoFlutuante:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* Painel de controles */
+.painel {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 64, 102, 0.18);
+  padding: 16px;
+  width: 240px;
+}
+
+.painelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.fecharBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.fecharBtn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.painelDica {
+  font-size: 12.5px;
+  color: #64748b;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controleBtnPrimario,
+.controleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #d8e6f2;
+}
+
+.controleBtnPrimario {
+  background-color: #0065a4;
+  color: #ffffff;
+  border-color: #0065a4;
+}
+
+.controleBtnPrimario:hover {
+  background-color: #004e80;
+}
+
+.controleBtn {
+  background-color: #f8fafc;
+  color: #0065a4;
+}
+
+.controleBtn:hover {
+  background-color: #eff6ff;
+}
+
+@media (max-width: 600px) {
+  .painel {
+    width: 210px;
+  }
+}

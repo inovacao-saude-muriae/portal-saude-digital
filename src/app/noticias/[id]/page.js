@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Camera } from 'lucide-react';
 import { getDbNoticias } from '@/data/noticiasData';
 import styles from './NoticiasDetail.module.css';
 
@@ -88,8 +89,8 @@ export default function NoticiaDetalhePage({ params }) {
             )}
 
             {/* IMAGEM DE CAPA */}
-            {noticia.imagem && (
-              <div className={styles.imageWrapper}>
+            <div className={styles.imageWrapper}>
+              {noticia.imagem ? (
                 <Image 
                   src={noticia.imagem} 
                   alt={noticia.titulo || 'Imagem da notícia'}
@@ -99,8 +100,13 @@ export default function NoticiaDetalhePage({ params }) {
                   unoptimized
                   priority
                 />
-              </div>
-            )}
+              ) : (
+                <div className={styles.imagemCapaPlaceholder}>
+                  <Camera size={56} strokeWidth={1.5} />
+                  <span>Sem imagem</span>
+                </div>
+              )}
+            </div>
 
             {/* CORPO DO TEXTO DA NOTÍCIA */}
             <div className={styles.corpoNoticia}>

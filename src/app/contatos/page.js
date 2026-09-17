@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, MapPin, Mail, MessageCircle, ArrowUpRight } from "lucide-react";
 import { listaContatos, categoriasContatos } from "@/data/contatosData";
 import styles from "./Contatos.module.css";
+
+// Retorna os dígitos do telefone já com DDD (assume 32/Muriaé quando vier sem)
+function digitosComDDD(tel) {
+  const digitos = (tel || "").replace(/\D/g, "");
+  return digitos.length <= 9 ? `32${digitos}` : digitos;
+}
 
 function normalizarTexto(texto) {
   if (!texto) return "";
@@ -30,8 +36,17 @@ export default function ContatosPage() {
       categoriaAtiva === "Todos" || item.categoria === categoriaAtiva;
     const bateNome = normalizarTexto(item.nome).includes(termo);
     const bateEndereco = normalizarTexto(item.endereco).includes(termo);
+    const bateCategoriaTexto = normalizarTexto(item.categoria).includes(termo);
+    const bateTelefone = (item.telefone || "").replace(/\D/g, "").includes(busca.replace(/\D/g, ""));
+    const buscaTemDigitos = busca.replace(/\D/g, "").length > 0;
 
-    return bateCategoria && (bateNome || bateEndereco);
+    const bateBusca =
+      bateNome ||
+      bateEndereco ||
+      bateCategoriaTexto ||
+      (buscaTemDigitos && bateTelefone);
+
+    return bateCategoria && bateBusca;
   });
 
   return (
@@ -101,6 +116,16 @@ export default function ContatosPage() {
             ))}
           </div>
 
+          {/* CONTADOR DE RESULTADOS */}
+          {contatosFiltrados.length > 0 && (
+            <p className={styles.resultCount}>
+              {contatosFiltrados.length}{" "}
+              {contatosFiltrados.length === 1
+                ? "unidade encontrada"
+                : "unidades encontradas"}
+            </p>
+          )}
+
           {/* LISTA DE CARDS DE CONTATO */}
           {contatosFiltrados.length > 0 ? (
             <div className={styles.contactsGrid}>
@@ -116,17 +141,40 @@ export default function ContatosPage() {
                   <div className={styles.cardBody}>
                     {contato.telefone && (
                       <div className={styles.infoRow}>
-                        <span className={styles.icon}>📞</span>
-                        <div>
-                          <strong>Telefone</strong>
-                          <p>{contato.telefone}</p>
+                        <span className={`${styles.iconBox} ${styles.iconBoxWhats}`}>
+                          <MessageCircle size={16} />
+                        </span>
+                        <div className={styles.infoContent}>
+                          <strong>WhatsApp</strong>
+                          <p className={styles.telefoneTexto}>
+                            {contato.telefone.split("/").map((tel, i, arr) => {
+                              const numeroLimpo = tel.trim();
+                              const numeroCompleto = digitosComDDD(tel);
+                              return (
+                                <span key={i}>
+                                  <a
+                                    href={`https://wa.me/55${numeroCompleto}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.whatsappLink}
+                                    title="Conversar no WhatsApp"
+                                  >
+                                    {numeroLimpo}
+                                  </a>
+                                  {i < arr.length - 1 ? " · " : ""}
+                                </span>
+                              );
+                            })}
+                          </p>
                         </div>
                       </div>
                     )}
                     {contato.endereco && (
                       <div className={styles.infoRow}>
-                        <span className={styles.icon}>📍</span>
-                        <div>
+                        <span className={`${styles.iconBox} ${styles.iconBoxAddress}`}>
+                          <MapPin size={16} />
+                        </span>
+                        <div className={styles.infoContent}>
                           <strong>Endereço</strong>
                           <p>{contato.endereco}</p>
                         </div>
@@ -134,10 +182,19 @@ export default function ContatosPage() {
                     )}
                     {contato.email && (
                       <div className={styles.infoRow}>
-                        <span className={styles.icon}>✉️</span>
-                        <div>
+                        <span className={`${styles.iconBox} ${styles.iconBoxMail}`}>
+                          <Mail size={16} />
+                        </span>
+                        <div className={styles.infoContent}>
                           <strong>E-mail</strong>
-                          <p>{contato.email}</p>
+                          <p>
+                            <a
+                              href={`mailto:${contato.email}`}
+                              className={styles.contatoLink}
+                            >
+                              {contato.email}
+                            </a>
+                          </p>
                         </div>
                       </div>
                     )}
@@ -150,20 +207,9 @@ export default function ContatosPage() {
                       rel="noopener noreferrer"
                       className={styles.mapsBtn}
                     >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      Ver localização no Google Maps ↗
+                      <MapPin size={16} />
+                      <span>Ver localização</span>
+                      <ArrowUpRight size={15} className={styles.mapsBtnArrow} />
                     </a>
                   </div>
                 </div>

@@ -1,0 +1,283 @@
+.pageWrapper {
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  padding: 32px 0 60px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* CABEÇALHO */
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.badgeHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mainTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 10px 0 4px;
+}
+
+.subTitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #0369a1;
+  border: 1px solid #e2e8f0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.backLink:hover {
+  background-color: #f8fafc;
+}
+
+/* TOOLBAR (BUSCA + CONTADOR) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.searchInput:focus {
+  border-color: #0284c7;
+}
+
+.contador {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* GRID DE CARDS */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid #008a83;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 59, 92, 0.04);
+}
+
+.cardTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.nome {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.animalTag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #008a83;
+  background-color: #e6f4f1;
+  padding: 2px 10px;
+  border-radius: 50px;
+}
+
+.btnRemover {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnRemover:hover:not(:disabled) {
+  background-color: #fee2e2;
+}
+
+.btnRemover:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* INFORMAÇÕES */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.infoItem,
+.infoItemFull {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.infoItemFull {
+  grid-column: 1 / -1;
+}
+
+.infoItem strong,
+.infoItemFull strong {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.infoItem span,
+.infoItemFull span {
+  font-size: 14px;
+  color: #334155;
+  word-break: break-word;
+}
+
+.cardRodape {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnTermo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eff6ff;
+  color: #0065a4;
+  border: 1px solid #bfdbfe;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnTermo:hover {
+  background-color: #0065a4;
+  color: #ffffff;
+  border-color: #0065a4;
+}
+
+/* ESTADO VAZIO / CARREGANDO */
+.estadoVazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  background-color: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  color: #64748b;
+  text-align: center;
+}
+
+.estadoVazio h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.estadoVazio p {
+  margin: 0;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -12,134 +12,136 @@ import {
   Loader2, 
   Mail, 
   CheckCircle2, 
-  X,
-  ShieldCheck
+  X
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import styles from './AdminLogin.module.css';
 
-const SCRIPT_USUARIOS_URL = process.env.NEXT_PUBLIC_SCRIPT_USUARIOS_URL || 'https://script.google.com/macros/s/AKfycbz0uiuPzrSYPHex_rhAVHXkRUFTIoOgC3WzgAFpEC5V-t3mo0GiaICsti63xAbEkI1ccA/exec';
-
 export default function AdminLoginPage() {
-  const [usuario, setUsuario] = useState('');
+  const [usuarioOuEmail, setUsuarioOuEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
   
-  // ESTADOS DO MODAL E REDEFINIÇÃO DE SENHA
+  // ESTADOS DO MODAL DE RECUPERAÇÃO DE SENHA
   const [modalRecuperarAberto, setModalRecuperarAberto] = useState(false);
-  const [passoRecuperacao, setPassoRecuperacao] = useState(1);
-  const [usuarioRecuperacao, setUsuarioRecuperacao] = useState('');
-  const [usuarioIdentificado, setUsuarioIdentificado] = useState('');
-  const [codigoDigitado, setCodigoDigitado] = useState('');
-  const [novaSenha, setNovaSenha] = useState('');
+  const [emailRecuperacao, setEmailRecuperacao] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [msgRecuperacao, setMsgRecuperacao] = useState(null);
 
   const router = useRouter();
 
-  // LOGIN CONSULTANDO DIRETAMENTE A PLANILHA DO GOOGLE
+  // Se já estiver logado, vai direto para o painel (evita "pedir login" de novo
+  // ao clicar em "Área Restrita" no menu quando a sessão ainda está ativa).
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    const user = localStorage.getItem('user_info');
+    if (token && user) {
+      router.replace('/admin');
+    }
+  }, [router]);
+
+  // LOGIN UTILIZANDO A FUNÇÃO RPC get_email_by_username
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
     setCarregando(true);
 
     try {
-      const response = await fetch(SCRIPT_USUARIOS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'LOGIN',
-          usuario: usuario.trim(),
-          senha: senha.trim()
-        })
+      let emailFinal = usuarioOuEmail.trim().toLowerCase();
+
+      // Se o usuário digitou um apelido/username (ex: admin.admin)
+      if (!emailFinal.includes('@')) {
+        const { data: emailEncontrado, error: rpcError } = await supabase
+          .rpc('get_email_by_username', { p_usuario: emailFinal });
+
+        if (rpcError || !emailEncontrado) {
+          setErro('Usuário não encontrado.');
+          setCarregando(false);
+          return;
+        }
+
+        emailFinal = emailEncontrado;
+      }
+
+      // Autentica via Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: emailFinal,
+        password: senha.trim()
       });
 
-      const data = await response.json();
-
-      if (data.status === 'success') {
-        localStorage.setItem('auth_token', 'autenticado_secretaria_saude');
-        localStorage.setItem('user_info', JSON.stringify(data.user));
-
-        router.push('/admin');
-      } else {
-        setErro(data.message || 'Usuário ou senha incorretos.');
+      if (authError || !authData.user) {
+        setErro('Usuário ou senha incorretos.');
+        setCarregando(false);
+        return;
       }
+
+      // Busca o perfil do usuário logado na tabela profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('nome, usuario, cargo')
+        .eq('id', authData.user.id)
+        .maybeSingle();
+
+      // Salva os dados na sessão
+      localStorage.setItem('auth_token', authData.session.access_token);
+      localStorage.setItem('user_info', JSON.stringify({
+        id: authData.user.id,
+        nome: profile?.nome || 'Gestor',
+        usuario: profile?.usuario || authData.user.email,
+        cargo: profile?.cargo || 'admin',
+        email: authData.user.email
+      }));
+
+      // Notifica o Header (e outros componentes) que o login mudou
+      window.dispatchEvent(new Event('auth-changed'));
+
+      router.push('/admin');
     } catch (err) {
-      console.error(err);
-      setErro('Erro ao conectar com o servidor para autenticação.');
+      console.error('Erro na autenticação:', err);
+      setErro('Erro ao conectar com o serviço de autenticação.');
     } finally {
       setCarregando(false);
     }
   };
 
-  // SOLICITAR CÓDIGO POR E-MAIL
-  const handleSolicitarCodigo = async (e) => {
+  // ENVIAR E-MAIL DE REDEFINIÇÃO DE SENHA
+  const handleSolicitarRedefinicao = async (e) => {
     e.preventDefault();
     setMsgRecuperacao(null);
     setEnviando(true);
 
     try {
-      const response = await fetch(SCRIPT_USUARIOS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'SOLICITAR_CODIGO',
-          usuarioOuEmail: usuarioRecuperacao.trim()
-        })
+      let emailAlvo = emailRecuperacao.trim().toLowerCase();
+
+      // Se informou o apelido/username no modal, resolve o e-mail via RPC
+      if (!emailAlvo.includes('@')) {
+        const { data: emailEncontrado } = await supabase
+          .rpc('get_email_by_username', { p_usuario: emailAlvo });
+
+        if (!emailEncontrado) {
+          setMsgRecuperacao({ tipo: 'erro', texto: 'Usuário não encontrado.' });
+          setEnviando(false);
+          return;
+        }
+        emailAlvo = emailEncontrado;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(emailAlvo, {
+        redirectTo: `${window.location.origin}/admin/redefinir-senha`
       });
 
-      const data = await response.json();
-
-      if (data.status === 'success') {
-        setUsuarioIdentificado(data.usuario);
-        setPassoRecuperacao(2);
-        setMsgRecuperacao({ tipo: 'sucesso', texto: data.message });
+      if (error) {
+        setMsgRecuperacao({ tipo: 'erro', texto: 'Erro ao enviar e-mail: ' + error.message });
       } else {
-        setMsgRecuperacao({ tipo: 'erro', texto: data.message || 'Erro ao processar.' });
+        setMsgRecuperacao({ 
+          tipo: 'sucesso', 
+          texto: 'E-mail de redefinição enviado com sucesso! Verifique sua caixa de entrada.' 
+        });
       }
     } catch (err) {
       console.error(err);
-      setMsgRecuperacao({ tipo: 'erro', texto: 'Falha ao conectar com o servidor.' });
-    } finally {
-      setEnviando(false);
-    }
-  };
-
-  // VALIDAR CÓDIGO E ALTERAR SENHA NA PLANILHA
-  const handleRedefinirSenha = async (e) => {
-    e.preventDefault();
-    setMsgRecuperacao(null);
-    setEnviando(true);
-
-    try {
-      const response = await fetch(SCRIPT_USUARIOS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'REDEFINIR_SENHA',
-          usuario: usuarioIdentificado,
-          codigo: codigoDigitado,
-          novaSenha: novaSenha
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.status === 'success') {
-        setMsgRecuperacao({ tipo: 'sucesso', texto: data.message });
-
-        setTimeout(() => {
-          setModalRecuperarAberto(false);
-          setPassoRecuperacao(1);
-          setUsuario(usuarioIdentificado);
-          setSenha(novaSenha);
-        }, 2000);
-      } else {
-        setMsgRecuperacao({ tipo: 'erro', texto: data.message });
-      }
-    } catch (err) {
-      console.error(err);
-      setMsgRecuperacao({ tipo: 'erro', texto: 'Falha ao atualizar a senha.' });
+      setMsgRecuperacao({ tipo: 'erro', texto: 'Falha ao processar solicitação.' });
     } finally {
       setEnviando(false);
     }
@@ -147,10 +149,7 @@ export default function AdminLoginPage() {
 
   const fecharModal = () => {
     setModalRecuperarAberto(false);
-    setPassoRecuperacao(1);
-    setUsuarioRecuperacao('');
-    setCodigoDigitado('');
-    setNovaSenha('');
+    setEmailRecuperacao('');
     setMsgRecuperacao(null);
   };
 
@@ -175,15 +174,15 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Usuário</label>
+            <label className={styles.label}>Usuário ou E-mail</label>
             <div className={styles.inputWrapper}>
               <User size={18} className={styles.inputIcon} />
               <input 
                 type="text" 
                 required
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-                placeholder="Informe seu usuário"
+                value={usuarioOuEmail}
+                onChange={(e) => setUsuarioOuEmail(e.target.value)}
+                placeholder="Informe seu usuário ou e-mail"
                 className={styles.input}
               />
             </div>
@@ -246,15 +245,11 @@ export default function AdminLoginPage() {
 
             <div className={styles.modalHeader}>
               <div className={styles.modalIconBadge}>
-                {passoRecuperacao === 1 ? <Mail size={24} /> : <ShieldCheck size={24} />}
+                <Mail size={24} />
               </div>
-              <h3 className={styles.modalTitle}>
-                {passoRecuperacao === 1 ? 'Recuperar Senha' : 'Digite o Código e a Nova Senha'}
-              </h3>
+              <h3 className={styles.modalTitle}>Recuperar Senha</h3>
               <p className={styles.modalSubtitle}>
-                {passoRecuperacao === 1 
-                  ? 'Informe seu usuário ou e-mail para receber um código de segurança.' 
-                  : `Enviamos um código para o e-mail cadastrado de ${usuarioIdentificado}.`}
+                Informe seu usuário ou e-mail para receber as instruções de redefinição.
               </p>
             </div>
 
@@ -265,57 +260,23 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            {passoRecuperacao === 1 ? (
-              <form onSubmit={handleSolicitarCodigo}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Usuário ou E-mail</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={usuarioRecuperacao}
-                    onChange={(e) => setUsuarioRecuperacao(e.target.value)}
-                    placeholder="Ex: admin.admin"
-                    className={styles.inputSimple}
-                  />
-                </div>
+            <form onSubmit={handleSolicitarRedefinicao}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Usuário ou E-mail</label>
+                <input 
+                  type="text" 
+                  required
+                  value={emailRecuperacao}
+                  onChange={(e) => setEmailRecuperacao(e.target.value)}
+                  placeholder="admin.admin ou exemplo@muriae.mg.gov.br"
+                  className={styles.inputSimple}
+                />
+              </div>
 
-                <button type="submit" disabled={enviando} className={styles.submitBtn}>
-                  {enviando ? <><Loader2 size={16} className="animate-spin" /> Enviando Código...</> : 'Enviar Código por E-mail'}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleRedefinirSenha}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Código de Verificação (6 dígitos)</label>
-                  <input 
-                    type="text" 
-                    required
-                    maxLength={6}
-                    value={codigoDigitado}
-                    onChange={(e) => setCodigoDigitado(e.target.value)}
-                    placeholder="123456"
-                    className={styles.inputSimple}
-                    style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '18px', fontWeight: 'bold' }}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Nova Senha</label>
-                  <input 
-                    type="password" 
-                    required
-                    value={novaSenha}
-                    onChange={(e) => setNovaSenha(e.target.value)}
-                    placeholder="Digite a nova senha"
-                    className={styles.inputSimple}
-                  />
-                </div>
-
-                <button type="submit" disabled={enviando} className={styles.submitBtn}>
-                  {enviando ? <><Loader2 size={16} className="animate-spin" /> Salvando...</> : 'Alterar Senha'}
-                </button>
-              </form>
-            )}
+              <button type="submit" disabled={enviando} className={styles.submitBtn}>
+                {enviando ? <><Loader2 size={16} className="animate-spin" /> Enviando...</> : 'Enviar E-mail de Redefinição'}
+              </button>
+            </form>
           </div>
         </div>
       )}

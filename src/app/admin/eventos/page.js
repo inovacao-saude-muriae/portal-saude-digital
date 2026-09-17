@@ -43,11 +43,16 @@ import {
   Archive,
   Users,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Camera
 } from 'lucide-react';
 import styles from './AdminEventos.module.css';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
+import { supabase } from '@/lib/supabase';
+import { useUI } from '@/components/UIFeedback';
 
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+// API URLs para Supabase
+const API_BASE_URL = '/api';
 
 function formatarCaminhoImagemModelo(caminho) {
   if (!caminho || typeof caminho !== 'string' || caminho === 'undefined') {
@@ -84,21 +89,11 @@ const MODELOS_CERTIFICADO = {
     id: 'modelo1',
     nome: 'Modelo 1 - Plenária Municipal de Saúde',
     imagem: '/img/modelo-certificado/modelo1.png',
-    gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
-      <>
-        Participou da Plenária Municipal de Saúde de Muriaé, com o tema <strong>&quot;{resumoEvento}&quot;</strong> realizada no dia {dataEvento}, no {localEvento}, em Muriaé-MG{cargaHoraria ? `, com carga horária total de ${cargaHoraria} (${cargaHorariaExtenso}) horas` : ''}.
-      </>
-    )
   },
   modelo2: {
     id: 'modelo2',
     nome: 'Modelo 2 - Simpósio / Workshop',
     imagem: '/img/modelo-certificado/modelo2.png',
-    gerarTexto: ({ resumoEvento, dataEvento, localEvento, cargaHoraria, cargaHorariaExtenso }) => (
-      <>
-        Concluiu com êxito a participação no Simpósio de Saúde sobre <strong>&quot;{resumoEvento}&quot;</strong>, promovido no dia {dataEvento}, nas dependências de {localEvento}{cargaHoraria ? `, cumprindo a carga horária de ${cargaHoraria} (${cargaHorariaExtenso}) horas de atividades acadêmicas` : ''}.
-      </>
-    )
   }
 };
 
@@ -216,6 +211,7 @@ function numeroParaExtenso(numero) {
 
 export default function AdminEventosPage() {
   const router = useRouter();
+  const { notificar, confirmar } = useUI();
 
   // CONTROLE DE SUB-ABAS: 'cadastrar' | 'gerenciar' | 'inscritos'
   const [abaSub, setAbaSub] = useState('cadastrar');
@@ -265,6 +261,129 @@ export default function AdminEventosPage() {
   // MODAL DE COMPROVANTE INDIVIDUAL
   const [comprovanteAdmin, setComprovanteAdmin] = useState(null);
 
+  // Funções para PDF do comprovante admin
+  const handleImprimirComprovanteAdmin = () => {
+    window.print();
+  };
+
+  const handleBaixarComprovanteAdminPdf = () => {
+    if (!comprovanteAdmin) return;
+
+    try {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Cabeçalho oficial
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 30, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('SISTEMA ADMINISTRATIVO', margin, 15);
+      
+      doc.setFontSize(12);
+      doc.text('Secretaria Municipal de Saúde', margin, 22);
+
+      // Reset cor do texto
+      doc.setTextColor(0, 0, 0);
+      
+      // Título principal
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('COMPROVANTE DE INSCRIÇÃO', pageWidth / 2, 50, { align: 'center' });
+      
+      // Linha decorativa
+      doc.setDrawColor(59, 130, 246);
+      doc.setLineWidth(1);
+      doc.line(margin, 55, pageWidth - margin, 55);
+
+      // Box do código
+      doc.setFillColor(239, 246, 255);
+      doc.rect(margin, 65, contentWidth, 25, 'F');
+      
+      doc.setTextColor(59, 130, 246);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text('CÓDIGO DE CONFIRMAÇÃO', margin + 5, 72);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(comprovanteAdmin.codigo, margin + 5, 83);
+
+      // Informações do evento
+      let yPos = 105;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text('EVENTO:', margin, yPos);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      const eventoLines = doc.splitTextToSize(comprovanteAdmin.evento, contentWidth - 40);
+      doc.text(eventoLines, margin + 35, yPos);
+      
+      yPos += (eventoLines.length * 6) + 15;
+
+      // Dados do participante
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text('DADOS DO PARTICIPANTE:', margin, yPos);
+      yPos += 15;
+
+      const campos = [
+        { label: 'Nome Completo', valor: comprovanteAdmin.nome },
+        { label: 'CPF', valor: comprovanteAdmin.cpf },
+        { label: 'Data e Hora da Inscrição', valor: comprovanteAdmin.dataHora }
+      ];
+
+      campos.forEach(campo => {
+        if (campo.valor && campo.valor !== '-') {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`${campo.label}:`, margin, yPos);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
+          doc.setTextColor(0, 0, 0);
+          doc.text(campo.valor, margin + 50, yPos);
+          
+          yPos += 8;
+        }
+      });
+
+      // Rodapé administrativo
+      const rodapeY = doc.internal.pageSize.getHeight() - 30;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, rodapeY - 5, pageWidth - margin, rodapeY - 5);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Documento gerado pelo Sistema Administrativo', pageWidth / 2, rodapeY, { align: 'center' });
+      doc.text('Data de geração: ' + new Date().toLocaleString('pt-BR'), pageWidth / 2, rodapeY + 5, { align: 'center' });
+
+      // Salvar
+      doc.save(`Comprovante_Admin_${comprovanteAdmin.codigo}.pdf`);
+
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      notificar('erro', 'Erro ao gerar PDF. Use a função de impressão como alternativa.');
+    }
+  };
+
+  // 1. AUTENTICAÇÃO E PERMISSÃO
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -277,44 +396,82 @@ export default function AdminEventosPage() {
       try {
         const user = JSON.parse(savedUser);
         const cargo = user?.cargo ? user.cargo.toLowerCase() : 'admin';
-        
         const cargosPermitidos = ['admin', 'master', 'gestor', 'comunicacao', 'imprensa'];
         
         if (!cargosPermitidos.includes(cargo)) {
-          alert('Acesso negado: Você não possui permissão para gerenciar Eventos.');
+          notificar('erro', 'Acesso negado: você não possui permissão para gerenciar Eventos.');
           router.push('/admin');
         }
       } catch (e) {
         console.error('Erro ao validar permissões:', e);
       }
     }
-  }, [router]);
+  }, [router, notificar]);
 
+  // 2. BUSCA DE EVENTOS
   useEffect(() => {
+    let montado = true;
+
     async function carregarEventos() {
       setLoadingEventos(true);
       try {
-        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`, {
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.EVENTOS, { action: 'GET_ALL' }), {
           method: 'GET',
           redirect: 'follow',
         });
         const resData = await response.json();
-        if (resData.status === 'success' && resData.eventos) {
-          setListaEventos(resData.eventos);
+        
+        if (resData.status === 'success' && resData.eventos && montado) {
+          // Converter dados do Supabase para formato esperado pelo admin
+          const eventosFormatados = resData.eventos.map(evento => ({
+            id: evento.id,
+            titulo: evento.titulo,
+            resumo: evento.resumo,
+            local: evento.local,
+            data: evento.data,
+            hora: evento.hora,
+            categoria: evento.categoria,
+            descricao: evento.descricao,
+            autor: evento.autor,
+            imagem: evento.imagem,
+            // Campos de inscrição - converter snake_case para camelCase
+            requerInscricao: evento.requer_inscricao,
+            inscricoesEncerradas: evento.inscricoes_encerradas,
+            geraCertificado: evento.gera_certificado,
+            vagasMaximo: evento.vagas_maximo,
+            // Arrays - fazer parse se necessário
+            formFields: typeof evento.form_fields === 'string' 
+              ? JSON.parse(evento.form_fields || '[]') 
+              : (evento.form_fields || []),
+            cronograma: typeof evento.cronograma === 'string' 
+              ? JSON.parse(evento.cronograma || '[]') 
+              : (evento.cronograma || []),
+            createdAt: evento.created_at,
+            updatedAt: evento.updated_at
+          }));
+          
+          setListaEventos(eventosFormatados);
         }
       } catch (err) {
         console.error('Erro ao carregar eventos:', err);
       } finally {
-        setLoadingEventos(false);
+        if (montado) setLoadingEventos(false);
       }
     }
 
     if (abaSub === 'gerenciar') {
       carregarEventos();
     }
+
+    return () => {
+      montado = false;
+    };
   }, [abaSub]);
 
+  // 3. BASE64 DO MODELO DE CERTIFICADO
   useEffect(() => {
+    let montado = true;
+
     async function converterImagemParaBase64() {
       const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
       const urlNormal = formatarCaminhoImagemModelo(modeloAtual?.imagem);
@@ -325,19 +482,37 @@ export default function AdminEventosPage() {
         const blob = await response.blob();
         const reader = new FileReader();
         reader.onloadend = () => {
-          setImagemModeloBase64(reader.result);
+          if (montado) setImagemModeloBase64(reader.result);
         };
         reader.readAsDataURL(blob);
       } catch (err) {
         console.error('Erro ao converter imagem para base64:', err);
-        setImagemModeloBase64(urlNormal);
+        if (montado) setImagemModeloBase64(urlNormal);
       }
     }
 
     if (abaSub === 'inscritos') {
       converterImagemParaBase64();
     }
+
+    return () => {
+      montado = false;
+    };
   }, [modeloCertificadoSelecionado, abaSub]);
+
+  // RECARREGAR EVENTOS
+  const recarregarEventos = async () => {
+    try {
+      const { data } = await supabase
+        .from('eventos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) setListaEventos(data);
+    } catch (err) {
+      console.error('Erro ao recarregar eventos:', err);
+    }
+  };
 
   // CRONOGRAMA
   const handleAdicionarItemCronograma = () => {
@@ -356,7 +531,7 @@ export default function AdminEventosPage() {
     });
   };
 
-  // CAMPOS DO FORMULÁRIO
+  // CAMPOS DO FORMULÁRIO DE INSCRIÇÃO
   const handleAdicionarCampoForm = () => {
     setFormFields((prev) => [
       ...prev,
@@ -481,29 +656,26 @@ export default function AdminEventosPage() {
     setAlterandoStatus(true);
 
     try {
-      const payload = {
-        target: 'EVENT',
-        action: 'UPDATE',
-        id: evento.id,
-        titulo: evento.titulo,
-        resumo: evento.resumo,
-        local: evento.local,
-        data: evento.data,
-        hora: evento.hora,
-        categoria: evento.categoria,
-        descricao: evento.descricao,
-        requerInscricao: evento.requerInscricao,
-        inscricoesEncerradas: novoStatus,
-        geraCertificado: evento.geraCertificado,
-        vagasMaximo: evento.vagasMaximo != null ? evento.vagasMaximo : null,
-        formFields: evento.formFields || [],
-        cronograma: evento.cronograma || []
-      };
-
-      const response = await fetch(SCRIPT_URL, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.EVENTOS), {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE',
+          id: evento.id,
+          titulo: evento.titulo,
+          resumo: evento.resumo,
+          local: evento.local,
+          data: evento.data,
+          hora: evento.hora,
+          categoria: evento.categoria,
+          descricao: evento.descricao,
+          requerInscricao: evento.requerInscricao,
+          inscricoesEncerradas: novoStatus,
+          geraCertificado: evento.geraCertificado,
+          vagasMaximo: evento.vagasMaximo,
+          formFields: evento.formFields || [],
+          cronograma: evento.cronograma || []
+        })
       });
 
       const resData = await response.json();
@@ -517,16 +689,36 @@ export default function AdminEventosPage() {
         );
         setConfirmModalAberto(null);
       } else {
-        alert('Erro ao atualizar status: ' + resData.message);
+        notificar('erro', 'Erro ao atualizar status: ' + resData.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Erro na comunicação com o servidor.');
+      notificar('erro', 'Erro ao atualizar status: ' + err.message);
     } finally {
       setAlterandoStatus(false);
     }
   };
 
+  // UPLOAD DO BANNER NO BUCKET 'eventos'
+  const uploadBannerEvento = async (file) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `banner_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('eventos')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from('eventos')
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  };
+
+  // CADASTRAR / EDITAR EVENTO NO SUPABASE
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     setLoadingForm(true);
@@ -551,11 +743,14 @@ export default function AdminEventosPage() {
     const dataOriginal = formData.get('dataEvento');
     const dataFormatadaEnvio = formatarDataParaEnvio(dataOriginal);
 
-    const processarEnvio = async (base64Image = '', name = '', type = '') => {
+    try {
+      let imagemUrl = isEditing ? (eventoEmEdicao.imagem || eventoEmEdicao.imgSrc) : '';
+
+      if (imagemArquivo) {
+        imagemUrl = await uploadBannerEvento(imagemArquivo);
+      }
+
       const payload = {
-        target: 'EVENT',
-        action: isEditing ? 'UPDATE' : 'CREATE',
-        id: isEditing ? eventoEmEdicao.id : 'evt-' + Date.now(),
         titulo: formData.get('titulo'),
         resumo: formData.get('resumo'),
         local: formData.get('local'),
@@ -563,7 +758,8 @@ export default function AdminEventosPage() {
         hora: formData.get('hora'),
         categoria: formData.get('categoria'),
         descricao: formData.get('descricao'),
-        autor: autorNome, 
+        autor: autorNome,
+        imagem: imagemUrl,
         requerInscricao: requerInscricao,
         inscricoesEncerradas: requerInscricao ? inscricoesEncerradas : false,
         geraCertificado: requerInscricao ? geraCertificado : false,
@@ -574,123 +770,122 @@ export default function AdminEventosPage() {
         cronograma: cronograma.filter(
           (item) => (item.horario && item.horario.trim() !== '') || (item.atividade && item.atividade.trim() !== '')
         ),
-        imagemBase64: base64Image,
-        imagemNome: name,
-        imagemType: type
+        updated_at: new Date().toISOString()
       };
 
-      try {
-        const response = await fetch(SCRIPT_URL, {
+      if (isEditing) {
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.EVENTOS), {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'UPDATE',
+            id: eventoEmEdicao.id,
+            ...payload
+          })
         });
-
+        
         const resData = await response.json();
-
-        if (resData.status === 'success') {
-          localStorage.removeItem('cache_portal_eventos');
-
-          setMensagem({ 
-            tipo: 'sucesso', 
-            texto: isEditing ? 'Evento atualizado com sucesso!' : 'Evento publicado com sucesso na planilha e no portal!' 
-          });
-
-          if (!isEditing) {
-            e.target.reset();
-            setCronograma([]);
-            setRequerInscricao(false);
-            setInscricoesEncerradas(false);
-            setGeraCertificado(false);
-            setVagasMaximo('');
-            setNomeArquivo('');
-          } else {
-            handleCancelarEdicao();
-            setAbaSub('gerenciar');
-          }
-        } else {
-          setMensagem({ tipo: 'erro', texto: 'Erro ao salvar evento: ' + resData.message });
+        if (resData.status !== 'success') {
+          throw new Error(resData.message || 'Erro ao atualizar evento');
         }
-      } catch (err) {
-        console.error(err);
-        setMensagem({ tipo: 'erro', texto: 'Falha na comunicação com o servidor de eventos.' });
-      } finally {
-        setLoadingForm(false);
+      } else {
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.EVENTOS), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'CREATE',
+            ...payload
+          })
+        });
+        
+        const resData = await response.json();
+        if (resData.status !== 'success') {
+          throw new Error(resData.message || 'Erro ao criar evento');
+        }
       }
-    };
 
-    if (imagemArquivo) {
-      const reader = new FileReader();
-      reader.readAsDataURL(imagemArquivo);
-      reader.onloadend = () => {
-        const base64Image = reader.result.split(',')[1];
-        processarEnvio(base64Image, imagemArquivo.name, imagemArquivo.type);
-      };
-      reader.onerror = () => {
-        setLoadingForm(false);
-        setMensagem({ tipo: 'erro', texto: 'Erro ao carregar imagem' });
-      };
-    } else {
-      processarEnvio();
+      localStorage.removeItem('cache_portal_eventos');
+
+      setMensagem({ 
+        tipo: 'sucesso', 
+        texto: isEditing ? 'Evento atualizado com sucesso!' : 'Evento publicado no portal com sucesso!' 
+      });
+
+      if (!isEditing) {
+        e.target.reset();
+        setCronograma([]);
+        setRequerInscricao(false);
+        setInscricoesEncerradas(false);
+        setGeraCertificado(false);
+        setVagasMaximo('');
+        setNomeArquivo('');
+      } else {
+        handleCancelarEdicao();
+        setAbaSub('gerenciar');
+      }
+    } catch (err) {
+      console.error(err);
+      setMensagem({ tipo: 'erro', texto: 'Erro ao salvar evento: ' + err.message });
+    } finally {
+      setLoadingForm(false);
     }
   };
 
+  // EXCLUIR EVENTO NO SUPABASE
   const handleDeletarEvento = async (id, titulo) => {
-    const confirmou = window.confirm(`Tem certeza que deseja remover o evento:\n"${titulo}"?`);
+    const confirmou = await confirmar({
+      titulo: 'Remover evento',
+      mensagem: `Tem certeza que deseja remover o evento "${titulo}"? Esta ação não pode ser desfeita.`,
+      textoConfirmar: 'Remover'
+    });
     if (!confirmou) return;
 
     setDeletandoId(id);
 
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          target: 'EVENT',
-          action: 'DELETE',
-          id: id
-        })
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.EVENTOS, { id }), {
+        method: 'DELETE'
       });
 
       const resData = await response.json();
 
       if (resData.status === 'success') {
         localStorage.removeItem('cache_portal_eventos');
-        alert('Evento excluído com sucesso!');
+        notificar('sucesso', 'Evento excluído com sucesso!');
         setListaEventos((prev) => prev.filter((item) => item.id !== id));
       } else {
-        alert('Erro ao excluir: ' + resData.message);
+        notificar('erro', 'Erro ao excluir: ' + resData.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Ocorreu um erro ao tentar excluir o evento.');
+      notificar('erro', 'Ocorreu um erro ao tentar excluir o evento: ' + err.message);
     } finally {
       setDeletandoId(null);
     }
   };
 
-  // ABRE A ABA DE INSCRITOS EM TELA CHEIA (SUBISTITUI O POPUP)
+  // BUSCA DE INSCRITOS DO EVENTO NO SUPABASE
   const handleAbrirEmissorCertificado = async (evento) => {
     setEventoCertificado(evento);
     setInscritos([]);
     setSelecionados([]);
     setModeloCertificadoSelecionado('modelo1');
     setCargaHorariaGeral('');
-    setPaginaAtual(1); // Reseta para a primeira página
+    setPaginaAtual(1);
     setAbaSub('inscritos');
     setLoadingInscritos(true);
 
     try {
-      const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(evento.titulo)}`;
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
-      });
-      const data = await res.json();
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.ADMIN_INSCRITOS, { 
+        eventoId: evento.id, 
+        eventoTitulo: evento.titulo 
+      }));
+      const resData = await response.json();
 
-      if (data && data.status === 'success' && Array.isArray(data.inscritos)) {
-        setInscritos(data.inscritos);
+      if (resData.status === 'success') {
+        setInscritos(resData.inscritos || []);
       } else {
+        console.error('Erro ao buscar inscritos:', resData.message);
         setInscritos([]);
       }
     } catch (err) {
@@ -703,49 +898,147 @@ export default function AdminEventosPage() {
 
   const handleExportarInscritosCSV = () => {
     if (inscritos.length === 0) {
-      alert('Não há inscritos para exportar.');
-      return;
-    }
-
-    const extrairValor = (p, termosBusca) => {
-      const chaveEncontrada = Object.keys(p).find((key) => {
-        const k = key.toLowerCase().trim();
-        return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
-      });
-      return chaveEncontrada ? p[chaveEncontrada] : '-';
-    };
-
-    let csvContent = '\uFEFF';
-    csvContent += 'Nº Inscrição;Nome Completo;CPF\n';
-
-    inscritos.forEach((p, index) => {
-      const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || ('INS-' + (index + 1));
-      const nome = extrairValor(p, ['nome completo', 'nome']);
-      const cpf = extrairValor(p, ['cpf']);
-
-      csvContent += `"${codigo}";"${nome}";"${cpf}"\n`;
-    });
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const nomeArquivoClean = (eventoCertificado?.titulo || 'Inscritos').replace(/[^a-zA-Z0-9]/g, '_');
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `Inscritos_Resumido_${nomeArquivoClean}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleExportarInscritosXLSX = () => {
-    if (!inscritos || inscritos.length === 0) {
-      alert('Não há inscritos para exportar.');
+      notificar('info', 'Não há inscritos para exportar.');
       return;
     }
 
     try {
-      const worksheet = XLSX.utils.json_to_sheet(inscritos);
+      const extrairValor = (p, termosBusca) => {
+        const chaveEncontrada = Object.keys(p).find((key) => {
+          const k = key.toLowerCase().trim();
+          return termosBusca.some((termo) => k.includes(termo.toLowerCase()));
+        });
+        return chaveEncontrada ? p[chaveEncontrada] : '-';
+      };
+
+      // Monta as linhas apenas com código, nome e CPF (exportação resumida)
+      const linhas = inscritos.map((p, index) => {
+        const codigo = p.codigo_inscricao || p.codigo || p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || ('INS-' + (index + 1));
+        const nome = p.nome || extrairValor(p, ['nome completo', 'nome']);
+        const cpf = p.cpf || extrairValor(p, ['cpf']);
+
+        return {
+          'Nº Inscrição': codigo,
+          'Nome Completo': nome,
+          'CPF': cpf
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(linhas, {
+        header: ['Nº Inscrição', 'Nome Completo', 'CPF']
+      });
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Inscritos');
+
+      const nomeArquivoClean = (eventoCertificado?.titulo || 'Inscritos').replace(/[^a-zA-Z0-9]/g, '_');
+      XLSX.writeFile(workbook, `Inscritos_Resumido_${nomeArquivoClean}.xlsx`);
+    } catch (error) {
+      console.error('Erro ao gerar planilha XLSX resumida:', error);
+      notificar('erro', 'Ocorreu um erro ao tentar exportar o arquivo Excel.');
+    }
+  };
+
+  const handleExportarInscritosXLSX = () => {
+    if (!inscritos || inscritos.length === 0) {
+      notificar('info', 'Não há inscritos para exportar.');
+      return;
+    }
+
+    try {
+      // Normaliza o objeto de respostas do formulário, que pode vir como
+      // objeto ({ label: valor }), array ([{ label, valor }]) ou string JSON.
+      const normalizarRespostas = (respostas) => {
+        if (!respostas) return {};
+
+        let dados = respostas;
+        if (typeof dados === 'string') {
+          try {
+            dados = JSON.parse(dados);
+          } catch {
+            return {};
+          }
+        }
+
+        // Formato array: [{ label, valor }]
+        if (Array.isArray(dados)) {
+          const obj = {};
+          dados.forEach((item) => {
+            if (item && item.label != null) {
+              obj[item.label] = item.valor ?? '';
+            }
+          });
+          return obj;
+        }
+
+        // Formato objeto: { label: valor }
+        if (typeof dados === 'object') {
+          return dados;
+        }
+
+        return {};
+      };
+
+      // 1. Descobre TODAS as colunas de formulário presentes em qualquer inscrito,
+      //    preservando a ordem em que aparecem.
+      const colunasFormulario = [];
+      const colunasVistas = new Set();
+
+      inscritos.forEach((inscrito) => {
+        const respostas = normalizarRespostas(inscrito.respostas);
+        Object.keys(respostas).forEach((label) => {
+          const chave = String(label).trim();
+          if (chave && !colunasVistas.has(chave)) {
+            colunasVistas.add(chave);
+            colunasFormulario.push(chave);
+          }
+        });
+      });
+
+      // 2. Monta cada linha combinando os campos fixos úteis + os campos
+      //    dinâmicos do formulário (achatados em colunas próprias).
+      const linhas = inscritos.map((inscrito) => {
+        const respostas = normalizarRespostas(inscrito.respostas);
+
+        const linha = {
+          'Código Inscrição': inscrito.codigo_inscricao || inscrito.codigo || '',
+          'Evento': inscrito.evento_titulo || '',
+          'Nome': inscrito.nome || '',
+          'CPF': inscrito.cpf || '',
+          'E-mail': inscrito.email || ''
+        };
+
+        // Adiciona cada campo do formulário como coluna.
+        // Evita duplicar colunas que já tenham valor nos campos fixos.
+        colunasFormulario.forEach((label) => {
+          let valor = respostas[label];
+          if (valor && typeof valor === 'object') {
+            valor = JSON.stringify(valor);
+          }
+          linha[label] = valor != null ? valor : '';
+        });
+
+        // Data de inscrição formatada por último
+        linha['Data de Inscrição'] = inscrito.created_at
+          ? new Date(inscrito.created_at).toLocaleString('pt-BR')
+          : '';
+
+        return linha;
+      });
+
+      // 3. Define a ordem final das colunas explicitamente.
+      const cabecalho = [
+        'Código Inscrição',
+        'Evento',
+        'Nome',
+        'CPF',
+        'E-mail',
+        ...colunasFormulario.filter(
+          (c) => !['Nome', 'CPF', 'E-mail', 'Nome Completo'].includes(c)
+        ),
+        'Data de Inscrição'
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(linhas, { header: cabecalho });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Inscritos');
 
@@ -755,7 +1048,7 @@ export default function AdminEventosPage() {
       XLSX.writeFile(workbook, nomeArquivo);
     } catch (error) {
       console.error('Erro ao gerar planilha XLSX:', error);
-      alert('Ocorreu um erro ao tentar exportar o arquivo Excel.');
+      notificar('erro', 'Ocorreu um erro ao tentar exportar o arquivo Excel.');
     }
   };
 
@@ -768,12 +1061,12 @@ export default function AdminEventosPage() {
       return chaveEncontrada ? p[chaveEncontrada] : '-';
     };
 
-    const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || 'INS-000';
-    const nome = extrairValor(['nome completo', 'nome']);
-    const cpf = extrairValor(['cpf']);
-    const dataNascimento = extrairValor(['nascimento', 'data nasc']);
-    const email = extrairValor(['e-mail', 'email']);
-    const dataReg = p['Data Inscrição'] || extrairValor(['data inscricao']) || new Date().toLocaleDateString('pt-BR');
+    const codigo = p.codigo || p['Código Inscrição'] || extrairValor(['código', 'codigo']) || 'INS-000';
+    const nome = p.nome || extrairValor(['nome completo', 'nome']);
+    const cpf = p.cpf || extrairValor(['cpf']);
+    const dataNascimento = p.nascimento || extrairValor(['nascimento', 'data nasc']);
+    const email = p.email || extrairValor(['e-mail', 'email']);
+    const dataReg = p.created_at ? new Date(p.created_at).toLocaleString('pt-BR') : (p['Data Inscrição'] || new Date().toLocaleString('pt-BR'));
 
     setComprovanteAdmin({
       codigo,
@@ -786,7 +1079,6 @@ export default function AdminEventosPage() {
     });
   };
 
-  // GERENCIAMENTO DA SELEÇÃO DE CERTIFICADOS
   const handleToggleSelecionarTudo = () => {
     if (selecionados.length === inscritos.length && inscritos.length > 0) {
       setSelecionados([]);
@@ -805,16 +1097,16 @@ export default function AdminEventosPage() {
     });
   };
 
-  // CÁLCULOS DA PAGINAÇÃO
+  // PAGINAÇÃO DOS INSCRITOS
   const totalPaginas = Math.ceil(inscritos.length / ITENS_POR_PAGINA);
   const inicioIndice = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const fimIndice = inicioIndice + ITENS_POR_PAGINA;
   const inscritosPaginados = inscritos.slice(inicioIndice, fimIndice);
 
-  // GERADOR E BAIXADOR UNIFICADO DE CERTIFICADOS COM NEGRITO REAL
+  // GERADOR E BAIXADOR UNIFICADO DE CERTIFICADOS
   const handleBaixarCertificados = async () => {
     if (selecionados.length === 0) {
-      alert('Selecione pelo menos um participante para baixar o certificado.');
+      notificar('info', 'Selecione pelo menos um participante para baixar o certificado.');
       return;
     }
 
@@ -832,13 +1124,12 @@ export default function AdminEventosPage() {
       const modeloAtual = MODELOS_CERTIFICADO[modeloCertificadoSelecionado] || MODELOS_CERTIFICADO.modelo1;
       const srcBg = imagemModeloBase64 || formatarCaminhoImagemModelo(modeloAtual?.imagem);
       
-      const resumoEvento = eventoCertificado?.resumo || eventoCertificado?.titulo || 'Resumo do Evento';
+      const tituloEvento = eventoCertificado?.titulo || eventoCertificado?.resumo || 'Evento';
       const dataEvento = formatarDataPorExtenso(eventoCertificado?.data);
       const localEvento = eventoCertificado?.local || 'Local';
       const cargaHoraria = cargaHorariaGeral ? cargaHorariaGeral.trim() : '';
       const cargaHorariaExtenso = numeroParaExtenso(cargaHoraria);
 
-      // Carrega imagem de fundo em base64
       let bgImageData = null;
       if (srcBg) {
         try {
@@ -854,13 +1145,12 @@ export default function AdminEventosPage() {
         }
       }
 
-      // Função utilitária com divisão por estilos (Normal / Bold)
       const criarPdfCertificado = (idxSelect) => {
         const p = inscritos[idxSelect];
         if (!p) return null;
 
-        const nome = extrairValor(p, ['nome completo', 'nome']) || 'PARTICIPANTE';
-        const codigo = p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || eventoCertificado.id;
+        const nome = p.nome || extrairValor(p, ['nome completo', 'nome']) || 'PARTICIPANTE';
+        const codigo = p.codigo || p['Código Inscrição'] || extrairValor(p, ['código', 'codigo']) || eventoCertificado.id;
 
         const doc = new jsPDF({
           orientation: 'landscape',
@@ -868,19 +1158,16 @@ export default function AdminEventosPage() {
           format: 'a4'
         });
 
-        // 1. Fundo
         if (bgImageData) {
           doc.addImage(bgImageData, 'PNG', 0, 0, 297, 210);
         }
 
-        // 2. Nome
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(24);
         doc.setTextColor(15, 23, 42);
         const nomeFormatado = String(nome).toUpperCase().trim();
         doc.text(nomeFormatado, 148.5, 80, { align: 'center' });
 
-        // 3. Texto do Certificado com Trechos em Negrito
         doc.setFontSize(11);
         doc.setTextColor(51, 65, 85);
 
@@ -889,7 +1176,7 @@ export default function AdminEventosPage() {
         if (modeloCertificadoSelecionado === 'modelo2') {
           segmentos = [
             { text: 'Concluiu com êxito a participação no Simpósio de Saúde sobre ', style: 'normal' },
-            { text: `"${resumoEvento}"`, style: 'bold' },
+            { text: `"${tituloEvento}"`, style: 'bold' },
             { text: `, promovido no dia ${dataEvento}, nas dependências de ${localEvento}`, style: 'normal' }
           ];
 
@@ -903,7 +1190,7 @@ export default function AdminEventosPage() {
         } else {
           segmentos = [
             { text: 'Participou da Plenária Municipal de Saúde de Muriaé, com o tema ', style: 'normal' },
-            { text: `"${resumoEvento}"`, style: 'bold' },
+            { text: `"${tituloEvento}"`, style: 'bold' },
             { text: ` realizada no dia ${dataEvento}, no ${localEvento}, em Muriaé-MG`, style: 'normal' }
           ];
 
@@ -916,8 +1203,7 @@ export default function AdminEventosPage() {
           }
         }
 
-        // Algoritmo de quebra de linha e centralização preservando estilos
-        const larguraMax = 220; // mm
+        const larguraMax = 220;
         let linhas = [];
         let linhaAtual = [];
         let larguraLinhaAtual = 0;
@@ -961,7 +1247,6 @@ export default function AdminEventosPage() {
           yPos += alturaLinha;
         });
 
-        // 4. Autenticidade
         doc.setFont('courier', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
@@ -970,7 +1255,6 @@ export default function AdminEventosPage() {
         return { doc, nomeFormatado };
       };
 
-      // CASO 1: SE 1 SELECIONADO -> PDF DIRETO
       if (selecionados.length === 1) {
         const resultado = criarPdfCertificado(selecionados[0]);
         if (resultado) {
@@ -978,7 +1262,6 @@ export default function AdminEventosPage() {
           resultado.doc.save(`Certificado_${nomeArquivoClean}.pdf`);
         }
       } 
-      // CASO 2: SE MÚLTIPLOS SELECIONADOS -> ARQUIVO ZIP COM PDFS
       else {
         const zip = new JSZip();
 
@@ -1006,7 +1289,7 @@ export default function AdminEventosPage() {
 
     } catch (error) {
       console.error('Erro ao gerar certificado:', error);
-      alert('Ocorreu um erro ao gerar o(s) certificado(s).');
+      notificar('erro', 'Ocorreu um erro ao gerar o(s) certificado(s).');
     } finally {
       setGerandoZip(false);
     }
@@ -1051,14 +1334,14 @@ export default function AdminEventosPage() {
               onClick={() => setAbaSub('inscritos')}
               className={`${styles.subTabBtn} ${styles.subTabInscritosActive}`}
             >
-              <Users size={16} /> Inscritos: {eventoCertificado?.titulo || 'Evento'}
+              <ClipboardList size={16} /> Inscritos: {eventoCertificado?.titulo || 'Evento'}
             </button>
           )}
         </div>
 
         {mensagem && (
           <div className={`${styles.alertMessage} ${mensagem.tipo === 'sucesso' ? styles.alertSucesso : styles.alertErro}`}>
-            {mensagem.tipo === 'sucesso' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+            <AlertCircle size={20} />
             {mensagem.texto}
           </div>
         )}
@@ -1163,10 +1446,8 @@ export default function AdminEventosPage() {
                           Encerrar Inscrições? (Impede novos cadastros no site)
                         </label>
 
-                        {/* CAMPO DE LIMITE DE VAGAS */}
                         <div className={styles.vagasFieldWrapper}>
                           <label className={styles.vagasFieldLabel}>
-                            <Users size={16} color="#0284c7" />
                             Limite de Vagas <span className={styles.vagasFieldOptional}>(deixe em branco para ilimitado)</span>
                           </label>
                           <input
@@ -1402,7 +1683,8 @@ export default function AdminEventosPage() {
             ) : listaEventos.length > 0 ? (
               <div className={styles.newsListContainer}>
                 {listaEventos.map((item) => {
-                  const urlTratadaImagem = formatarCaminhoImagemModelo(item.imgSrc || item.imagem);
+                  const imagemOriginal = item.imgSrc || item.imagem || '';
+                  const urlTratadaImagem = imagemOriginal ? formatarCaminhoImagemModelo(imagemOriginal) : '';
                   const horaLimpa = limparHora(item.hora);
 
                   return (
@@ -1410,15 +1692,18 @@ export default function AdminEventosPage() {
                       <div className={styles.newsItemContent}>
                         
                         <div className={styles.imageThumbnailWrapper}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img 
-                            src={urlTratadaImagem} 
-                            alt={item.titulo || 'Capa do Evento'} 
-                            className={styles.thumbnailImgDirect}
-                            onError={(e) => {
-                              e.currentTarget.src = '/img/eventos/simposio.png';
-                            }}
-                          />
+                          {urlTratadaImagem ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img 
+                              src={urlTratadaImagem} 
+                              alt={item.titulo || 'Capa do Evento'} 
+                              className={styles.thumbnailImgDirect}
+                            />
+                          ) : (
+                            <div className={styles.thumbnailPlaceholder}>
+                              <Camera size={24} strokeWidth={1.5} />
+                            </div>
+                          )}
                         </div>
 
                         <div>
@@ -1447,7 +1732,7 @@ export default function AdminEventosPage() {
                               className={item.inscricoesEncerradas ? styles.btnReabrirInscricao : styles.btnLockInscricao}
                               title={item.inscricoesEncerradas ? 'Reabrir Inscrições' : 'Encerrar Inscrições'}
                             >
-                              {item.inscricoesEncerradas ? <Unlock size={15} /> : <Lock size={15} />}
+                              <Lock size={15} />
                               {item.inscricoesEncerradas ? 'Reabrir' : 'Encerrar Inscrições'}
                             </button>
 
@@ -1477,7 +1762,7 @@ export default function AdminEventosPage() {
           </div>
         )}
 
-        {/* ABA 3: GERENCIAR INSCRITOS (COM PAGINAÇÃO A CADA 30 INSCRITOS) */}
+        {/* ABA 3: GERENCIAR INSCRITOS */}
         {abaSub === 'inscritos' && eventoCertificado && (
           <div className={styles.cardSection}>
             <div className={styles.inscritosHeaderBar}>
@@ -1487,7 +1772,6 @@ export default function AdminEventosPage() {
                   <ClipboardList color="#0284c7" size={24} /> {eventoCertificado.titulo}
                 </h2>
 
-                {/* CONTADOR DE VAGAS NA ABA INSCRITOS */}
                 {(() => {
                   const limite = eventoCertificado.vagasMaximo != null ? parseInt(eventoCertificado.vagasMaximo, 10) : null;
                   if (!limite || isNaN(limite)) return null;
@@ -1521,9 +1805,9 @@ export default function AdminEventosPage() {
                   onClick={handleExportarInscritosCSV}
                   disabled={inscritos.length === 0}
                   className={styles.btnExportarCsv}
-                  title="Exportar apenas código, nome e CPF em CSV"
+                  title="Exportar apenas código, nome e CPF em Excel (.xlsx)"
                 >
-                  <Download size={15} /> Exportar Resumido
+                  <Download size={15} /> Exportar inscrição
                 </button>
 
                 <button 
@@ -1533,7 +1817,7 @@ export default function AdminEventosPage() {
                   className={styles.btnExportarXlsx}
                   title="Exportar todas as colunas da planilha em formato nativo do Excel (.xlsx)"
                 >
-                  <Table size={15} /> Exportar Completo
+                  <Table size={15} /> Exportar Formulário
                 </button>
 
                 <button 
@@ -1549,7 +1833,7 @@ export default function AdminEventosPage() {
             <div className={styles.modalControlsBoxFull}>
               <div>
                 <label className={styles.modalLabelWithIcon}>
-                  <FileText size={14} /> Modelo / Layout do Certificado:
+                  Modelo / Layout do Certificado:
                 </label>
                 <select 
                   value={modeloCertificadoSelecionado}
@@ -1582,7 +1866,7 @@ export default function AdminEventosPage() {
                   onClick={handleBaixarCertificados}
                   disabled={selecionados.length === 0 || gerandoZip}
                   className={styles.btnExportarZipLarge}
-                  title="Baixar certificado em PDF (se 1 selecionado) ou em arquivo ZIP com PDFs separados (se múltiplos selecionados)"
+                  title="Baixar certificado em PDF"
                 >
                   {gerandoZip ? (
                     <><Loader2 size={18} className="animate-spin" /> Processando...</>
@@ -1602,7 +1886,6 @@ export default function AdminEventosPage() {
                   onClick={handleToggleSelecionarTudo}
                   className={styles.toggleAllBtn}
                 >
-                  {selecionados.length === inscritos.length && inscritos.length > 0 ? <CheckSquare size={18} color="#0284c7" /> : <Square size={18} />} 
                   {selecionados.length === inscritos.length && inscritos.length > 0 ? 'Desmarcar Todos' : 'Selecionar Todos os Participantes'}
                 </button>
                 
@@ -1611,7 +1894,6 @@ export default function AdminEventosPage() {
                 </span>
               </div>
 
-              {/* INFO DA PÁGINA */}
               {inscritos.length > 0 && (
                 <span className={styles.paginaInfoText}>
                   Exibindo <strong>{inicioIndice + 1}</strong>–<strong>{Math.min(fimIndice, inscritos.length)}</strong> de <strong>{inscritos.length}</strong>
@@ -1649,9 +1931,9 @@ export default function AdminEventosPage() {
                         return chaveEncontrada ? p[chaveEncontrada] : null;
                       };
 
-                      const nome = extrairValor(['nome completo', 'nome']) || 'Participante';
-                      const cpf = extrairValor(['cpf']) || '-';
-                      const codigo = p['Código Inscrição'] || extrairValor(['código', 'codigo']) || '-';
+                      const nome = p.nome || extrairValor(['nome completo', 'nome']) || 'Participante';
+                      const cpf = p.cpf || extrairValor(['cpf']) || '-';
+                      const codigo = p.codigo || p['Código Inscrição'] || extrairValor(['código', 'codigo']) || '-';
 
                       return (
                         <tr key={idxGlobal} className={isSelected ? styles.selectedRow : ''}>
@@ -1691,7 +1973,6 @@ export default function AdminEventosPage() {
               )}
             </div>
 
-            {/* BARRA DE CONTROLE DA PAGINAÇÃO */}
             {totalPaginas > 1 && (
               <div className={styles.paginationContainer}>
                 <button
@@ -1774,7 +2055,7 @@ export default function AdminEventosPage() {
                 ) : confirmModalData.novoStatus ? (
                   <><Lock size={16} /> Confirmar Encerramento</>
                 ) : (
-                  <><Unlock size={16} /> Confirmar Reabertura</>
+                  <><Lock size={16} /> Confirmar Reabertura</>
                 )}
               </button>
             </div>
@@ -1811,7 +2092,7 @@ export default function AdminEventosPage() {
                 <span className={styles.ticketSectionLabel}>EVENTO SELECIONADO</span>
                 <h3 className={styles.ticketEventTitle}>{comprovanteAdmin.evento}</h3>
                 <div className={styles.ticketMetaRow}>
-                  <span>📅 <strong>Data de Registro:</strong> {formatarDataParaExibicao(comprovanteAdmin.dataHora)}</span>
+                  <span>📅 <strong>Data e hora da inscrição:</strong> {comprovanteAdmin.dataHora}</span>
                 </div>
               </div>
 
@@ -1824,14 +2105,6 @@ export default function AdminEventosPage() {
                   <strong className={styles.ticketDetailLabel}>CPF</strong>
                   <span className={styles.ticketDetailValue}>{comprovanteAdmin.cpf}</span>
                 </div>
-                <div className={styles.ticketDetailItem}>
-                  <strong className={styles.ticketDetailLabel}>Data de Nascimento</strong>
-                  <span className={styles.ticketDetailValue}>{formatarDataParaExibicao(comprovanteAdmin.dataNascimento)}</span>
-                </div>
-                <div className={styles.ticketDetailItem}>
-                  <strong className={styles.ticketDetailLabel}>E-mail</strong>
-                  <span className={styles.ticketDetailValue}>{comprovanteAdmin.email}</span>
-                </div>
               </div>
 
               <div className={styles.ticketFooter}>
@@ -1842,10 +2115,16 @@ export default function AdminEventosPage() {
 
             <div className={styles.flexRowGap12}>
               <button 
-                onClick={() => window.print()}
+                onClick={handleBaixarComprovanteAdminPdf}
                 className={styles.btnDownloadPdf}
               >
-                <Printer size={16} /> Imprimir Comprovante
+                <Download size={16} /> Baixar PDF
+              </button>
+              <button 
+                onClick={handleImprimirComprovanteAdmin}
+                className={styles.btnImprimirPdf}
+              >
+                <Printer size={16} /> Imprimir
               </button>
               <button 
                 onClick={() => setComprovanteAdmin(null)}

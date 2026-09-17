@@ -1,67 +1,54 @@
-import Papa from 'papaparse';
-
-const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqaHp2GoWXoHsYmsELjBXVwfVvserOmyipeTHbvxAq939fLXoArpDEIMwCFqdB_3lPSS89Yyq6Ncv4/pub?output=csv";
-
-const noticiasEstaticas = {};
+import { supabase } from '@/lib/supabase';
 
 /**
- * Função para buscar e converter as notícias da planilha em um objeto indexado por ID/Slug
+ * Função para buscar as notícias salvas na tabela 'noticias' do Supabase
+ * e retornar um objeto indexado por ID
  */
 export async function getDbNoticias() {
   try {
-    const response = await fetch(`${GOOGLE_SHEETS_CSV_URL}&_t=${Date.now()}`, {
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      throw new Error('Falha ao carregar notícias do CSV.');
+    const { data, error } = await supabase
+      .from('noticias')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
     }
 
-    const csvText = await response.text();
+    const dbDinamico = {};
 
-    return new Promise((resolve) => {
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const dbDinamico = {};
-
-          results.data.forEach((row) => {
-            const id = row.id || row.ID || row.Id;
-            if (id) {
-              dbDinamico[String(id).trim()] = {
-                id: String(id).trim(),
-                titulo: row.titulo || row.Titulo || '',
-                resumo: row.resumo || row.Resumo || '',
-                data: row.data || row.Data || '',
-                categoria: row.categoria || row.Categoria || '',
-                tipoCategoria: row.tipoCategoria || row.tipo || 'infra',
-                imagem: row.imagem || row.Imagem || '/img/noticias/noticia1.jpeg',
-                conteudo: row.conteudo || row.Conteudo || ''
-              };
-            }
-          });
-
-          resolve(dbDinamico);
-        },
-        error: (err) => {
-          console.error('Erro ao converter CSV:', err);
-          resolve({});
-        }
-      });
+    (data || []).forEach((row) => {
+      if (row.id) {
+        const idStr = String(row.id).trim();
+        dbDinamico[idStr] = {
+          id: idStr,
+          titulo: row.titulo || '',
+          resumo: row.resumo || '',
+          data: row.data || '',
+          categoria: row.categoria || '',
+          tipoCategoria: row.tipo_categoria || row.categoria || 'infra',
+          imagem: row.imagem || '',
+          conteudo: row.conteudo || '',
+          autor: row.autor || ''
+        };
+      }
     });
+
+    return dbDinamico;
   } catch (error) {
-    console.error('Erro na requisição das notícias do Google Sheets:', error);
+    console.error('Erro na requisição das notícias do Supabase:', error);
     return {};
   }
 }
 
-
+/**
+ * Função para converter a string de data (DD/MM/YYYY ou YYYY-MM-DD) em um objeto Date
+ */
 export function converterParaDate(dataStr) {
   if (!dataStr) return new Date(0);
   const str = String(dataStr).trim();
 
-  // Tratamento para datas no formato DD/MM/AAAA ou DD MMM AAAA
+  // Tratamento para datas no formato DD/MM/AAAA
   if (str.includes('/')) {
     const partes = str.split('/');
     if (partes.length === 3) {
@@ -69,7 +56,7 @@ export function converterParaDate(dataStr) {
     }
   }
 
-  // Tratamento para YYYY-MM-DD
+  // Tratamento para formato YYYY-MM-DD
   const dataParsed = new Date(str.includes('T') ? str : `${str}T00:00:00`);
   return isNaN(dataParsed.getTime()) ? new Date(0) : dataParsed;
 }

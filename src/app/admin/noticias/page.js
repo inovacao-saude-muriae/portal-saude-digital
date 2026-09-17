@@ -14,11 +14,13 @@ import {
   List, 
   PlusCircle, 
   Pencil, 
-  XCircle 
+  XCircle,
+  Camera
 } from 'lucide-react';
 import styles from './AdminNoticia.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwsi09GSHFIZSj_y77dxpz7pRBJAKwk0DE_fi_-O8yddeVtU5S6Ue8VFc1uRiGIRbKKMQ/exec';
+import { supabase } from '@/lib/supabase';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
+import { useUI } from '@/components/UIFeedback';
 
 const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
@@ -38,11 +40,11 @@ function getClasseCategoria(categoria) {
 
 // FUNÇÃO RESILIENTE PARA EXTRAIR E FORMATAR IMAGENS DO GOOGLE DRIVE
 function extrairImagem(item) {
-  if (!item) return '/img/noticias/noticia1.jpeg';
+  if (!item) return '';
   
   let url = item.imagem || item.imgSrc || item.imageUrl || item.img || '';
   if (typeof url !== 'string' || !url.trim()) {
-    return '/img/noticias/noticia1.jpeg';
+    return '';
   }
 
   url = url.trim();
@@ -186,6 +188,8 @@ function formatarDataParaInput(dataStr) {
 }
 
 export default function AdminNoticiasPage() {
+  const { notificar, confirmar } = useUI();
+
   const [abaSub, setAbaSub] = useState('cadastrar');
   const [loadingForm, setLoadingForm] = useState(false);
   const [mensagem, setMensagem] = useState(null);
@@ -200,11 +204,7 @@ export default function AdminNoticiasPage() {
     async function carregarNoticias() {
       setLoadingNoticias(true);
       try {
-        const response = await fetch(`${SCRIPT_URL}?target=NEWS&action=GET_ALL&_t=${Date.now()}`, {
-          method: 'GET',
-          redirect: 'follow',
-        });
-
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.NOTICIAS, { _t: Date.now() }));
         const resData = await response.json();
 
         if (resData.status === 'success' && Array.isArray(resData.noticias)) {
@@ -224,6 +224,24 @@ export default function AdminNoticiasPage() {
       carregarNoticias();
     }
   }, [abaSub]);
+
+  // UPLOAD DA IMAGEM NO BUCKET 'noticias'
+  const uploadImagemNoticia = async (file) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `noticia_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('noticias')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from('noticias')
+      .getPublicUrl(fileName);
+
+    return publicUrlData.publicUrl;
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -269,98 +287,89 @@ export default function AdminNoticiasPage() {
     const dataOriginal = formData.get('dataNoticia');
     const dataFormatadaEnvio = formatarDataParaEnvio(dataOriginal);
 
-    const processarEnvio = async (base64Image = '', name = '', type = '') => {
+    try {
+      // Se houver nova imagem, faz o upload no Supabase Storage.
+      // Caso contrário, mantém a imagem atual (na edição) ou deixa vazio.
+      let imagemUrl = isEditing ? (noticiaEmEdicao.imagem || noticiaEmEdicao.imgSrc || '') : '';
+
+      if (imagemArquivo) {
+        imagemUrl = await uploadImagemNoticia(imagemArquivo);
+      }
+
       const payload = {
-        target: 'NEWS',
         action: isEditing ? 'UPDATE' : 'CREATE',
-        id: isEditing ? noticiaEmEdicao.id : 'news-' + Date.now(),
+        id: isEditing ? noticiaEmEdicao.id : undefined,
         titulo: formData.get('titulo'),
         resumo: formData.get('resumo'),
         data: dataFormatadaEnvio,
         categoria: formData.get('categoria'),
+        tipoCategoria: formData.get('categoria'),
         conteudo: formData.get('conteudo'),
         autor: autorNome,
-        imagemBase64: base64Image,
-        imagemNome: name,
-        imagemType: type
+        imagem: imagemUrl
       };
 
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-        });
-
-        const resData = await response.json();
-
-        if (resData.status === 'success') {
-          localStorage.removeItem('cache_portal_noticias');
-
-          setMensagem({ 
-            tipo: 'sucesso', 
-            texto: isEditing ? 'Notícia atualizada com sucesso!' : 'Notícia publicada com sucesso no portal!' 
-          });
-
-          if (!isEditing) {
-            e.target.reset();
-            setNomeArquivo('');
-          } else {
-            handleCancelarEdicao();
-            setAbaSub('gerenciar');
-          }
-        } else {
-          setMensagem({ tipo: 'erro', texto: 'Erro ao salvar notícia: ' + resData.message });
-        }
-      } catch (err) {
-        console.error(err);
-        setMensagem({ tipo: 'erro', texto: 'Falha na comunicação com o servidor.' });
-      } finally {
-        setLoadingForm(false);
-      }
-    };
-
-    if (imagemArquivo) {
-      const reader = new FileReader();
-      reader.readAsDataURL(imagemArquivo);
-      reader.onloadend = () => {
-        const base64Image = reader.result.split(',')[1];
-        processarEnvio(base64Image, imagemArquivo.name, imagemArquivo.type);
-      };
-    } else {
-      processarEnvio();
-    }
-  };
-
-  const handleDeletarNoticia = async (id, titulo) => {
-    const confirmou = window.confirm(`Tem certeza que deseja remover a notícia:\n"${titulo}"?`);
-    if (!confirmou) return;
-
-    setDeletandoId(id);
-
-    try {
-      const response = await fetch(SCRIPT_URL, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.NOTICIAS), {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          target: 'NEWS',
-          action: 'DELETE',
-          id: id
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
 
       const resData = await response.json();
 
       if (resData.status === 'success') {
         localStorage.removeItem('cache_portal_noticias');
-        alert('Notícia excluída com sucesso!');
-        setListaNoticias((prev) => prev.filter((item) => item.id !== id));
+
+        setMensagem({
+          tipo: 'sucesso',
+          texto: isEditing ? 'Notícia atualizada com sucesso!' : 'Notícia publicada com sucesso no portal!'
+        });
+
+        if (!isEditing) {
+          e.target.reset();
+          setNomeArquivo('');
+        } else {
+          handleCancelarEdicao();
+          setAbaSub('gerenciar');
+        }
       } else {
-        alert('Erro ao excluir: ' + resData.message);
+        setMensagem({ tipo: 'erro', texto: 'Erro ao salvar notícia: ' + (resData.message || 'Erro desconhecido') });
       }
     } catch (err) {
       console.error(err);
-      alert('Ocorreu um erro ao tentar excluir a notícia.');
+      setMensagem({ tipo: 'erro', texto: 'Erro ao salvar notícia: ' + err.message });
+    } finally {
+      setLoadingForm(false);
+    }
+  };
+
+  const handleDeletarNoticia = async (id, titulo) => {
+    const confirmou = await confirmar({
+      titulo: 'Remover notícia',
+      mensagem: `Tem certeza que deseja remover a notícia "${titulo}"? Esta ação não pode ser desfeita.`,
+      textoConfirmar: 'Remover'
+    });
+    if (!confirmou) return;
+
+    setDeletandoId(id);
+
+    try {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.NOTICIAS, { id }), {
+        method: 'DELETE'
+      });
+
+      const resData = await response.json();
+
+      if (resData.status === 'success') {
+        localStorage.removeItem('cache_portal_noticias');
+        notificar('sucesso', 'Notícia excluída com sucesso!');
+        setListaNoticias((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        notificar('erro', 'Erro ao excluir: ' + resData.message);
+      }
+    } catch (err) {
+      console.error(err);
+      notificar('erro', 'Ocorreu um erro ao tentar excluir a notícia.');
     } finally {
       setDeletandoId(null);
     }
@@ -507,7 +516,7 @@ export default function AdminNoticiasPage() {
                     <div className={styles.uploadSubtext}>Formatos JPG, PNG ou WEBP</div>
                     {nomeArquivo ? (
                       <span className={styles.fileNameBadge}>📷 {nomeArquivo}</span>
-                    ) : extrairImagem(noticiaEmEdicao) !== '/img/noticias/noticia1.jpeg' ? (
+                    ) : extrairImagem(noticiaEmEdicao) ? (
                       <span className={styles.fileNameBadge}>📷 Imagem mantida</span>
                     ) : null}
                     <input type="file" name="imagem" accept="image/*" onChange={handleFileChange} className={styles.fileInputHidden} />
@@ -539,14 +548,20 @@ export default function AdminNoticiasPage() {
                     <div key={item.id} className={styles.newsItemRow}>
                       <div className={styles.newsItemContent}>
                         <div className={styles.imageThumbnailWrapper}>
-                          <Image 
-                            src={imagemUrl} 
-                            alt={item.titulo || 'Notícia'} 
-                            fill 
-                            sizes="90px"
-                            className={styles.thumbnailImg} 
-                            unoptimized 
-                          />
+                          {imagemUrl ? (
+                            <Image 
+                              src={imagemUrl} 
+                              alt={item.titulo || 'Notícia'} 
+                              fill 
+                              sizes="90px"
+                              className={styles.thumbnailImg} 
+                              unoptimized 
+                            />
+                          ) : (
+                            <div className={styles.thumbnailPlaceholder}>
+                              <Camera size={22} strokeWidth={1.5} />
+                            </div>
+                          )}
                           
                           <div className={styles.dateBadgeOverlay}>
                             <span className={styles.badgeDay}>{dia}</span>

@@ -88,6 +88,24 @@
   height: 100%;
 }
 
+/* PLACEHOLDER PARA NOTÍCIAS SEM IMAGEM (ícone de câmera) */
+.cardImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.cardImagePlaceholder span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* Conteúdo de texto do cartão */
 .cardContent {
   padding: 20px;
