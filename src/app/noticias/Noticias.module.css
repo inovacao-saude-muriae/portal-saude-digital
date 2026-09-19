@@ -92,6 +92,7 @@
   color: #0369a1; 
   border: 1px solid #bae6fd; 
 }
+
 .catInfraestrutura { 
   background-color: #fef3c7; 
   color: #b45309; 
@@ -102,31 +103,37 @@
   color: #15803d; 
   border: 1px solid #bbf7d0; 
 }
+
 .catComunicado { 
   background-color: #fee2e2; 
   color: #b91c1c; 
   border: 1px solid #fecaca; 
 }
+
 .catInovacao { 
   background-color: #f3e8ff; 
   color: #6b21a8; 
   border: 1px solid #e9d5ff; 
 }
+
 .catCampanha { 
   background-color: #ffedd5; 
   color: #c2410c; 
   border: 1px solid #fed7aa; 
 }
+
 .catInauguracao { 
   background-color: #e0e7ff; 
   color: #3730a3; 
   border: 1px solid #c7d2fe; 
 }
+
 .catPadrao { 
   background-color: #f1f5f9; 
   color: #475569; 
   border: 1px solid #cbd5e1; 
 }
+
 /* ==========================================================================
    --- BARRA DE NAVEGAÇÃO DE VOLTAR --- 
    ========================================================================== */
@@ -266,6 +273,24 @@
   object-fit: cover;
 }
 
+/* PLACEHOLDER PARA NOTÍCIAS SEM IMAGEM (ícone de câmera) */
+.imagemNoticiaPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.imagemNoticiaPlaceholder span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .infoCard {
   padding: 24px;
   display: flex;
@@ -288,11 +313,6 @@
 }
 
 /* Categorias customizadas */
-.catVacinacao {
-  background-color: #e0f2fe;
-  color: #0369a1;
-}
-
 .catInfra {
   background-color: #f0fdf4;
   color: #2b943d;

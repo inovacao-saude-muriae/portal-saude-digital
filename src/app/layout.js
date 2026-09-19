@@ -1,6 +1,10 @@
 import "@/app/globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import VLibras from "@/components/VLibras";
+import LeitorTela from "@/components/LeitorTela";
+import { UIFeedbackProvider } from "@/components/UIFeedback";
 
 export const metadata = {
     title: "Portal Saúde Digital Muriaé",
@@ -14,11 +18,16 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR">
       {/* Adicione a propriedade abaixo para ignorar atributos injetados por extensões */}
       <body suppressHydrationWarning>
-        <Header />
-        <main style={{ minHeight: 'calc(100vh - 400px)' }}>
-          {children}
-        </main>
-        <Footer /> 
+        <UIFeedbackProvider>
+          <ScrollToTop />
+          <Header />
+          <main style={{ minHeight: 'calc(100vh - 400px)' }}>
+            {children}
+          </main>
+          <Footer /> 
+          <VLibras />
+          <LeitorTela />
+        </UIFeedbackProvider>
       </body>
     </html>
   );

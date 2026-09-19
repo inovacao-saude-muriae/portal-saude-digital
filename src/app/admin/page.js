@@ -12,11 +12,14 @@ import {
   LogOut,
   Images,
   Sparkles,
-  PawPrint
+  PawPrint,
+  ClipboardList,
+  UserCog
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import styles from './AdminHub.module.css';
 
-// Função para inscrever ouvintes de eventos (não precisamos escutar mudanças externas aqui)
+// Função para inscrever ouvintes de eventos (leitura reativa do localStorage)
 const subscribe = () => () => {};
 
 // Lê os dados do localStorage apenas no navegador
@@ -46,19 +49,55 @@ export default function AdminHubPage() {
     }
   }
 
-  // Valida a autenticação apenas no navegador
+  // Valida a autenticação. Fonte primária: o token salvo no localStorage
+  // (que persiste entre páginas). O Supabase é consultado apenas para
+  // renovar/sincronizar o token, sem deslogar caso ele demore a reidratar.
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-      router.push('/admin/login');
+    let ativo = true;
+
+    async function checarSessao() {
+      const tokenLocal = localStorage.getItem('auth_token');
+      const userLocal = localStorage.getItem('user_info');
+
+      // Sem credencial local nenhuma => não está logado
+      if (!tokenLocal || !userLocal) {
+        router.push('/admin/login');
+        return;
+      }
+
+      // Tem credencial local: mantém o usuário logado.
+      // Tenta sincronizar com a sessão do Supabase de forma não-destrutiva.
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!ativo) return;
+        if (session?.access_token) {
+          localStorage.setItem('auth_token', session.access_token);
+        }
+      } catch (err) {
+        // Falha ao consultar a sessão não deve deslogar o usuário
+        console.warn('Não foi possível sincronizar a sessão:', err);
+      }
     }
+
+    checarSessao();
+
+    return () => {
+      ativo = false;
+    };
   }, [router]);
 
-  // Função para encerrar a sessão
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_info');
-    router.push('/admin/login');
+  // Função para encerrar a sessão no Supabase e limpar o navegador
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Erro ao fazer logout no Supabase:', err);
+    } finally {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+      window.dispatchEvent(new Event('auth-changed'));
+      router.push('/admin/login');
+    }
   };
 
   // Identifica o cargo do usuário logado (padrão: 'admin')
@@ -128,13 +167,28 @@ export default function AdminHubPage() {
                 <span className={styles.cardBadgeGreen} style={{ backgroundColor: '#e6f4f1', color: '#008a83' }}>
                   Zoonoses
                 </span>
-                <h2 className={styles.cardTitle}>Gerenciar Adoção (CCZ)</h2>
-                <p className={styles.cardDescription}>
-                  Cadastre novos animais com fotos, edite históricos e remova os peludinhos adotados.
-                </p>
+                <h2 className={styles.cardTitle}>Gerenciar Animais para adoção</h2>
               </div>
               <Link href="/admin/adocao" className={styles.actionBtnGreen} style={{ backgroundColor: '#008a83' }}>
-                Acessar CCZ <ArrowRight size={18} />
+                Acessar<ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
+
+          {/* MÓDULO: SOLICITAÇÕES DE ADOÇÃO RECEBIDAS */}
+          {temPermissao(['ccz', 'zoonoses', 'veterinario']) && (
+            <div className={styles.moduleCard}>
+              <div className={styles.iconWrapperGreen} style={{ backgroundColor: '#e6f4f1', color: '#008a83' }}>
+                <ClipboardList size={32} />
+              </div>
+              <div className={styles.cardContent}>
+                <span className={styles.cardBadgeGreen} style={{ backgroundColor: '#e6f4f1', color: '#008a83' }}>
+                  Zoonoses
+                </span>
+                <h2 className={styles.cardTitle}>Solicitações de Adoção</h2>
+              </div>
+              <Link href="/admin/adocao-solicitacoes" className={styles.actionBtnGreen} style={{ backgroundColor: '#008a83' }}>
+                Ver Solicitações <ArrowRight size={18} />
               </Link>
             </div>
           )}
@@ -148,12 +202,10 @@ export default function AdminHubPage() {
               <div className={styles.cardContent}>
                 <span className={styles.cardBadge}>Página Inicial</span>
                 <h2 className={styles.cardTitle}>Indicadores da Home</h2>
-                <p className={styles.cardDescription}>
-                  Altere os números e rótulos dos 4 cartões de estatísticas do banner principal.
-                </p>
+        
               </div>
               <Link href="/admin/hero" className={styles.actionBtnBlue}>
-                Acessar Indicadores <ArrowRight size={18} />
+                Acessar<ArrowRight size={18} />
               </Link>
             </div>
           )}
@@ -167,12 +219,9 @@ export default function AdminHubPage() {
               <div className={styles.cardContent}>
                 <span className={styles.cardBadgePurple}>Destaques</span>
                 <h2 className={styles.cardTitle}>Gerenciar Carrossel</h2>
-                <p className={styles.cardDescription}>
-                  Cadastre e edite as imagens e campanhas em destaque exibidas na página inicial.
-                </p>
               </div>
               <Link href="/admin/carousel" className={styles.actionBtnPurple}>
-                Acessar Carrossel <ArrowRight size={18} />
+                Acessar <ArrowRight size={18} />
               </Link>
             </div>
           )}
@@ -186,12 +235,9 @@ export default function AdminHubPage() {
               <div className={styles.cardContent}>
                 <span className={styles.cardBadge}>Comunicação</span>
                 <h2 className={styles.cardTitle}>Gerenciar Notícias</h2>
-                <p className={styles.cardDescription}>
-                  Publique comunicados oficiais, matérias jornalísticas e novidades do SUS municipal.
-                </p>
               </div>
               <Link href="/admin/noticias" className={styles.actionBtnBlue}>
-                Acessar Notícias <ArrowRight size={18} />
+                Acessar<ArrowRight size={18} />
               </Link>
             </div>
           )}
@@ -205,12 +251,25 @@ export default function AdminHubPage() {
               <div className={styles.cardContent}>
                 <span className={styles.cardBadgeGreen}>Agendamento Público</span>
                 <h2 className={styles.cardTitle}>Gerenciar Eventos</h2>
-                <p className={styles.cardDescription}>
-                  Cadastre mutirões de saúde, campanhas de vacinação, workshops e ações comunitárias.
-                </p>
               </div>
               <Link href="/admin/eventos" className={styles.actionBtnGreen}>
-                Acessar Eventos <ArrowRight size={18} />
+                Acessar<ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
+
+          {/* MÓDULO: GERENCIAR USUÁRIOS (somente administradores) */}
+          {(userCargo === 'admin' || userCargo === 'master' || userCargo === 'gestor') && (
+            <div className={styles.moduleCard}>
+              <div className={styles.iconWrapperBlue}>
+                <UserCog size={32} />
+              </div>
+              <div className={styles.cardContent}>
+                <span className={styles.cardBadge}>Administração</span>
+                <h2 className={styles.cardTitle}>Gerenciar Usuários</h2>
+              </div>
+              <Link href="/admin/usuarios" className={styles.actionBtnBlue}>
+                Acessar<ArrowRight size={18} />
               </Link>
             </div>
           )}

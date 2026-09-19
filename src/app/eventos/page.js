@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
+import { useEventos } from '@/hooks/useEventos';
+import Loading from '@/components/Loading';
 import styles from './Eventos.module.css';
-import { Search } from 'lucide-react';
+import { Search, Camera } from 'lucide-react';
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
 
 function timestampSeguro(dataBruta) {
   if (!dataBruta) return 0;
@@ -52,40 +54,8 @@ function normalizarTexto(texto) {
 export default function EventosPage() {
   const [busca, setBusca] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [eventos, setEventos] = useState(dbEventosLocal || []);
+  const { eventos, loading, error } = useEventos();
   const ITENS_POR_PAGINA = 9;
-
-  useEffect(() => {
-    async function carregarEventosOnline() {
-      // 1. Lê o cache se existir
-      const cachedData = localStorage.getItem('cache_portal_eventos');
-      if (cachedData) {
-        try {
-          const parsed = JSON.parse(cachedData);
-          if (Array.isArray(parsed)) {
-            setEventos(parsed);
-          }
-        } catch (e) {
-          console.error('Erro ao ler cache de eventos:', e);
-        }
-      }
-
-      // 2. Busca a lista atualizada do servidor de eventos
-      try {
-        const response = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`);
-        const resData = await response.json();
-        
-        if (resData.status === 'success' && Array.isArray(resData.eventos)) {
-          setEventos(resData.eventos);
-          localStorage.setItem('cache_portal_eventos', JSON.stringify(resData.eventos));
-        }
-      } catch (err) {
-        console.error('Erro ao buscar eventos online:', err);
-      }
-    }
-
-    carregarEventosOnline();
-  }, []);
 
   const handleBusca = (valor) => {
     setBusca(valor);
@@ -173,7 +143,9 @@ export default function EventosPage() {
             <button type="submit" className={styles.searchBtn}>Buscar</button>
           </form>
 
-          {eventosPagina.length > 0 ? (
+          {loading && eventos.length === 0 ? (
+            <Loading texto="Carregando eventos..." />
+          ) : eventosPagina.length > 0 ? (
             <>
               <div className={styles.eventosGrid}>
                 {eventosPagina.map((evento) => {
@@ -183,14 +155,21 @@ export default function EventosPage() {
                   return (
                     <Link key={evento.id} href={`/eventos/${evento.id}`} className={styles.eventoCard}>
                       <div className={styles.cardImageWrapper}>
-                        <Image 
-                          src={evento.imgSrc || evento.imagem || '/img/eventos/simposio.png'} 
-                          alt={evento.titulo} 
-                          width={400} 
-                          height={240} 
-                          unoptimized 
-                          className={styles.cardImage}
-                        />
+                        {(evento.imgSrc || evento.imagem) ? (
+                          <Image 
+                            src={evento.imgSrc || evento.imagem} 
+                            alt={evento.titulo} 
+                            width={400} 
+                            height={240} 
+                            unoptimized 
+                            className={styles.cardImage}
+                          />
+                        ) : (
+                          <div className={styles.cardImagePlaceholder}>
+                            <Camera size={40} strokeWidth={1.5} />
+                            <span>Sem imagem</span>
+                          </div>
+                        )}
                         <span className={`${styles.statusBadge} ${status.class}`}>
                           {status.label}
                         </span>

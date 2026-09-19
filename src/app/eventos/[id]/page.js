@@ -4,11 +4,12 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { X, CheckCircle, Send, Loader2, ClipboardList, Download, Search, FileCheck, Lock } from 'lucide-react';
+import { X, CheckCircle, Send, Loader2, ClipboardList, Download, Search, FileCheck, Lock, Camera } from 'lucide-react';
+import jsPDF from 'jspdf';
 import { dbEventos as dbEventosLocal, getStatusEvento } from '@/data/eventosData';
+import { useEvento } from '@/hooks/useEventos';
+import { useUI } from '@/components/UIFeedback';
 import styles from './EventosDetail.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
 
 function aplicarMascaraCPF(value) {
   return value
@@ -88,9 +89,9 @@ function formatarDataParaExibicao(valor) {
 export default function EventoDetailPage() {
   const params = useParams();
   const id = params?.id;
+  const { notificar } = useUI();
 
-  const [evento, setEvento] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { evento, loading, error } = useEvento(id);
 
   const [modalAberto, setModalAberto] = useState(false);
   const [abaModal, setAbaModal] = useState('inscricao');
@@ -105,67 +106,15 @@ export default function EventoDetailPage() {
   const [buscandoCpf, setBuscandoCpf] = useState(false);
 
   // CONTAGEM DE VAGAS
-  const [totalInscritos, setTotalInscritos] = useState(null); // null = ainda carregando
+  const [totalInscritos, setTotalInscritos] = useState(null);
 
-  useEffect(() => {
-    async function carregarEvento() {
-      let eventoEncontrado = null;
-
-      try {
-        const cacheSalvo = localStorage.getItem('cache_portal_eventos');
-        if (cacheSalvo) {
-          const eventosCache = JSON.parse(cacheSalvo);
-          eventoEncontrado = eventosCache.find((e) => String(e.id) === String(id));
-        }
-      } catch (e) {
-        console.warn('Erro ao ler cache:', e);
-      }
-
-      if (!eventoEncontrado) {
-        eventoEncontrado = dbEventosLocal.find((item) => String(item.id) === String(id));
-      }
-
-      if (eventoEncontrado) {
-        setEvento(eventoEncontrado);
-        setLoading(false);
-      }
-
-      try {
-        const res = await fetch(`${SCRIPT_URL}?target=EVENT&action=GET_ALL`, {
-          method: 'GET',
-          redirect: 'follow',
-        });
-
-        const contentType = res.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Resposta inválida do servidor');
-        }
-
-        const data = await res.json();
-        if (data.status === 'success' && Array.isArray(data.eventos)) {
-          localStorage.setItem('cache_portal_eventos', JSON.stringify(data.eventos));
-          const eventoOnline = data.eventos.find((e) => String(e.id) === String(id));
-          if (eventoOnline) setEvento(eventoOnline);
-        }
-      } catch (err) {
-        console.warn('Usando dados offline:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (id) carregarEvento();
-  }, [id]);
-
-  // BUSCA CONTAGEM DE INSCRIÇÕES QUANDO O EVENTO TEM LIMITE DE VAGAS
+  // BUSCA CONTAGEM DE INSCRIÇÕES NO SUPABASE
   useEffect(() => {
     if (!evento || !evento.requerInscricao) return;
-    const limite = evento.vagasMaximo != null ? parseInt(evento.vagasMaximo, 10) : null;
-    if (!limite || isNaN(limite)) return;
 
     async function buscarContagem() {
       try {
-        const res = await fetch(`/api/inscricoes?eventoTitulo=${encodeURIComponent(evento.titulo)}`);
+        const res = await fetch(`/api/inscricoes?eventoId=${encodeURIComponent(evento.id)}&eventoTitulo=${encodeURIComponent(evento.titulo)}`);
         const data = await res.json();
         if (data.status === 'success') {
           setTotalInscritos(data.total);
@@ -202,12 +151,10 @@ export default function EventoDetailPage() {
     );
   }
 
-  // TRATAMENTO DA BADGE DE STATUS DO TOPO
   const isEncerrado = evento.inscricoesEncerradas === true || String(evento.inscricoesEncerradas) === 'true';
   const vagasLimite = evento.vagasMaximo != null ? parseInt(evento.vagasMaximo, 10) : null;
   const vagasEsgotadas = vagasLimite && !isNaN(vagasLimite) && totalInscritos !== null && totalInscritos >= vagasLimite;
   const inscricaoBloqueada = isEncerrado || vagasEsgotadas;
-  const vagasRestantes = vagasLimite && !isNaN(vagasLimite) && totalInscritos !== null ? vagasLimite - totalInscritos : null;
 
   const statusOriginal = getStatusEvento(evento, styles);
   
@@ -216,7 +163,7 @@ export default function EventoDetailPage() {
     : statusOriginal.label;
   const statusClass = inscricaoBloqueada ? styles.statusBadgeEncerrado : statusOriginal.class;
 
-  const imagemExibicao = evento.imgSrc || evento.imagem || '/img/eventos/simposio.png';
+  const imagemExibicao = evento.imgSrc || evento.imagem || '';
   const horaExibicao = limparHora(evento.hora);
 
   const camposFormulario = Array.isArray(evento.formFields) && evento.formFields.length > 0 
@@ -248,7 +195,7 @@ export default function EventoDetailPage() {
 
   const handleAbrirModal = (aba = 'inscricao') => {
     if (aba === 'inscricao' && inscricaoBloqueada) {
-      alert(vagasEsgotadas && !isEncerrado ? 'As vagas para este evento estão esgotadas.' : 'As inscrições para este evento estão encerradas.');
+      notificar('info', vagasEsgotadas && !isEncerrado ? 'As vagas para este evento estão esgotadas.' : 'As inscrições para este evento estão encerradas.');
       return;
     }
     setAbaModal(aba);
@@ -276,7 +223,6 @@ export default function EventoDetailPage() {
     setEnviandoMsgExtra(false);
     setMensagemErro(null);
 
-    // Após 8s mostra mensagem de "aguarde, ainda processando"
     const timerMsgExtra = setTimeout(() => setEnviandoMsgExtra(true), 8000);
 
     for (const campo of camposFormulario) {
@@ -303,10 +249,8 @@ export default function EventoDetailPage() {
 
     try {
       const payload = {
-        action: 'SUBMIT_INSCRICAO',
         eventoId: evento.id,
         eventoTitulo: evento.titulo,
-        vagasMaximo: vagasLimite || null,
         respostas: listaRespostas
       };
 
@@ -318,7 +262,6 @@ export default function EventoDetailPage() {
 
       const resData = await response.json();
 
-      // Trata erros explícitos do GAS (CPF duplicado, vagas esgotadas, etc.)
       if (resData.status === 'error') {
         const msg = resData.message || '';
 
@@ -327,7 +270,7 @@ export default function EventoDetailPage() {
           return;
         }
 
-        if (msg.toLowerCase().includes('vagas esgotadas')) {
+        if (msg.toLowerCase().includes('esgotadas')) {
           setTotalInscritos(vagasLimite);
           setMensagemErro('Que pena! As vagas para este evento foram esgotadas.');
           return;
@@ -337,23 +280,19 @@ export default function EventoDetailPage() {
         return;
       }
 
-      // Só mostra comprovante se vier código real do GAS
-      if (resData.codigoInscricao) {
+      if (resData.codigo || resData.inscrito) {
         setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
+        
+        const inscrito = resData.inscrito || {};
+        const listaDetalhes = inscrito.respostas 
+          ? Object.entries(inscrito.respostas).map(([key, val]) => ({ label: key, valor: val }))
+          : listaRespostas;
+
         setComprovante({
-          codigo: resData.codigoInscricao,
-          evento: evento.titulo,
-          dataHora: new Date().toLocaleDateString('pt-BR'),
-          detalhes: listaRespostas
-        });
-      } else {
-        // GAS retornou sucesso mas sem código — inscrição gravada, exibe comprovante genérico
-        setTotalInscritos((prev) => (prev !== null ? prev + 1 : null));
-        setComprovante({
-          codigo: 'INS-' + Math.floor(100000 + Math.random() * 900000),
-          evento: evento.titulo,
-          dataHora: new Date().toLocaleDateString('pt-BR'),
-          detalhes: listaRespostas
+          codigo: resData.codigo || inscrito.codigo_inscricao || 'INS-CONFIRMED',
+          evento: inscrito.evento_titulo || evento.titulo,
+          dataHora: new Date().toLocaleString('pt-BR'),
+          detalhes: listaDetalhes
         });
       }
     } catch (err) {
@@ -379,26 +318,29 @@ export default function EventoDetailPage() {
     setMensagemErro(null);
 
     try {
-      const url = `${SCRIPT_URL}?action=CONSULTAR_INSCRICOES&cpf=${encodeURIComponent(cpfConsulta)}&eventoTitulo=${encodeURIComponent(evento.titulo)}`;
+      const url = `/api/inscricoes?cpf=${encodeURIComponent(cpfConsulta)}&eventoId=${encodeURIComponent(evento.id)}&eventoTitulo=${encodeURIComponent(evento.titulo)}`;
       const res = await fetch(url);
       const data = await res.json();
 
-      if (data.status === 'success' && Array.isArray(data.inscricoes) && data.inscricoes.length > 0) {
-        const item = data.inscricoes[0];
-        
+      const item = data.inscricao || data.comprovante || data.data;
+
+      if ((data.status === 'success' || data.success) && item) {
+        const listaDetalhes = item.respostas 
+          ? Object.entries(item.respostas).map(([key, val]) => ({ label: key, valor: val }))
+          : [
+              { label: 'Nome Completo', valor: item.nome },
+              { label: 'CPF', valor: item.cpf },
+              { label: 'E-mail', valor: item.email }
+            ];
+
         setComprovante({
-          codigo: item.codigoInscricao,
-          evento: item.eventoTitulo || evento.titulo,
-          dataHora: item.dataRegistro || new Date().toLocaleDateString('pt-BR'),
-          detalhes: [
-            { label: 'Nome Completo', valor: item.nome },
-            { label: 'CPF', valor: item.cpf },
-            { label: 'Data de Nascimento', valor: item.dataNascimento },
-            { label: 'E-mail', valor: item.email }
-          ]
+          codigo: item.codigo_inscricao || item.codigo || 'INS-CONFIRMED',
+          evento: item.evento_titulo || evento.titulo,
+          dataHora: item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'),
+          detalhes: listaDetalhes
         });
       } else {
-        setMensagemErro('Nenhuma inscrição encontrada neste evento para o CPF informado.');
+        setMensagemErro(data.message || 'Nenhuma inscrição encontrada neste evento para o CPF informado.');
       }
     } catch (err) {
       console.error('Erro na consulta:', err);
@@ -409,7 +351,155 @@ export default function EventoDetailPage() {
   };
 
   const handleBaixarPdf = () => {
-    window.print();
+    if (!comprovante) return;
+
+    try {
+      // Criar um novo documento PDF
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Configurações de estilo
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Cabeçalho
+      doc.setFillColor(15, 23, 42); // Cor de fundo azul escuro
+      doc.rect(0, 0, pageWidth, 30, 'F');
+      
+      doc.setTextColor(255, 255, 255); // Texto branco
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('PORTAL SAÚDE DIGITAL', margin, 15);
+      
+      doc.setFontSize(12);
+      doc.text('Secretaria Municipal de Saúde', margin, 22);
+
+      // Reset cor do texto
+      doc.setTextColor(0, 0, 0);
+      
+      // Título principal
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('COMPROVANTE DE INSCRIÇÃO', pageWidth / 2, 50, { align: 'center' });
+      
+      // Linha decorativa
+      doc.setDrawColor(59, 130, 246);
+      doc.setLineWidth(1);
+      doc.line(margin, 55, pageWidth - margin, 55);
+
+      // Informações do código
+      doc.setFillColor(239, 246, 255);
+      doc.rect(margin, 65, contentWidth, 25, 'F');
+      
+      doc.setTextColor(59, 130, 246);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text('CÓDIGO DE CONFIRMAÇÃO', margin + 5, 72);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(comprovante.codigo, margin + 5, 83);
+
+      // Título do evento
+      let yPosition = 105;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text('EVENTO:', margin, yPosition);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      
+      // Quebra o título em linhas se for muito longo
+      const tituloLines = doc.splitTextToSize(comprovante.evento, contentWidth - 40);
+      doc.text(tituloLines, margin + 35, yPosition);
+      
+      yPosition += (tituloLines.length * 6) + 10;
+
+      // Data e hora da inscrição
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(15, 23, 42);
+      doc.text('DATA E HORA DA INSCRIÇÃO:', margin, yPosition);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text(String(comprovante.dataHora), margin + 78, yPosition);
+      
+      yPosition += 15;
+
+      // Linha divisória
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
+
+      // Dados do participante
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text('DADOS DO PARTICIPANTE:', margin, yPosition);
+      yPosition += 12;
+
+      // Renderiza os detalhes do comprovante, ocultando E-mail e Data de Nascimento
+      const detalhesFiltrados = (comprovante.detalhes || []).filter((detalhe) => {
+        const lbl = (detalhe.label || '').toLowerCase().trim();
+        const ocultar =
+          lbl.includes('email') ||
+          lbl.includes('e-mail') ||
+          lbl.includes('nascimento') ||
+          lbl.includes('data nasc');
+        return !ocultar;
+      });
+
+      if (detalhesFiltrados.length > 0) {
+        detalhesFiltrados.forEach((detalhe) => {
+          if (detalhe.valor && detalhe.valor.trim() !== '' && detalhe.valor !== '-') {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${detalhe.label}:`, margin, yPosition);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            
+            const valorLines = doc.splitTextToSize(detalhe.valor, contentWidth - 50);
+            doc.text(valorLines, margin + 50, yPosition);
+            
+            yPosition += Math.max(valorLines.length * 5, 8);
+          }
+        });
+      }
+
+      // Rodapé
+      const rodapeY = pageHeight - 40;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, rodapeY - 5, pageWidth - margin, rodapeY - 5);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Este é um documento oficial gerado automaticamente pelo sistema.', pageWidth / 2, rodapeY, { align: 'center' });
+      doc.text('Portal Saúde Digital - Secretaria Municipal de Saúde', pageWidth / 2, rodapeY + 10, { align: 'center' });
+
+      // Salvar o PDF
+      const nomeEvento = comprovante.evento.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+      const nomeArquivo = `Comprovante_${comprovante.codigo}_${nomeEvento}.pdf`;
+      
+      doc.save(nomeArquivo);
+
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      notificar('erro', 'Erro ao gerar o arquivo PDF. Tente novamente ou use a impressão do navegador.');
+    }
   };
 
   return (
@@ -426,7 +516,6 @@ export default function EventoDetailPage() {
         <div className={styles.container}>
           <article className={styles.articleCard}>
             
-            {/* META HEADER COM STATUS ATUALIZADO */}
             <div className={styles.headerMeta}>
               <span className={styles.dataPublicacao}>
                 Data: {formatarDataBR(evento.data)} {horaExibicao ? `• ${horaExibicao}` : ''}
@@ -440,13 +529,17 @@ export default function EventoDetailPage() {
 
             {evento.resumo && <p className={styles.resumo}>{evento.resumo}</p>}
 
-            {imagemExibicao && (
-              <div className={styles.imageWrapper}>
+            <div className={styles.imageWrapper}>
+              {imagemExibicao ? (
                 <Image src={imagemExibicao} alt={evento.titulo} width={900} height={450} priority unoptimized className={styles.imagemCapa} />
-              </div>
-            )}
+              ) : (
+                <div className={styles.imagemCapaPlaceholder}>
+                  <Camera size={56} strokeWidth={1.5} />
+                  <span>Sem imagem</span>
+                </div>
+              )}
+            </div>
 
-            {/* BANNER DE INSCRIÇÃO ABERTA / ENCERRADA */}
             {evento.requerInscricao && (
               <div className={`${styles.bannerInscricao} ${inscricaoBloqueada ? styles.bannerEncerrado : ''}`}>
                 <div>
@@ -464,8 +557,6 @@ export default function EventoDetailPage() {
                       ? 'As inscrições para este evento foram encerradas pela organização.'
                       : 'Garanta sua vaga neste evento preenchendo o formulário de participação.'}
                   </p>
-
-                  {/* CONTADOR DE VAGAS — removido da página pública, disponível no painel admin */}
                 </div>
                 
                 <div className={styles.bannerButtonsCol}>
@@ -535,7 +626,6 @@ export default function EventoDetailPage() {
         </div>
       </main>
 
-      {/* MODAL DE INSCRIÇÃO / CONSULTA POR CPF */}
       {modalAberto && (
         <div className={styles.modalBackdrop} onClick={(e) => e.target === e.currentTarget && handleFecharModal()}>
           <div className={styles.modalBoxContainer}>
@@ -699,7 +789,7 @@ export default function EventoDetailPage() {
                     <span className={styles.ticketSectionLabel}>EVENTO SELECIONADO</span>
                     <h3 className={styles.ticketEventTitle}>{comprovante.evento}</h3>
                     <div className={styles.ticketMetaRow}>
-                      <span>📅 <strong>Data da inscrição:</strong> {formatarDataParaExibicao(comprovante.dataHora)}</span>
+                      <span>📅 <strong>Data e hora da inscrição:</strong> {comprovante.dataHora}</span>
                     </div>
                   </div>
 
@@ -707,9 +797,7 @@ export default function EventoDetailPage() {
                     {(() => {
                       const chavesDesejadas = [
                         { labelExibicao: 'Nome Completo', termos: ['nome', 'nome completo'] },
-                        { labelExibicao: 'CPF', termos: ['cpf'] },
-                        { labelExibicao: 'Data de Nascimento', termos: ['data de nascimento', 'nascimento', 'data nasc'], isDate: true },
-                        { labelExibicao: 'E-mail', termos: ['e-mail', 'email'] }
+                        { labelExibicao: 'CPF', termos: ['cpf'] }
                       ];
 
                       return chavesDesejadas.map((item, i) => {
@@ -742,7 +830,7 @@ export default function EventoDetailPage() {
 
                 <div className={styles.comprovanteActionButtons}>
                   <button onClick={handleBaixarPdf} className={styles.btnDownloadPdf}>
-                    <Download size={16} /> Salvar / Baixar em PDF
+                    <Download size={16} /> Baixar PDF
                   </button>
                   <button onClick={handleFecharModal} className={styles.btnFecharModal}>
                     Fechar

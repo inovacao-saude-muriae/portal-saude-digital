@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, ImageOff } from 'lucide-react';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
+import { TERMO_COMPROMISSOS, TERMO_CIENTE } from '@/lib/termoAdocao';
+import { useUI } from '@/components/UIFeedback';
 import styles from './Adocao.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || 'https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec';
 
 function normalizarTexto(texto) {
   if (!texto) return '';
@@ -16,7 +17,39 @@ function normalizarTexto(texto) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
+// Máscara de CPF: 000.000.000-00
+function aplicarMascaraCPF(valor) {
+  return String(valor || '')
+    .replace(/\D/g, '')
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+}
+
+// Máscara de CEP: 00000-000
+function aplicarMascaraCEP(valor) {
+  return String(valor || '')
+    .replace(/\D/g, '')
+    .slice(0, 8)
+    .replace(/(\d{5})(\d{1,3})$/, '$1-$2');
+}
+
+// Máscara de telefone: (32) 9 9826-5629 (celular) ou (32) 3696-3305 (fixo)
+function aplicarMascaraTelefone(valor) {
+  const d = String(valor || '').replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 2) return d.replace(/(\d{0,2})/, '($1');
+  if (d.length <= 6) return d.replace(/(\d{2})(\d{0,4})/, '($1) $2');
+  if (d.length <= 10) {
+    // fixo: (32) 3696-3305
+    return d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+  }
+  // celular: (32) 9 9826-5629
+  return d.replace(/(\d{2})(\d{1})(\d{4})(\d{0,4})/, '($1) $2 $3-$4');
+}
+
 export default function AdocaoPage() {
+  const { notificar } = useUI();
   const [animais, setAnimais] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [filtroEspecie, setFiltroEspecie] = useState('todos');
@@ -34,7 +67,7 @@ export default function AdocaoPage() {
   const [termoAceito, setTermoAceito] = useState(false);
   
   const [dadosAdocao, setDadosAdocao] = useState({ 
-    nome: '', cpf: '', telefone: '', email: '', rua: '', numero: '', bairro: '', cidade: '' 
+    nome: '', cpf: '', telefone: '', rua: '', numero: '', bairro: '', cidade: '', cep: '' 
   });
 
   const [enviando, setEnviando] = useState(false);
@@ -47,9 +80,9 @@ export default function AdocaoPage() {
     async function carregarAnimaisOnline() {
       setCarregando(true);
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_ANIMAIS&t=${Date.now()}`);
+        const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.ANIMAIS, { t: Date.now() }));
         const data = await res.json();
-        
+
         if (ativo && data && data.status === 'success') {
           setAnimais(data.animais || []);
         }
@@ -113,7 +146,7 @@ export default function AdocaoPage() {
     setPassoModal('detalhes');
     setTermoAceito(false);
     setEnviadoSucesso(false);
-    setDadosAdocao({ nome: '', cpf: '', telefone: '', email: '', rua: '', numero: '', bairro: '', cidade: '' });
+    setDadosAdocao({ nome: '', cpf: '', telefone: '', rua: '', numero: '', bairro: '', cidade: '', cep: '' });
   };
 
   const handleEnviarFormulario = async (e) => {
@@ -121,23 +154,35 @@ export default function AdocaoPage() {
     setEnviando(true);
 
     try {
-      const params = new URLSearchParams({
-        tipo: 'adocao',
+      const payload = {
+        animalId: animalSelecionado?.id || null,
+        animalNome: animalSelecionado?.nome || null,
         nome: dadosAdocao.nome,
         cpf: dadosAdocao.cpf,
         telefone: dadosAdocao.telefone,
-        email: dadosAdocao.email,
         rua: dadosAdocao.rua,
         numero: dadosAdocao.numero,
         bairro: dadosAdocao.bairro,
         cidade: dadosAdocao.cidade,
-        animal: animalSelecionado?.nome || 'Não especificado'
+        cep: dadosAdocao.cep
+      };
+
+      const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.ADOCAO_SOLICITACOES), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
 
-      await fetch(`${SCRIPT_URL}?${params.toString()}`);
-      setEnviadoSucesso(true);
-    } catch {
-      setEnviadoSucesso(true);
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        setEnviadoSucesso(true);
+      } else {
+        notificar('erro', 'Não foi possível registrar sua solicitação: ' + (data.message || 'tente novamente.'));
+      }
+    } catch (err) {
+      console.error('Erro ao enviar solicitação de adoção:', err);
+      notificar('erro', 'Ocorreu um erro ao enviar sua solicitação. Tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -213,22 +258,33 @@ export default function AdocaoPage() {
                 {animaisPagina.map((animal) => {
                   const isMacho = String(animal.sexo).toLowerCase() === 'macho';
                   const isFilhote = String(animal.filhote) === 'true';
+                  const temFoto = animal.foto && animal.foto !== 'SEM_FOTO' && String(animal.foto).trim() !== '';
 
                   return (
                     <div key={animal.id} className={styles.animalCard}>
                       <div className={styles.imageWrapper}>
-                        <Image 
-                          src={animal.foto} 
-                          alt={animal.nome}
-                          width={300}
-                          height={400}
-                          unoptimized
-                          className={styles.animalImg}
-                        />
+                        {temFoto ? (
+                          <Image 
+                            src={animal.foto} 
+                            alt={animal.nome}
+                            width={300}
+                            height={400}
+                            unoptimized
+                            className={styles.animalImg}
+                          />
+                        ) : (
+                          <div className={styles.semFotoAnimal}>
+                            <ImageOff size={36} strokeWidth={1.5} />
+                            <span>Sem foto</span>
+                          </div>
+                        )}
                         <span className={`${styles.sexoIconBadge} ${isMacho ? styles.badgeMacho : styles.badgeFemea}`}>
                           {isMacho ? '♂' : '♀'}
                         </span>
                         {isFilhote && <span className={styles.badgeFilhote}>Filhote</span>}
+                        {animal.id_animal && (
+                          <span className={styles.idAnimalBadge}>ID: {animal.id_animal}</span>
+                        )}
                       </div>
 
                       <div className={styles.cardHeaderOnly}>
@@ -293,7 +349,13 @@ export default function AdocaoPage() {
             {passoModal === 'detalhes' && (
               <div className={styles.modalBodyDetails}>
                 <div className={styles.modalImageWrapper}>
-                  <Image src={animalSelecionado.foto} alt={animalSelecionado.nome} width={200} height={266} unoptimized className={styles.modalImgSmall} />
+                  {animalSelecionado.foto && animalSelecionado.foto !== 'SEM_FOTO' && String(animalSelecionado.foto).trim() !== '' ? (
+                    <Image src={animalSelecionado.foto} alt={animalSelecionado.nome} width={200} height={266} unoptimized className={styles.modalImgSmall} />
+                  ) : (
+                    <div className={styles.semFotoAnimalModal}>
+                      <ImageOff size={40} strokeWidth={1.5} />
+                    </div>
+                  )}
                 </div>
                 <div className={styles.modalTitleRow}>
                   <h2>{animalSelecionado.nome}</h2>
@@ -312,13 +374,24 @@ export default function AdocaoPage() {
             {passoModal === 'termo' && (
               <div className={styles.modalBodyTermo}>
                 <button className={styles.btnVoltarModal} onClick={() => setPassoModal('detalhes')}>← Voltar</button>
-                <h2 className={styles.formTitle}>Termo de Responsabilidade</h2>
+                <h2 className={styles.formTitle}>Termo de Adoção e Responsabilidade</h2>
                 <div className={styles.termoScrollBox}>
-                  <ul>
-                    <li>✔ Garantir o bem-estar físico e emocional do animal.</li>
-                    <li>✔ Garantir consultas veterinárias e vacinação em dia.</li>
-                    <li>✔ Não manter o animal preso em correntes de forma cruel.</li>
-                    <li>✔ Nunca abandonar o animal.</li>
+                  <p className={styles.termoIntro}>
+                    Ao adotar <strong>{animalSelecionado?.nome}</strong>, eu me comprometo a:
+                  </p>
+                  <ul className={styles.termoLista}>
+                    {TERMO_COMPROMISSOS.map((item, i) => (
+                      <li key={i}>
+                        <strong>{item.titulo}</strong> {item.texto}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className={styles.termoSubtitulo}>Estou ciente de que:</p>
+                  <ul className={styles.termoLista}>
+                    {TERMO_CIENTE.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
                   </ul>
                 </div>
                 <div className={styles.aceiteCheckboxContainer}>
@@ -339,23 +412,54 @@ export default function AdocaoPage() {
                 {enviadoSucesso ? (
                   <div className={styles.msgSucesso}>
                     <h3>🎉 Solicitação Enviada!</h3>
-                    <p>Sua demonstração de interesse em adotar foi registrada!</p>
+                    <p>Sua demonstração de interesse em adotar foi registrada! A equipe do CCZ entrará em contato para dar continuidade à adoção.</p>
                     <button className={styles.btnFecharSucesso} onClick={handleFecharModal}>Concluir</button>
                   </div>
                 ) : (
                   <form onSubmit={handleEnviarFormulario} className={styles.formAdocao}>
                     <div className={styles.formGroup}>
-                      <label>Seu Nome Completo *</label>
-                      <input type="text" required value={dadosAdocao.nome} onChange={(e) => setDadosAdocao({...dadosAdocao, nome: e.target.value})} />
+                      <label>Nome Completo *</label>
+                      <input type="text" required value={dadosAdocao.nome} onChange={(e) => setDadosAdocao({...dadosAdocao, nome: e.target.value})} placeholder="Seu nome completo" />
                     </div>
+
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label>CPF *</label>
+                        <input type="text" required inputMode="numeric" maxLength={14} value={dadosAdocao.cpf} onChange={(e) => setDadosAdocao({...dadosAdocao, cpf: aplicarMascaraCPF(e.target.value)})} placeholder="000.000.000-00" />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Telefone / Celular *</label>
+                        <input type="tel" required inputMode="numeric" maxLength={16} value={dadosAdocao.telefone} onChange={(e) => setDadosAdocao({...dadosAdocao, telefone: aplicarMascaraTelefone(e.target.value)})} placeholder="(32) 9 9826-5629" />
+                      </div>
+                    </div>
+
+                    <div className={styles.formRow}>
+                      <div className={`${styles.formGroup} ${styles.formGroupGrow}`}>
+                        <label>Rua / Logradouro *</label>
+                        <input type="text" required value={dadosAdocao.rua} onChange={(e) => setDadosAdocao({...dadosAdocao, rua: e.target.value})} placeholder="Ex: Rua das Flores" />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Número *</label>
+                        <input type="text" required value={dadosAdocao.numero} onChange={(e) => setDadosAdocao({...dadosAdocao, numero: e.target.value})} placeholder="Nº" />
+                      </div>
+                    </div>
+
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label>Bairro *</label>
+                        <input type="text" required value={dadosAdocao.bairro} onChange={(e) => setDadosAdocao({...dadosAdocao, bairro: e.target.value})} placeholder="Seu bairro" />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>CEP *</label>
+                        <input type="text" required inputMode="numeric" maxLength={9} value={dadosAdocao.cep} onChange={(e) => setDadosAdocao({...dadosAdocao, cep: aplicarMascaraCEP(e.target.value)})} placeholder="00000-000" />
+                      </div>
+                    </div>
+
                     <div className={styles.formGroup}>
-                      <label>CPF *</label>
-                      <input type="text" required value={dadosAdocao.cpf} onChange={(e) => setDadosAdocao({...dadosAdocao, cpf: e.target.value})} />
+                      <label>Cidade *</label>
+                      <input type="text" required value={dadosAdocao.cidade} onChange={(e) => setDadosAdocao({...dadosAdocao, cidade: e.target.value})} placeholder="Sua cidade" />
                     </div>
-                    <div className={styles.formGroup}>
-                      <label>Telefone / Celular *</label>
-                      <input type="tel" required value={dadosAdocao.telefone} onChange={(e) => setDadosAdocao({...dadosAdocao, telefone: e.target.value})} />
-                    </div>
+
                     <button type="submit" disabled={enviando} className={styles.btnSubmitAdocao}>{enviando ? 'Enviando...' : 'Confirmar e Enviar'}</button>
                   </form>
                 )}

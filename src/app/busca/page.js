@@ -14,15 +14,14 @@ import {
   ArrowRight 
 } from 'lucide-react';
 
-import { dbEventos } from '@/data/eventosData';
+import { getDbEventos } from '@/data/eventosData';
 import { getDbNoticias } from '@/data/noticiasData'; 
 import { listaContatos } from '@/data/contatosData';
 import { servicos } from '@/data/servicosData';
 
 import styles from './Busca.module.css';
 
-// URL DO GOOGLE APPS SCRIPT DO CCZ (Para busca de animais em tempo real)
-const CCZ_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoGz1c0Q2cRICMbJ7dSA-xp_UPL7O_W2BDojgHKbY_gMdK4aVUCSAxOJHd_o2j6ja8YQ/exec"; // Caso use variável de ambiente, use: process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
 
 // FUNÇÃO AUXILIAR QUE REMOVE ACENTOS E CONVERTE PARA MINÚSCULAS
 function normalizarTexto(texto) {
@@ -60,26 +59,28 @@ function SearchResultsContent() {
   
   const [inputBusca, setInputBusca] = useState(query);
   const [noticiasState, setNoticiasState] = useState({});
+  const [eventosState, setEventosState] = useState([]);
   const [animaisState, setAnimaisState] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Busca Notícias e Animais atualizados em tempo real via Google Sheets
+  // Busca Eventos e Notícias no Supabase, e Animais do CCZ (Google Sheets)
   useEffect(() => {
     async function carregarDadosDinamicos() {
       setLoading(true);
       try {
-        // 1. Busca Notícias
+        // 1. Busca Notícias (Supabase)
         const dbNoticiasAtualizado = await getDbNoticias();
         setNoticiasState(dbNoticiasAtualizado || {});
 
-        // 2. Busca Animais do CCZ (Google Sheets)
-        const urlScript = process.env.NEXT_PUBLIC_SCRIPT_CCZ_URL || CCZ_SCRIPT_URL;
-        if (urlScript) {
-          const resAnimais = await fetch(urlScript);
-          const jsonAnimais = await resAnimais.json();
-          if (jsonAnimais && jsonAnimais.status === 'success') {
-            setAnimaisState(jsonAnimais.animais || []);
-          }
+        // 2. Busca Eventos (Supabase)
+        const eventosSupabase = await getDbEventos();
+        setEventosState(Array.isArray(eventosSupabase) ? eventosSupabase : []);
+
+        // 3. Busca Animais do CCZ (Supabase)
+        const resAnimais = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.ANIMAIS));
+        const jsonAnimais = await resAnimais.json();
+        if (jsonAnimais && jsonAnimais.status === 'success') {
+          setAnimaisState(jsonAnimais.animais || []);
         }
       } catch (err) {
         console.error("Erro ao carregar dados dinâmicos para a busca:", err);
@@ -147,8 +148,8 @@ function SearchResultsContent() {
     url: `/noticias/${n.id}`
   })) : [];
 
-  // 4. EVENTOS
-  const eventosEncontrados = termo ? (dbEventos || []).filter(e =>
+  // 4. EVENTOS (Supabase)
+  const eventosEncontrados = termo ? (eventosState || []).filter(e =>
     normalizarTexto(e.titulo).includes(termo) ||
     normalizarTexto(e.resumo).includes(termo) ||
     normalizarTexto(e.descricao).includes(termo)

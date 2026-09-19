@@ -234,6 +234,36 @@
   object-fit: cover;
 }
 
+/* PLACEHOLDER PARA ANIMAL SEM FOTO (card da listagem) */
+.semFotoAnimal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.semFotoAnimal span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* PLACEHOLDER PARA ANIMAL SEM FOTO (modal de detalhes) */
+.semFotoAnimalModal {
+  width: 160px;
+  height: 213px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  border-radius: 10px;
+}
+
 .sexoIconBadge {
   position: absolute;
   top: 10px;
@@ -264,6 +294,21 @@
   padding: 3px 10px;
   border-radius: 20px;
   text-transform: uppercase;
+}
+
+/* ID do animal no canto inferior da foto (fundo transparente, cantos arredondados) */
+.idAnimalBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
 }
 
 .cardHeaderOnly {
@@ -555,6 +600,28 @@
   border-color: #008a83;
 }
 
+/* Dois (ou mais) campos lado a lado no formulário de adoção */
+.formRow {
+  display: flex;
+  gap: 12px;
+}
+
+.formRow .formGroup {
+  flex: 1;
+}
+
+/* Campo que deve ocupar mais espaço na linha (ex: rua ao lado do número) */
+.formGroupGrow {
+  flex: 2 !important;
+}
+
+@media (max-width: 600px) {
+  .formRow {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
 .btnSubmitAdocao {
   background-color: #2b943d;
   color: #ffffff;
@@ -691,7 +758,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 12px;
   padding: 16px;
-  max-height: 220px;
+  max-height: 300px;
   overflow-y: auto;
   margin-bottom: 20px;
 }
@@ -709,6 +776,28 @@
   font-size: 13px;
   color: #334155;
   line-height: 1.5;
+}
+
+.termoIntro {
+  font-size: 13.5px;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.termoSubtitulo {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 16px 0 10px 0;
+}
+
+.termoLista {
+  padding-left: 18px !important;
+  list-style: disc !important;
+}
+
+.termoLista li {
+  padding-left: 2px;
 }
 
 .termoAvisoLei {

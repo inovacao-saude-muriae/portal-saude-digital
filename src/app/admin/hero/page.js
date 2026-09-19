@@ -10,9 +10,9 @@ import {
   ArrowLeft, 
   ShieldCheck 
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useUI } from '@/components/UIFeedback';
 import styles from './AdminHero.module.css';
-
-const SCRIPT_URL = process.env.NEXT_PUBLIC_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbyzBI9rvja9s0STIWBIsTeA0z2OhGDZLVL4bu5IjDOQkTOA-SDFE1JxF54COF9YS4A/exec';
 
 const VALORES_INICIAIS = {
   c1Val: '4.375', c1Text: 'Nº de Agendamentos em Consultas',
@@ -22,52 +22,83 @@ const VALORES_INICIAIS = {
 };
 
 export default function AdminHeroPage() {
+  const { notificar } = useUI();
   const [stats, setStats] = useState(VALORES_INICIAIS);
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
 
+  // CARREGAMENTO INICIAL DOS INDICADORES DO SUPABASE
   useEffect(() => {
+    let montado = true;
+
     async function carregar() {
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_HERO_STATS`);
-        const data = await res.json();
-        if (data && data.status === 'success' && data.stats) {
-          setStats(data.stats);
+        const { data, error } = await supabase
+          .from('hero_stats')
+          .select('*')
+          .eq('id', 1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data && montado) {
+          setStats({
+            c1Val: data.c1_val || '',
+            c1Text: data.c1_text || '',
+            c2Val: data.c2_val || '',
+            c2Text: data.c2_text || '',
+            c3Val: data.c3_val || '',
+            c3Text: data.c3_text || '',
+            c4Val: data.c4_val || '',
+            c4Text: data.c4_text || ''
+          });
         }
       } catch (err) {
-        console.warn('Erro ao carregar dados do admin:', err);
+        console.warn('Erro ao carregar dados do Supabase:', err);
       } finally {
-        setLoading(false);
+        if (montado) setLoading(false);
       }
     }
+
     carregar();
+
+    return () => {
+      montado = false;
+    };
   }, []);
 
+  // SALVAR OU ATUALIZAR INDICADORES NO SUPABASE
   const handleSalvar = async (e) => {
     e.preventDefault();
     setSalvando(true);
     setMensagemSucesso(false);
 
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'UPDATE_HERO_STATS',
-          stats: stats
-        })
-      });
+      const payload = {
+        c1_val: stats.c1Val,
+        c1_text: stats.c1Text,
+        c2_val: stats.c2Val,
+        c2_text: stats.c2Text,
+        c3_val: stats.c3Val,
+        c3_text: stats.c3Text,
+        c4_val: stats.c4Val,
+        c4_text: stats.c4Text,
+        updated_at: new Date().toISOString()
+      };
 
-      const resData = await response.json();
-      if (resData.status === 'success') {
-        localStorage.setItem('cache_hero_stats', JSON.stringify(stats));
-        setMensagemSucesso(true);
-        setTimeout(() => setMensagemSucesso(false), 4000);
-      }
+      const { error } = await supabase
+        .from('hero_stats')
+        .upsert({ id: 1, ...payload });
+
+      if (error) throw error;
+
+      localStorage.setItem('cache_hero_stats', JSON.stringify(stats));
+      setMensagemSucesso(true);
+      setTimeout(() => setMensagemSucesso(false), 4000);
     } catch (err) {
-      console.error(err);
-      alert('Erro ao salvar configurações.');
+      console.error('Erro ao salvar configurações no Supabase:', err);
+      notificar('erro', 'Erro ao salvar configurações: ' + err.message);
     } finally {
       setSalvando(false);
     }

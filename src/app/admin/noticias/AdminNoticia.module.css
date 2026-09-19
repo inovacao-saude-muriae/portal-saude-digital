@@ -193,7 +193,10 @@
 }
 
 .textarea {
-  resize: vertical;
+  resize: none;
+  min-height: 240px;
+  max-height: 360px;
+  overflow-y: auto;
   line-height: 1.6;
 }
 
@@ -365,6 +368,17 @@
 
 .thumbnailImg {
   object-fit: cover;
+}
+
+/* PLACEHOLDER PARA NOTÍCIAS SEM IMAGEM (ícone de câmera) */
+.thumbnailPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  background-color: #cbd5e1;
 }
 
 .newsMetaText {

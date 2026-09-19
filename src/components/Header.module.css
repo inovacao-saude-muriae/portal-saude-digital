@@ -67,6 +67,44 @@
     opacity: 0.5;
 }
 
+/* ÁREA DO USUÁRIO LOGADO (barra superior) */
+.userArea {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.userNameLink {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.userNameLink:hover {
+    opacity: 0.8;
+}
+
+.logoutBtn {
+    display: inline-flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.logoutBtn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 .mainHeader {
     background-color: #FFFFFF;
     padding: 15px 0;
@@ -261,5 +299,15 @@
         color: #004066;
         font-weight: 700;
         background-color: #f0f7fc;
+    }
+
+    .mobileLogout {
+        color: #b91c1c;
+        font-weight: 700;
+        background-color: #fef2f2;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: inherit;
     }
 }

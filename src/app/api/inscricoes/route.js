@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
-// Tempo máximo de espera para o GAS responder (30 segundos)
-export const maxDuration = 30;
-
-// 1. Converte TUDO para CAIXA ALTA 
+// Helper: Converte nomes para CAIXA ALTA
 function caixaAlta(texto) {
   if (!texto || typeof texto !== 'string') return '';
   return texto.trim().toUpperCase();
 }
 
-// 2. Converte para Iniciais Maiúsculas 
+// Helper: Capitaliza palavras mantendo preposições em minúsculo
 function capitalizarTexto(texto) {
   if (!texto || typeof texto !== 'string') return '';
 
@@ -28,105 +26,261 @@ function capitalizarTexto(texto) {
     .join(' ');
 }
 
-const SCRIPT_URL =
-  process.env.NEXT_PUBLIC_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbx1tWcH_pkyhUNdR1safUWAGrlNfJWSMRqSps09p7yc5lBXO2c5iEGJXQl5Sz2bmPex/exec';
-
-// GET — retorna a contagem de inscrições de um evento
+// GET — Consulta 2ª via por CPF ou total de vagas do evento
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+    const cpfBruto = searchParams.get('cpf');
+    const eventoId = searchParams.get('eventoId');
     const eventoTitulo = searchParams.get('eventoTitulo');
 
-    if (!eventoTitulo) {
-      return NextResponse.json({ status: 'error', message: 'Parâmetro eventoTitulo obrigatório.' }, { status: 400 });
+    // -------------------------------------------------------------
+    // CENÁRIO A: Busca de 2ª Via por CPF
+    // -------------------------------------------------------------
+    if (cpfBruto) {
+      const cpfApenasNumeros = cpfBruto.replace(/\D/g, '');
+      let cpfFormatado = cpfApenasNumeros;
+
+      if (cpfApenasNumeros.length === 11) {
+        cpfFormatado = cpfApenasNumeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      }
+
+      const { data: inscricoes, error } = await supabase
+        .from('evento_inscritos')
+        .select('*')
+        .or(`cpf.eq.${cpfBruto},cpf.eq.${cpfApenasNumeros},cpf.eq.${cpfFormatado}`);
+
+      if (error) throw error;
+
+      if (!inscricoes || inscricoes.length === 0) {
+        return NextResponse.json({
+          status: 'error',
+          success: false,
+          message: 'Nenhuma inscrição encontrada para o CPF informado.'
+        }, { status: 200 });
+      }
+
+      let registro = inscricoes[0];
+
+      if (eventoId || eventoTitulo) {
+        const idBuscado = (eventoId || '').trim();
+        const tituloBuscado = (eventoTitulo || '').toLowerCase().trim();
+
+        const match = inscricoes.find((item) => {
+          const itemEvtId = (item.evento_id || '').trim();
+          const itemEvtTitulo = (item.evento_titulo || '').toLowerCase().trim();
+
+          return (
+            (idBuscado && itemEvtId === idBuscado) ||
+            (tituloBuscado && itemEvtTitulo.includes(tituloBuscado))
+          );
+        });
+
+        if (match) registro = match;
+      }
+
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        inscricao: registro,
+        comprovante: registro,
+        data: registro,
+        item: registro,
+        total: inscricoes.length
+      });
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
-
-    try {
-      const url = `${SCRIPT_URL}?action=GET_INSCRITOS&eventoTitulo=${encodeURIComponent(eventoTitulo)}`;
-      const res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
-      clearTimeout(timeout);
-      const text = await res.text();
-
-      let data = {};
-      try { data = JSON.parse(text); } catch { data = { status: 'error' }; }
-
-      const total = Array.isArray(data.inscritos) ? data.inscritos.length : 0;
-      return NextResponse.json({ status: 'success', total });
-    } catch (fetchErr) {
-      clearTimeout(timeout);
-      throw fetchErr;
+    // -------------------------------------------------------------
+    // CENÁRIO B: Contagem Total de Inscritos
+    // -------------------------------------------------------------
+    if (!eventoTitulo && !eventoId) {
+      return NextResponse.json(
+        { status: 'error', message: 'Informe eventoId, eventoTitulo ou cpf.' }, 
+        { status: 400 }
+      );
     }
+
+    let countQuery = supabase.from('evento_inscritos').select('*', { count: 'exact', head: true });
+
+    if (eventoId) {
+      countQuery = countQuery.eq('evento_id', String(eventoId).trim());
+    } else if (eventoTitulo) {
+      countQuery = countQuery.ilike('evento_titulo', `%${eventoTitulo.trim()}%`);
+    }
+
+    const { count, error: countError } = await countQuery;
+
+    if (countError) throw countError;
+
+    return NextResponse.json({ status: 'success', total: count || 0 });
 
   } catch (error) {
-    console.error('Erro ao contar inscrições:', error);
-    return NextResponse.json({ status: 'error', total: 0 }, { status: 500 });
+    console.error('Erro na API de Inscrições (GET):', error);
+    return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
   }
 }
 
+// POST — Cadastra a inscrição validando duplicidade de CPF e existência do evento
 export async function POST(request) {
   try {
     const body = await request.json();
+    const { eventoId, eventoTitulo } = body;
 
-    // TRATAMENTO DAS RESPOSTAS DO FORMULÁRIO
+    let targetEventoId = eventoId ? String(eventoId).trim() : null;
+
+    // 1. Valida se o evento existe na tabela 'eventos'
+    if (targetEventoId) {
+      const { data: eventoExiste } = await supabase
+        .from('eventos')
+        .select('id, vagas_maximo, inscricoes_encerradas')
+        .eq('id', targetEventoId)
+        .maybeSingle();
+
+      if (!eventoExiste) {
+        targetEventoId = null;
+      } else {
+        if (eventoExiste.inscricoes_encerradas) {
+          return NextResponse.json(
+            { status: 'error', message: 'As inscrições para este evento já foram encerradas.' },
+            { status: 400 }
+          );
+        }
+
+        if (eventoExiste.vagas_maximo) {
+          const { count } = await supabase
+            .from('evento_inscritos')
+            .select('codigo_inscricao', { count: 'exact', head: true })
+            .eq('evento_id', targetEventoId);
+
+          if (count >= eventoExiste.vagas_maximo) {
+            return NextResponse.json(
+              { status: 'error', message: 'As vagas para este evento foram esgotadas.' },
+              { status: 400 }
+            );
+          }
+        }
+      }
+    }
+
+    // Fallback de ID pelo Título
+    if (!targetEventoId) {
+      const { data: eventoPorTitulo } = await supabase
+        .from('eventos')
+        .select('id')
+        .ilike('titulo', `%${(eventoTitulo || '').trim()}%`)
+        .limit(1)
+        .maybeSingle();
+
+      targetEventoId = eventoPorTitulo ? eventoPorTitulo.id : 'evt-4';
+    }
+
+    // Processamento e formatação dos campos do formulário
+    let respostasTratadas = {};
+    let nomeInscrito = '';
+    let cpfInscrito = '';
+    let emailInscrito = '';
+
     if (body.respostas && Array.isArray(body.respostas)) {
-      body.respostas = body.respostas.map((item) => {
+      body.respostas.forEach((item) => {
         let valor = item.valor;
         const label = (item.label || '').toLowerCase().trim();
 
         if (typeof valor === 'string') {
           if (label.includes('nome')) {
             valor = caixaAlta(valor);
-          } else if (!label.includes('email') && !label.includes('cpf') && !label.includes('e-mail')) {
+            nomeInscrito = valor;
+          } else if (label.includes('cpf')) {
+            cpfInscrito = valor.trim();
+          } else if (label.includes('email') || label.includes('e-mail')) {
+            emailInscrito = valor.toLowerCase().trim();
+          } else {
             valor = capitalizarTexto(valor);
           }
         }
 
-        return { ...item, valor };
+        respostasTratadas[item.label] = valor;
       });
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
+    const cpfFinal = cpfInscrito || respostasTratadas['CPF'] || '';
 
-    try {
-      const googleResponse = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-        redirect: 'follow',
-      });
-      clearTimeout(timeout);
-
-      const textResponse = await googleResponse.text();
-      let resData = {};
-      try {
-        resData = JSON.parse(textResponse);
-      } catch (e) {
-        resData = { status: 'success' };
+    // -------------------------------------------------------------
+    // VALIDAÇÃO DE CPF DUPLICADO NO MESMO EVENTO
+    // -------------------------------------------------------------
+    if (cpfFinal) {
+      const cpfLimpo = cpfFinal.replace(/\D/g, '');
+      let cpfComMascara = cpfLimpo;
+      if (cpfLimpo.length === 11) {
+        cpfComMascara = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
       }
 
-      return NextResponse.json(resData);
+      // Procura por qualquer cadastro com esse CPF no mesmo evento_id
+      const { data: inscricaoDuplicada } = await supabase
+        .from('evento_inscritos')
+        .select('codigo_inscricao')
+        .eq('evento_id', targetEventoId)
+        .or(`cpf.eq.${cpfFinal},cpf.eq.${cpfLimpo},cpf.eq.${cpfComMascara}`)
+        .limit(1)
+        .maybeSingle();
 
-    } catch (fetchErr) {
-      clearTimeout(timeout);
-      if (fetchErr.name === 'AbortError') {
-        return NextResponse.json(
-          { status: 'error', message: 'O servidor demorou muito para responder. Verifique sua inscrição pela opção "Emitir 2ª via" antes de tentar novamente.' },
-          { status: 504 }
-        );
+      if (inscricaoDuplicada) {
+        return NextResponse.json({
+          status: 'error',
+          message: 'Este CPF já possui uma inscrição cadastrada para este evento.'
+        }, { status: 400 });
       }
-      throw fetchErr;
     }
+
+    // Gera o código INS-XXXXXX único
+    let codigoInscricao = '';
+    let codigoExiste = true;
+    let tentativas = 0;
+
+    while (codigoExiste && tentativas < 5) {
+      tentativas++;
+      const numRand = Math.floor(100000 + Math.random() * 900000);
+      codigoInscricao = `INS-${numRand}`;
+
+      const { count } = await supabase
+        .from('evento_inscritos')
+        .select('codigo_inscricao', { count: 'exact', head: true })
+        .eq('codigo_inscricao', codigoInscricao);
+
+      if (!count || count === 0) {
+        codigoExiste = false;
+      }
+    }
+
+    const payload = {
+      codigo_inscricao: codigoInscricao,
+      evento_id: targetEventoId,
+      evento_titulo: eventoTitulo || 'TURMA 01| COMUNICAÇÃO ASSERTIVA E RESOLUTIVIDADE NA ATENÇÃO PRIMÁRIA',
+      nome: nomeInscrito || respostasTratadas['Nome Completo'] || 'Inscrito',
+      cpf: cpfFinal,
+      email: emailInscrito || respostasTratadas['E-mail'] || '',
+      respostas: respostasTratadas,
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('evento_inscritos')
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({
+      status: 'success',
+      message: 'Inscrição realizada com sucesso!',
+      codigo: codigoInscricao,
+      inscrito: data
+    });
 
   } catch (error) {
-    console.error('Erro na API de Inscrições:', error);
+    console.error('Erro na API de Inscrições do Supabase:', error);
     return NextResponse.json(
-      { status: 'error', message: 'Falha interna no processamento da inscrição.' },
+      { status: 'error', message: 'Falha interna ao registrar inscrição no banco de dados: ' + error.message },
       { status: 500 }
     );
   }

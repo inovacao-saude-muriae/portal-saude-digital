@@ -140,6 +140,26 @@
   border-radius: 16px;
 }
 
+/* PLACEHOLDER PARA EVENTOS SEM IMAGEM (ícone de câmera) */
+.imagemCapaPlaceholder {
+  width: 100%;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  border-radius: 16px;
+}
+
+.imagemCapaPlaceholder span {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 /* BANNER DE INSCRIÇÃO */
 .bannerInscricao {
   margin: 30px 0;
@@ -848,6 +868,27 @@
   background-color: #004d7a;
 }
 
+.btnImprimirPdf {
+  flex: 1;
+  background-color: #059669;
+  color: #ffffff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.btnImprimirPdf:hover {
+  background-color: #047857;
+}
+
 .btnFecharModal {
   background-color: #e2e8f0;
   color: #334155;
@@ -886,20 +927,22 @@
 }
 
 /* ==========================================================================
-   --- REGRA DE IMPRESSÃO REVERTIDA PARA PAISAGEM (PAISAGEM NO CERTIFICADO) ---
+   --- REGRA DE IMPRESSÃO DO COMPROVANTE (RETRATO / A4 PORTRAIT) ---
+   O comprovante de inscrição foi desenhado no formato retrato. Forçar
+   paisagem deixava o layout desconfigurado ao imprimir.
    ========================================================================== */
 @media print {
   @page {
-    size: A4 landscape !important; /* MODO PAISAGEM OBRIGATÓRIO PARA CERTIFICADO */
-    margin: 0 !important;
+    size: A4 portrait !important; /* MODO RETRATO PARA O COMPROVANTE */
+    margin: 12mm !important;
   }
 
   :global(html),
   :global(body),
   :global(#__next) {
-    width: 297mm !important;
-    height: 210mm !important;
-    overflow: hidden !important;
+    width: 210mm !important;
+    height: auto !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
@@ -958,7 +1001,7 @@
   :global(#comprovante-pdf-container) {
     position: relative !important;
     width: 100% !important;
-    max-width: 580px !important;
+    max-width: 100% !important;
     margin: 0 auto !important;
     padding: 20px !important;
     border: 2px solid #0065a4 !important;

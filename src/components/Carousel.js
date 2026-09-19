@@ -6,8 +6,7 @@ import 'keen-slider/keen-slider.min.css';
 import styles from './Carousel.module.css'; 
 import Image from 'next/image'; 
 import { Images } from 'lucide-react';
-
-const SCRIPT_CARROSSEL_URL = 'https://script.google.com/macros/s/AKfycbxXCjv22fJcKIuwYV9ml5B6d99pQIX2rT0WBKkbz2JpjV78zADBCCQoGcFvjkt9DuJs3A/exec';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
 
 function tratarUrlImagem(url) {
   if (!url || typeof url !== 'string') return '';
@@ -90,9 +89,7 @@ export default function Carousel() {
       }
 
       try {
-        const response = await fetch(`${SCRIPT_CARROSSEL_URL}?_t=${Date.now()}`, {
-          method: 'GET',
-          redirect: 'follow',
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.CARROSSEL, { _t: Date.now() }), {
           cache: 'no-store'
         });
         const resData = await response.json();
