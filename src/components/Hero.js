@@ -104,21 +104,30 @@ export default function Hero() {
         {/* LADO DIREITO: CARDS GLASSMORPHISM */}
         <div className={styles.heroRight}>
           <div className={styles.glassGrid}>
-            <div className={styles.glassCard}>
-              <h2>{stats.c1Val}</h2>
-              <p>{stats.c1Text}</p>
+            {/* GRUPO CONSULTAS (2 PRIMEIROS RETÂNGULOS) */}
+            <h3 className={styles.grupoTitulo}>Consultas</h3>
+            <div className={styles.glassRow}>
+              <div className={styles.glassCard}>
+                <h2>{stats.c1Val}</h2>
+                <p>{stats.c1Text}</p>
+              </div>
+              <div className={styles.glassCard}>
+                <h2>{stats.c2Val}</h2>
+                <p>{stats.c2Text}</p>
+              </div>
             </div>
-            <div className={styles.glassCard}>
-              <h2>{stats.c2Val}</h2>
-              <p>{stats.c2Text}</p>
-            </div>
-            <div className={styles.glassCard}>
-              <h2>{stats.c3Val}</h2>
-              <p>{stats.c3Text}</p>
-            </div>
-            <div className={styles.glassCard}>
-              <h2>{stats.c4Val}</h2>
-              <p>{stats.c4Text}</p>
+
+            {/* GRUPO EXAMES (2 ÚLTIMOS RETÂNGULOS) */}
+            <h3 className={styles.grupoTitulo}>Exames</h3>
+            <div className={styles.glassRow}>
+              <div className={styles.glassCard}>
+                <h2>{stats.c3Val}</h2>
+                <p>{stats.c3Text}</p>
+              </div>
+              <div className={styles.glassCard}>
+                <h2>{stats.c4Val}</h2>
+                <p>{stats.c4Text}</p>
+              </div>
             </div>
           </div>
         </div>

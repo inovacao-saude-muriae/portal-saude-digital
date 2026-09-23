@@ -153,9 +153,9 @@
 }
 
 .glassGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     background-color: rgba(255, 255, 255, 0.10);
     padding: 20px;
     border-radius: 16px;
@@ -163,6 +163,29 @@
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     width: 100%;
+}
+
+/* Título de cada grupo (Consultas / Exames) */
+.grupoTitulo {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    padding-bottom: 2px;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Segundo grupo ganha um respiro a mais acima */
+.grupoTitulo + .glassRow {
+    margin-bottom: 4px;
+}
+
+/* Linha de 2 cards dentro de cada grupo */
+.glassRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
 }
 
 .glassCard {
