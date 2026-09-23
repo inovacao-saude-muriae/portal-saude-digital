@@ -111,7 +111,7 @@ function formatarDataParaExibicao(valor) {
 export default function EventoDetailPage() {
   const params = useParams();
   const id = params?.id;
-  const { notificar } = useUI();
+  const { notificar, confirmar } = useUI();
 
   const { evento, loading, error } = useEvento(id);
 
@@ -126,6 +126,10 @@ export default function EventoDetailPage() {
 
   const [cpfConsulta, setCpfConsulta] = useState("");
   const [buscandoCpf, setBuscandoCpf] = useState(false);
+
+  // CANCELAMENTO DE INSCRIÇÃO
+  const [cancelando, setCancelando] = useState(false);
+  const [inscricaoCancelada, setInscricaoCancelada] = useState(false);
 
   // CONTAGEM DE VAGAS
   const [totalInscritos, setTotalInscritos] = useState(null);
@@ -264,6 +268,7 @@ export default function EventoDetailPage() {
     setMensagemErro(null);
     setComprovante(null);
     setCpfConsulta("");
+    setInscricaoCancelada(false);
   };
 
   const handleFecharModal = () => {
@@ -271,6 +276,7 @@ export default function EventoDetailPage() {
     setComprovante(null);
     setRespostas({});
     setMensagemErro(null);
+    setInscricaoCancelada(false);
   };
 
   const handleInscricaoSubmit = async (e) => {
@@ -610,6 +616,47 @@ export default function EventoDetailPage() {
         "erro",
         "Erro ao gerar o arquivo PDF. Tente novamente ou use a impressão do navegador.",
       );
+    }
+  };
+
+  // Cancela a inscrição: remove os dados do participante do evento.
+  const handleCancelarInscricao = async () => {
+    if (!comprovante || !comprovante.codigo) return;
+
+    const confirmou = await confirmar({
+      titulo: "Cancelar inscrição",
+      mensagem:
+        "Tem certeza que deseja cancelar sua inscrição? Seus dados serão removidos deste evento e esta ação não pode ser desfeita.",
+      textoConfirmar: "Cancelar inscrição",
+    });
+    if (!confirmou) return;
+
+    setCancelando(true);
+    try {
+      const url = `/api/inscricoes?codigo=${encodeURIComponent(comprovante.codigo)}`;
+      const res = await fetch(url, { method: "DELETE" });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        setTotalInscritos((prev) =>
+          prev !== null && prev > 0 ? prev - 1 : prev,
+        );
+        setInscricaoCancelada(true);
+        notificar("sucesso", "Inscrição cancelada e dados removidos do evento.");
+      } else {
+        notificar(
+          "erro",
+          data.message || "Não foi possível cancelar a inscrição.",
+        );
+      }
+    } catch (err) {
+      console.error("Erro ao cancelar inscrição:", err);
+      notificar(
+        "erro",
+        "Ocorreu um erro ao cancelar a inscrição. Tente novamente.",
+      );
+    } finally {
+      setCancelando(false);
     }
   };
 
@@ -1108,20 +1155,50 @@ export default function EventoDetailPage() {
                   </div>
                 </div>
 
-                <div className={styles.comprovanteActionButtons}>
-                  <button
-                    onClick={handleBaixarPdf}
-                    className={styles.btnDownloadPdf}
-                  >
-                    <Download size={16} /> Baixar PDF
-                  </button>
-                  <button
-                    onClick={handleFecharModal}
-                    className={styles.btnFecharModal}
-                  >
-                    Fechar
-                  </button>
-                </div>
+                {inscricaoCancelada ? (
+                  <div className={styles.cancelamentoAviso}>
+                    <p>
+                      Sua inscrição foi cancelada e seus dados foram removidos
+                      deste evento.
+                    </p>
+                    <button
+                      onClick={handleFecharModal}
+                      className={styles.btnFecharModal}
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.comprovanteActionButtons}>
+                    <button
+                      onClick={handleBaixarPdf}
+                      className={styles.btnDownloadPdf}
+                    >
+                      <Download size={16} /> Baixar PDF
+                    </button>
+                    <button
+                      onClick={handleCancelarInscricao}
+                      disabled={cancelando}
+                      className={styles.btnCancelarInscricao}
+                    >
+                      {cancelando ? (
+                        <>
+                          <Loader2 size={16} className="girando" /> Cancelando...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 size={16} /> Cancelar Inscrição
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleFecharModal}
+                      className={styles.btnFecharModal}
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
