@@ -905,6 +905,55 @@
   background-color: #cbd5e1;
 }
 
+/* BOTÃO DE CANCELAR INSCRIÇÃO */
+.btnCancelarInscricao {
+  flex: 1;
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.btnCancelarInscricao:hover:not(:disabled) {
+  background-color: #fee2e2;
+}
+
+.btnCancelarInscricao:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* AVISO EXIBIDO APÓS O CANCELAMENTO */
+.cancelamentoAviso {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.cancelamentoAviso p {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* NÃO ENCONTRADO */
 .containerNotFound {
   text-align: center;

@@ -285,3 +285,65 @@ export async function POST(request) {
     );
   }
 }
+
+// DELETE — Cancela (remove) a inscrição de um participante em um evento.
+// Identifica o registro pelo código de inscrição (único) e, como reforço,
+// pode receber o CPF para garantir que só a própria inscrição seja removida.
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const codigo = (searchParams.get('codigo') || '').trim();
+    const cpfBruto = (searchParams.get('cpf') || '').trim();
+
+    if (!codigo && !cpfBruto) {
+      return NextResponse.json(
+        { status: 'error', message: 'Informe o código da inscrição ou o CPF para cancelar.' },
+        { status: 400 }
+      );
+    }
+
+    // Localiza a inscrição antes de remover, para confirmar que existe.
+    let query = supabase.from('evento_inscritos').select('*');
+
+    if (codigo) {
+      query = query.eq('codigo_inscricao', codigo);
+    } else {
+      const cpfLimpo = cpfBruto.replace(/\D/g, '');
+      let cpfComMascara = cpfLimpo;
+      if (cpfLimpo.length === 11) {
+        cpfComMascara = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      }
+      query = query.or(`cpf.eq.${cpfBruto},cpf.eq.${cpfLimpo},cpf.eq.${cpfComMascara}`);
+    }
+
+    const { data: encontradas, error: buscaError } = await query;
+
+    if (buscaError) throw buscaError;
+
+    if (!encontradas || encontradas.length === 0) {
+      return NextResponse.json(
+        { status: 'error', message: 'Nenhuma inscrição encontrada para cancelar.' },
+        { status: 404 }
+      );
+    }
+
+    // Remove pelo código (garante que apaga apenas o registro certo).
+    const alvo = encontradas[0];
+
+    const { error: deleteError } = await supabase
+      .from('evento_inscritos')
+      .delete()
+      .eq('codigo_inscricao', alvo.codigo_inscricao);
+
+    if (deleteError) throw deleteError;
+
+    return NextResponse.json({
+      status: 'success',
+      message: 'Inscrição cancelada e dados removidos do evento.',
+      codigo: alvo.codigo_inscricao
+    });
+  } catch (error) {
+    console.error('Erro na API de Inscrições (DELETE):', error);
+    return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
+  }
+}
