@@ -13,35 +13,41 @@ const VALORES_PADRAO = {
 };
 
 export default function Hero() {
-  const [stats, setStats] = useState(() => {
-    if (typeof window === 'undefined') return VALORES_PADRAO;
-    try {
-      const cache = localStorage.getItem('cache_hero_stats');
-      if (cache) {
-        const dados = JSON.parse(cache);
-        if (dados && typeof dados === 'object') {
-          return {
-            c1Val: String(dados.c1Val || VALORES_PADRAO.c1Val),
-            c1Text: String(dados.c1Text || VALORES_PADRAO.c1Text),
-            c2Val: String(dados.c2Val || VALORES_PADRAO.c2Val),
-            c2Text: String(dados.c2Text || VALORES_PADRAO.c2Text),
-            c3Val: String(dados.c3Val || VALORES_PADRAO.c3Val),
-            c3Text: String(dados.c3Text || VALORES_PADRAO.c3Text),
-            c4Val: String(dados.c4Val || VALORES_PADRAO.c4Val),
-            c4Text: String(dados.c4Text || VALORES_PADRAO.c4Text)
-          };
-        }
-      }
-    } catch {
-      // Ignora erro
-    }
-    return VALORES_PADRAO;
-  });
+  // O estado inicial DEVE ser igual no servidor e no cliente (VALORES_PADRAO),
+  // caso contrário ocorre "hydration mismatch". A leitura do cache do
+  // localStorage e a busca online acontecem apenas após a montagem (useEffect).
+  const [stats, setStats] = useState(VALORES_PADRAO);
 
   useEffect(() => {
     let cancelado = false;
 
-    async function carregarOnline() {
+    // A leitura do cache e a busca online ficam dentro de uma função async
+    // para evitar setState síncrono no corpo do effect (regra do React Compiler)
+    // e, principalmente, o hydration mismatch (o estado inicial é sempre padrão).
+    async function carregarStats() {
+      // 1. Aplica o valor em cache (se houver), já no cliente.
+      try {
+        const cache = localStorage.getItem('cache_hero_stats');
+        if (cache) {
+          const dados = JSON.parse(cache);
+          if (dados && typeof dados === 'object' && !cancelado) {
+            setStats({
+              c1Val: String(dados.c1Val || VALORES_PADRAO.c1Val),
+              c1Text: String(dados.c1Text || VALORES_PADRAO.c1Text),
+              c2Val: String(dados.c2Val || VALORES_PADRAO.c2Val),
+              c2Text: String(dados.c2Text || VALORES_PADRAO.c2Text),
+              c3Val: String(dados.c3Val || VALORES_PADRAO.c3Val),
+              c3Text: String(dados.c3Text || VALORES_PADRAO.c3Text),
+              c4Val: String(dados.c4Val || VALORES_PADRAO.c4Val),
+              c4Text: String(dados.c4Text || VALORES_PADRAO.c4Text)
+            });
+          }
+        }
+      } catch {
+        // Ignora erro de leitura do cache
+      }
+
+      // 2. Busca os valores atualizados online.
       try {
         const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.HERO));
         const data = await res.json();
@@ -66,7 +72,7 @@ export default function Hero() {
       }
     }
 
-    carregarOnline();
+    carregarStats();
 
     return () => {
       cancelado = true;
