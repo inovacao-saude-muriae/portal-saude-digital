@@ -114,7 +114,7 @@ export default function AdminUsuariosPage() {
     setForm({
       nome: u.nome || '',
       usuario: u.usuario || '',
-      email: '',
+      email: u.email || '',
       senha: '',
       cargo: String(u.cargo || 'comunicacao').toLowerCase()
     });
@@ -252,15 +252,15 @@ export default function AdminUsuariosPage() {
             </div>
 
             <div className={styles.campo}>
-              <label>E-mail {usuarioEmEdicao ? '(deixe em branco para manter)' : '*'}</label>
+              <label>E-mail *</label>
               <div className={styles.inputWrap}>
                 <AtSign size={16} className={styles.inputIcon} />
                 <input
                   type="email"
-                  required={!usuarioEmEdicao}
+                  required
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder={usuarioEmEdicao ? 'Novo e-mail (opcional)' : 'exemplo@muriae.mg.gov.br'}
+                  placeholder="exemplo@muriae.mg.gov.br"
                 />
               </div>
             </div>

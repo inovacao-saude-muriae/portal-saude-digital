@@ -14,7 +14,7 @@ export async function GET() {
     const admin = getSupabaseAdmin()
     const { data, error } = await admin
       .from('profiles')
-      .select('id, nome, usuario, cargo, created_at')
+      .select('id, nome, usuario, email, cargo, created_at')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -83,7 +83,7 @@ export async function POST(request) {
     // em 'profiles' automaticamente ao criar o usuário no Auth.
     const { error: profileError } = await admin
       .from('profiles')
-      .upsert([{ id: authData.user.id, nome, usuario, cargo }], { onConflict: 'id' })
+      .upsert([{ id: authData.user.id, nome, usuario, email, cargo }], { onConflict: 'id' })
 
     if (profileError) {
       // Desfaz a criação do Auth para não deixar usuário órfão
@@ -95,7 +95,7 @@ export async function POST(request) {
     return NextResponse.json({
       status: 'success',
       message: 'Usuário criado com sucesso',
-      usuario: { id: authData.user.id, nome, usuario, cargo }
+      usuario: { id: authData.user.id, nome, usuario, email, cargo }
     })
   } catch (error) {
     console.error('Erro no POST usuários:', error)
@@ -141,10 +141,13 @@ export async function PUT(request) {
       return NextResponse.json({ status: 'error', message: 'Este nome de usuário já está em uso por outra pessoa.' }, { status: 400 })
     }
 
-    // 1. Atualiza o perfil (nome, usuário, cargo)
+    // 1. Atualiza o perfil (nome, usuário, cargo e, se informado, e-mail)
+    const perfilUpdate = { nome, usuario, cargo }
+    if (email) perfilUpdate.email = email
+
     const { error: profileError } = await admin
       .from('profiles')
-      .update({ nome, usuario, cargo })
+      .update(perfilUpdate)
       .eq('id', id)
 
     if (profileError) {
