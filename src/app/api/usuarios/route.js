@@ -103,6 +103,82 @@ export async function POST(request) {
   }
 }
 
+// PUT - Edita os dados de um usuário existente (profiles + opcionalmente Auth)
+export async function PUT(request) {
+  try {
+    const body = await request.json()
+    const id = (body.id || '').trim()
+    const nome = (body.nome || '').trim()
+    const usuario = (body.usuario || '').trim().toLowerCase()
+    const email = (body.email || '').trim().toLowerCase()
+    const senha = (body.senha || '').trim()
+    const cargo = (body.cargo || '').trim().toLowerCase()
+
+    if (!id) {
+      return NextResponse.json({ status: 'error', message: 'ID do usuário é obrigatório.' }, { status: 400 })
+    }
+    if (!nome || !usuario) {
+      return NextResponse.json({ status: 'error', message: 'Preencha nome e usuário.' }, { status: 400 })
+    }
+    if (!CARGOS_VALIDOS.includes(cargo)) {
+      return NextResponse.json({ status: 'error', message: 'Cargo inválido.' }, { status: 400 })
+    }
+    if (senha && senha.length < 6) {
+      return NextResponse.json({ status: 'error', message: 'A nova senha deve ter pelo menos 6 caracteres.' }, { status: 400 })
+    }
+
+    const admin = getSupabaseAdmin()
+
+    // Impede que o apelido de usuário colida com o de OUTRO usuário
+    const { data: apelidoEmUso } = await admin
+      .from('profiles')
+      .select('id')
+      .eq('usuario', usuario)
+      .neq('id', id)
+      .maybeSingle()
+
+    if (apelidoEmUso) {
+      return NextResponse.json({ status: 'error', message: 'Este nome de usuário já está em uso por outra pessoa.' }, { status: 400 })
+    }
+
+    // 1. Atualiza o perfil (nome, usuário, cargo)
+    const { error: profileError } = await admin
+      .from('profiles')
+      .update({ nome, usuario, cargo })
+      .eq('id', id)
+
+    if (profileError) {
+      console.error('Erro ao atualizar perfil:', profileError)
+      return NextResponse.json({ status: 'error', message: 'Erro ao atualizar o perfil do usuário.', error: profileError.message }, { status: 500 })
+    }
+
+    // 2. Atualiza dados de autenticação (e-mail e/ou senha), se informados
+    const authUpdate = {}
+    if (email) authUpdate.email = email
+    if (senha) authUpdate.password = senha
+
+    if (Object.keys(authUpdate).length > 0) {
+      const { error: authError } = await admin.auth.admin.updateUserById(id, authUpdate)
+      if (authError) {
+        console.error('Erro ao atualizar dados de acesso:', authError)
+        const msg = authError?.message?.includes('already been registered')
+          ? 'Este e-mail já está cadastrado para outro usuário.'
+          : (authError?.message || 'Erro ao atualizar dados de acesso.')
+        return NextResponse.json({ status: 'error', message: msg }, { status: 400 })
+      }
+    }
+
+    return NextResponse.json({
+      status: 'success',
+      message: 'Usuário atualizado com sucesso',
+      usuario: { id, nome, usuario, cargo }
+    })
+  } catch (error) {
+    console.error('Erro no PUT usuários:', error)
+    return NextResponse.json({ status: 'error', message: error.message }, { status: 500 })
+  }
+}
+
 // DELETE - Remove um usuário (Auth + profiles em cascata)
 export async function DELETE(request) {
   try {

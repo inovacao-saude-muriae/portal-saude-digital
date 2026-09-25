@@ -274,6 +274,64 @@
   cursor: not-allowed;
 }
 
+/* Linha do título do card com botão de cancelar edição */
+.cardTituloRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cardTituloRow .cardTitulo {
+  margin: 0 0 18px;
+}
+
+.btnCancelarEdicao {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.btnCancelarEdicao:hover {
+  background-color: #fef2f2;
+}
+
+/* Grupo de ações (editar + remover) na linha do usuário */
+.usuarioAcoes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btnEditar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background-color: #eff6ff;
+  color: #0065a4;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnEditar:hover {
+  background-color: #dbeafe;
+}
+
 .estadoVazio {
   display: flex;
   flex-direction: column;

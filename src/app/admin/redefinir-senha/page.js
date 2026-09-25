@@ -9,7 +9,9 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from '../login/AdminLogin.module.css';
@@ -19,6 +21,8 @@ export default function RedefinirSenhaPage() {
 
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [mostrarNova, setMostrarNova] = useState(false);
+  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState(null);
   const [sessaoValida, setSessaoValida] = useState(false);
@@ -148,13 +152,21 @@ export default function RedefinirSenhaPage() {
                 <div className={styles.inputWrapper}>
                   <Lock size={18} className={styles.inputIcon} />
                   <input
-                    type="password"
+                    type={mostrarNova ? 'text' : 'password'}
                     required
                     value={novaSenha}
                     onChange={(e) => setNovaSenha(e.target.value)}
                     placeholder="Digite a nova senha"
-                    className={styles.input}
+                    className={`${styles.input} ${styles.inputComToggle}`}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarNova((v) => !v)}
+                    className={styles.toggleSenhaBtn}
+                    aria-label={mostrarNova ? 'Ocultar senha' : 'Mostrar senha'}
+                  >
+                    {mostrarNova ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 
@@ -163,13 +175,21 @@ export default function RedefinirSenhaPage() {
                 <div className={styles.inputWrapper}>
                   <Lock size={18} className={styles.inputIcon} />
                   <input
-                    type="password"
+                    type={mostrarConfirmar ? 'text' : 'password'}
                     required
                     value={confirmarSenha}
                     onChange={(e) => setConfirmarSenha(e.target.value)}
                     placeholder="Repita a nova senha"
-                    className={styles.input}
+                    className={`${styles.input} ${styles.inputComToggle}`}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarConfirmar((v) => !v)}
+                    className={styles.toggleSenhaBtn}
+                    aria-label={mostrarConfirmar ? 'Ocultar senha' : 'Mostrar senha'}
+                  >
+                    {mostrarConfirmar ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 

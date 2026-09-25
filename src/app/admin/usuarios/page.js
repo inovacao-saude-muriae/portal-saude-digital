@@ -13,7 +13,9 @@ import {
   AtSign,
   KeyRound,
   Users,
-  Save
+  Save,
+  Pencil,
+  XCircle
 } from 'lucide-react';
 import { API_CONFIG, buildApiUrl } from '@/lib/config';
 import { useUI } from '@/components/UIFeedback';
@@ -39,6 +41,9 @@ export default function AdminUsuariosPage() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [removendoId, setRemovendoId] = useState(null);
+
+  // Usuário sendo editado (null = modo de criação)
+  const [usuarioEmEdicao, setUsuarioEmEdicao] = useState(null);
 
   const [form, setForm] = useState({
     nome: '',
@@ -101,27 +106,52 @@ export default function AdminUsuariosPage() {
     return () => { montado = false; };
   }, []);
 
-  const handleCriar = async (e) => {
+  // Preenche o formulário com os dados do usuário para edição.
+  // A senha e o e-mail ficam vazios (o e-mail não vem na listagem, e a senha
+  // só é alterada se o admin digitar um valor novo).
+  const iniciarEdicao = (u) => {
+    setUsuarioEmEdicao(u);
+    setForm({
+      nome: u.nome || '',
+      usuario: u.usuario || '',
+      email: '',
+      senha: '',
+      cargo: String(u.cargo || 'comunicacao').toLowerCase()
+    });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const cancelarEdicao = () => {
+    setUsuarioEmEdicao(null);
+    setForm({ nome: '', usuario: '', email: '', senha: '', cargo: 'comunicacao' });
+  };
+
+  const handleSalvar = async (e) => {
     e.preventDefault();
     setSalvando(true);
+
+    const editando = !!usuarioEmEdicao;
+
     try {
       const res = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.USUARIOS), {
-        method: 'POST',
+        method: editando ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(editando ? { ...form, id: usuarioEmEdicao.id } : form)
       });
       const data = await res.json();
 
       if (data.status === 'success') {
-        notificar('sucesso', 'Usuário criado com sucesso!');
-        setForm({ nome: '', usuario: '', email: '', senha: '', cargo: 'comunicacao' });
+        notificar('sucesso', editando ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!');
+        cancelarEdicao();
         carregarUsuarios();
       } else {
-        notificar('erro', data.message || 'Não foi possível criar o usuário.');
+        notificar('erro', data.message || `Não foi possível ${editando ? 'atualizar' : 'criar'} o usuário.`);
       }
     } catch (err) {
-      console.error('Erro ao criar usuário:', err);
-      notificar('erro', 'Ocorreu um erro ao criar o usuário.');
+      console.error('Erro ao salvar usuário:', err);
+      notificar('erro', `Ocorreu um erro ao ${editando ? 'atualizar' : 'criar'} o usuário.`);
     } finally {
       setSalvando(false);
     }
@@ -178,11 +208,20 @@ export default function AdminUsuariosPage() {
         </div>
 
         <div className={styles.grid}>
-          {/* FORMULÁRIO DE CRIAÇÃO */}
-          <form onSubmit={handleCriar} className={styles.card}>
-            <h2 className={styles.cardTitulo}>
-              <UserPlus size={18} color="#0065a4" /> Novo Usuário
-            </h2>
+          {/* FORMULÁRIO DE CRIAÇÃO / EDIÇÃO */}
+          <form onSubmit={handleSalvar} className={styles.card}>
+            <div className={styles.cardTituloRow}>
+              <h2 className={styles.cardTitulo}>
+                {usuarioEmEdicao
+                  ? <><Pencil size={18} color="#0065a4" /> Editar: {usuarioEmEdicao.nome}</>
+                  : <><UserPlus size={18} color="#0065a4" /> Novo Usuário</>}
+              </h2>
+              {usuarioEmEdicao && (
+                <button type="button" onClick={cancelarEdicao} className={styles.btnCancelarEdicao}>
+                  <XCircle size={15} /> Cancelar
+                </button>
+              )}
+            </div>
 
             <div className={styles.campo}>
               <label>Nome Completo *</label>
@@ -213,30 +252,30 @@ export default function AdminUsuariosPage() {
             </div>
 
             <div className={styles.campo}>
-              <label>E-mail *</label>
+              <label>E-mail {usuarioEmEdicao ? '(deixe em branco para manter)' : '*'}</label>
               <div className={styles.inputWrap}>
                 <AtSign size={16} className={styles.inputIcon} />
                 <input
                   type="email"
-                  required
+                  required={!usuarioEmEdicao}
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="exemplo@muriae.mg.gov.br"
+                  placeholder={usuarioEmEdicao ? 'Novo e-mail (opcional)' : 'exemplo@muriae.mg.gov.br'}
                 />
               </div>
             </div>
 
             <div className={styles.campo}>
-              <label>Senha * (mínimo 6 caracteres)</label>
+              <label>Senha {usuarioEmEdicao ? '(deixe em branco para manter)' : '* (mínimo 6 caracteres)'}</label>
               <div className={styles.inputWrap}>
                 <KeyRound size={16} className={styles.inputIcon} />
                 <input
                   type="text"
-                  required
+                  required={!usuarioEmEdicao}
                   minLength={6}
                   value={form.senha}
                   onChange={(e) => setForm({ ...form, senha: e.target.value })}
-                  placeholder="Defina uma senha"
+                  placeholder={usuarioEmEdicao ? 'Nova senha (opcional)' : 'Defina uma senha'}
                 />
               </div>
             </div>
@@ -258,7 +297,13 @@ export default function AdminUsuariosPage() {
             </div>
 
             <button type="submit" disabled={salvando} className={styles.btnSalvar}>
-              {salvando ? <><Loader2 size={18} className="animate-spin" /> Criando...</> : <><Save size={18} /> Criar Usuário</>}
+              {salvando ? (
+                <><Loader2 size={18} className="girando" /> {usuarioEmEdicao ? 'Salvando...' : 'Criando...'}</>
+              ) : usuarioEmEdicao ? (
+                <><Save size={18} /> Salvar Alterações</>
+              ) : (
+                <><Save size={18} /> Criar Usuário</>
+              )}
             </button>
           </form>
 
@@ -290,14 +335,23 @@ export default function AdminUsuariosPage() {
                         <p>@{u.usuario} · <span className={styles.cargoTag}>{labelCargo(u.cargo)}</span></p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleRemover(u)}
-                      disabled={removendoId === u.id}
-                      className={styles.btnRemover}
-                      title="Remover usuário"
-                    >
-                      {removendoId === u.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                    </button>
+                    <div className={styles.usuarioAcoes}>
+                      <button
+                        onClick={() => iniciarEdicao(u)}
+                        className={styles.btnEditar}
+                        title="Editar usuário"
+                      >
+                        <Pencil size={15} />
+                      </button>
+                      <button
+                        onClick={() => handleRemover(u)}
+                        disabled={removendoId === u.id}
+                        className={styles.btnRemover}
+                        title="Remover usuário"
+                      >
+                        {removendoId === u.id ? <Loader2 size={15} className="girando" /> : <Trash2 size={15} />}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

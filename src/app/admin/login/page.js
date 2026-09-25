@@ -12,7 +12,9 @@ import {
   Loader2, 
   Mail, 
   CheckCircle2, 
-  X
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from './AdminLogin.module.css';
@@ -20,6 +22,7 @@ import styles from './AdminLogin.module.css';
 export default function AdminLoginPage() {
   const [usuarioOuEmail, setUsuarioOuEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
   
@@ -202,13 +205,21 @@ export default function AdminLoginPage() {
             <div className={styles.inputWrapper}>
               <KeyRound size={18} className={styles.inputIcon} />
               <input 
-                type="password" 
+                type={mostrarSenha ? 'text' : 'password'} 
                 required
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 placeholder="••••••••"
-                className={styles.input}
+                className={`${styles.input} ${styles.inputComToggle}`}
               />
+              <button
+                type="button"
+                onClick={() => setMostrarSenha((v) => !v)}
+                className={styles.toggleSenhaBtn}
+                aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {mostrarSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
