@@ -1659,9 +1659,11 @@ export default function AdminEventosPage() {
                     <label className={styles.label}>Categoria do Evento*</label>
                     <select name="categoria" className={styles.select} defaultValue={eventoEmEdicao?.categoria || 'Mutirão'}>
                       <option value="Mutirão">Mutirão de Saúde</option>
-                      <option value="Vacinação">Campanha de Vacinação</option>
                       <option value="Palestra">Palestra / Workshop</option>
                       <option value="Ação Comunitária">Ação Comunitária</option>
+                      <option value="Promoção à Saúde">Promoção à Saúde</option>
+                      <option value="Conferência">Conferência</option>
+                      <option value="Congresso">Congresso</option>
                     </select>
                   </div>
 
